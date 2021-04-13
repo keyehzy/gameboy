@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+set -u
+
+FILES() {
+    git ls-files --cached --exclude-standard 
+}
+
+match() {
+    grep -E "${1}" || true
+}
+
+FILES | match '\.(c|h)$' | xargs clang-format -i 
