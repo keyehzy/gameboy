@@ -41,7 +41,7 @@ typedef struct
         uint16 BC;
         uint16 DE;
         uint16 HL;
-        uint16 SP;
+        uint16 SP; /* XXX we need to use our own stack pointer */
         uint16 PC;
     } reg;
 

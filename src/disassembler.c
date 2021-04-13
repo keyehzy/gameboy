@@ -1289,6 +1289,8 @@ int disassemble_rom(CPU *u)
 
         case 0x08: /* LD (16),SP */
             puts("LD (a16),SP");
+            u->reg.SP = m_consume16(u); /* XXX SP */
+            /* TODO(keyehzy): see if we use u->st->ptr too? */
             continue;
 
         case 0x18: /* JR r8 */
