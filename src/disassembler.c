@@ -1105,19 +1105,19 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x01: /* LD reg,d16 */
-            puts("LD BC,d16");
+            printf("LD BC = 0x%x, 0x%x\n", u->reg.BC, m_peek16(u, u->mem.ptr));
             u->reg.BC = m_consume16(u);
             continue;
         case 0x11:
-            puts("LD DE,d16");
+            printf("LD DE = 0x%x, 0x%x\n", u->reg.DE, m_peek16(u, u->mem.ptr));
             u->reg.DE = m_consume16(u);
             continue;
         case 0x21:
-            puts("LD HL,d16");
+            printf("LD HL = 0x%x, 0x%x\n", u->reg.HL, m_peek16(u, u->mem.ptr));
             u->reg.HL = m_consume16(u);
             continue;
         case 0x31:
-            puts("LD SP,d16");
+            printf("LD SP = 0x%x, 0x%x\n", u->reg.SP, m_peek16(u, u->mem.ptr));
             u->reg.SP = m_consume16(u);
             continue;
 
