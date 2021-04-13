@@ -1292,14 +1292,20 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x18: /* JR r8 */
-            puts("JR r8");
+            printf("JR 0x%x\n", m_peek8(u, u->mem.ptr));
             u->mem.ptr += m_peek8(u, u->mem.ptr);
             continue;
         case 0x28:
-            puts("JR Z,r8");
+            printf("JR Z (Z = 0x%x), 0x%x\n", get_flag(u, 'Z'),
+                   m_peek8(u, u->mem.ptr));
+            if (get_flag(u, 'Z'))
+                u->mem.ptr += m_peek8(u, u->mem.ptr);
             continue;
         case 0x38:
-            puts("JR C,r8");
+            printf("JR C (C = 0x%x), 0x%x\n", get_flag(u, 'C'),
+                   m_peek8(u, u->mem.ptr));
+            if (get_flag(u, 'C'))
+                u->mem.ptr += m_peek8(u, u->mem.ptr);
             continue;
 
         case 0x09: /* add HL to 2 byte */
