@@ -950,7 +950,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     {
     case 0x0:
     { /* OR B to A */
-        printf("OR A, B");
+        printf("OR A = 0x%x, B = 0x%x\n", reg(u, 'A'), reg(u, 'B'));
         uint8 A = reg(u, 'A') | reg(u, 'B');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -959,7 +959,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x1:
     { /* OR C to A */
-        puts("OR A, C");
+        printf("OR A = 0x%x, C = 0x%x\n", reg(u, 'A'), reg(u, 'C'));
         uint8 A = reg(u, 'A') | reg(u, 'C');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -968,7 +968,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x2:
     { /* OR D to A */
-        puts("OR A, D");
+        printf("OR A = 0x%x, D = 0x%x\n", reg(u, 'A'), reg(u, 'D'));
         uint8 A = reg(u, 'A') | reg(u, 'D');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -977,7 +977,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x3:
     { /* OR E to A */
-        puts("OR A, E");
+        printf("OR A = 0x%x, E = 0x%x\n", reg(u, 'A'), reg(u, 'E'));
         uint8 A = reg(u, 'A') | reg(u, 'E');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -986,7 +986,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x4:
     { /* OR H to A */
-        puts("OR A, H");
+        printf("OR A = 0x%x, H = 0x%x\n", reg(u, 'A'), reg(u, 'H'));
         uint8 A = reg(u, 'A') | reg(u, 'H');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -995,7 +995,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x5:
     { /* OR L to A */
-        puts("OR A, L");
+        printf("OR A = 0x%x, L = 0x%x\n", reg(u, 'A'), reg(u, 'L'));
         uint8 A = reg(u, 'A') | reg(u, 'L');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -1004,7 +1004,8 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x6:
     { /* OR (HL) to A */
-        puts("OR A, (HL)");
+        printf("OR A = 0x%x, (HL) = 0x%x\n", reg(u, 'A'),
+               u->mem.content[u->reg.HL]);
         uint8 A = reg(u, 'A') | u->mem.content[u->reg.HL];
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -1013,7 +1014,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x7:
     { /* OR A to A */
-        puts("OR A, A");
+        printf("OR A = 0x%x, A = 0x%x\n", reg(u, 'A'), reg(u, 'A'));
         uint8 A = reg(u, 'A') | reg(u, 'A');
         u->reg.AF = reg_combine(A, reg(u, 'F'));
         /* set_flags(u, Z, N, H, C); */
@@ -1022,7 +1023,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x8:
     { /* CP B to A */
-        printf("CP A, B");
+        printf("CP A = 0x%x, B = 0x%x\n", reg(u, 'A'), reg(u, 'B'));
         uint8 A = reg(u, 'A') - reg(u, 'B');
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1030,7 +1031,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0x9:
     { /* CP C to A */
-        puts("CP A, C");
+        printf("CP A = 0x%x, C = 0x%x\n", reg(u, 'A'), reg(u, 'C'));
         uint8 A = reg(u, 'A') - reg(u, 'C');
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1038,7 +1039,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0xA:
     { /* CP D to A */
-        puts("CP A, D");
+        printf("CP A = 0x%x, D = 0x%x\n", reg(u, 'A'), reg(u, 'D'));
         uint8 A = reg(u, 'A') - reg(u, 'D');
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1046,7 +1047,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0xB:
     { /* CP E to A */
-        puts("CP A, E");
+        printf("CP A = 0x%x, E = 0x%x\n", reg(u, 'A'), reg(u, 'E'));
         uint8 A = reg(u, 'A') - reg(u, 'E');
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1054,7 +1055,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0xC:
     { /* CP H to A */
-        puts("CP A, H");
+        printf("CP A = 0x%x, H = 0x%x\n", reg(u, 'A'), reg(u, 'H'));
         uint8 A = reg(u, 'A') - reg(u, 'H');
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1062,7 +1063,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0xD:
     { /* CP L to A */
-        puts("CP A, L");
+        printf("CP A = 0x%x, L = 0x%x\n", reg(u, 'A'), reg(u, 'L'));
         uint8 A = reg(u, 'A') - reg(u, 'L');
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1070,7 +1071,8 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0xE:
     { /* CP (HL) to A */
-        puts("CP A, (HL)");
+        printf("CP A = 0x%x, (HL) = 0x%x\n", reg(u, 'A'),
+               u->mem.content[u->reg.HL]);
         uint8 A = reg(u, 'A') - u->mem.content[u->reg.HL];
         /* set_flags(u, Z, N, H, C); */
         break;
@@ -1078,7 +1080,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
 
     case 0xF:
     { /* CP A to A */
-        puts("CP A, A");
+        printf("CP A = 0x%x, A = 0x%x\n", reg(u, 'A'), reg(u, 'A'));
         uint8 A = reg(u, 'A') - reg(u, 'B');
         /* set_flags(u, Z, N, H, C); */
         break;
