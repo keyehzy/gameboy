@@ -1161,29 +1161,29 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x03: /* INC 2 byte register */
-            puts("INC BC");
+            printf("INC BC = 0x%x\n", u->reg.BC);
             u->reg.BC++;
             /* set_flags(u, Z, N, H, C); */
             continue;
         case 0x13:
-            puts("INC DE");
+            printf("INC DE = 0x%x\n", u->reg.DE);
             u->reg.DE++;
             /* set_flags(u, Z, N, H, C); */
             continue;
         case 0x23:
-            puts("INC HL");
+            printf("INC HL = 0x%x\n", u->reg.HL);
             u->reg.HL++;
             /* set_flags(u, Z, N, H, C); */
             continue;
         case 0x33:
-            puts("INC SP");
+            printf("INC SP = 0x%x\n", u->reg.SP);
             u->reg.SP++;
             /* set_flags(u, Z, N, H, C); */
             continue;
 
         case 0x04:
         { /* INC 1 byte register */
-            puts("INC B");
+            printf("INC B = 0x%x\n", reg(u, 'B'));
             uint8 B = reg(u, 'B') + 1;
             u->reg.BC = reg_combine(B, reg(u, 'C'));
             /* set_flags(u, Z, N, H, C); */
@@ -1191,7 +1191,7 @@ int disassemble_rom(CPU *u)
         }
         case 0x14:
         {
-            puts("INC D");
+            printf("INC D = 0x%x\n", reg(u, 'D'));
             uint8 D = reg(u, 'D') + 1;
             u->reg.DE = reg_combine(D, reg(u, 'E'));
             /* set_flags(u, Z, N, H, C); */
@@ -1199,7 +1199,7 @@ int disassemble_rom(CPU *u)
         }
         case 0x24:
         {
-            puts("INC H");
+            printf("INC H = 0x%x\n", reg(u, 'H'));
             uint8 H = reg(u, 'H') + 1;
             u->reg.HL = reg_combine(H, reg(u, 'L'));
             /* set_flags(u, Z, N, H, C); */
@@ -1207,7 +1207,7 @@ int disassemble_rom(CPU *u)
         }
         case 0x34:
         {
-            puts("INC (HL)");
+            printf("INC (HL) = 0x%x\n", u->mem.content[u->reg.HL]);
             u->mem.content[u->reg.HL]++;
             /* set_flags(u, Z, N, H, C); */
             continue;
@@ -1215,7 +1215,7 @@ int disassemble_rom(CPU *u)
 
         case 0x05:
         { /* DEC 1 byte register */
-            puts("DEC B");
+            printf("DEC B = 0x%x\n", reg(u, 'B'));
             uint8 B = reg(u, 'B') - 1;
             u->reg.BC = reg_combine(B, reg(u, 'C'));
             /* set_flags(u, Z, N, H, C); */
@@ -1223,7 +1223,7 @@ int disassemble_rom(CPU *u)
         }
         case 0x15:
         {
-            puts("DEC D");
+            printf("DEC D = 0x%x\n", reg(u, 'D'));
             uint8 D = reg(u, 'D') - 1;
             u->reg.DE = reg_combine(D, reg(u, 'E'));
             /* set_flags(u, Z, N, H, C); */
@@ -1231,7 +1231,7 @@ int disassemble_rom(CPU *u)
         }
         case 0x25:
         {
-            puts("DEC H");
+            printf("DEC H = 0x%x\n", reg(u, 'H'));
             uint8 H = reg(u, 'H') - 1;
             u->reg.HL = reg_combine(H, reg(u, 'L'));
             /* set_flags(u, Z, N, H, C); */
@@ -1239,7 +1239,7 @@ int disassemble_rom(CPU *u)
         }
         case 0x35:
         {
-            puts("DEC (HL)");
+            printf("DEC (HL) = 0x%x\n", u->mem.content[u->reg.HL]));
             u->mem.content[u->reg.HL]--;
             /* set_flags(u, Z, N, H, C); */
             continue;
