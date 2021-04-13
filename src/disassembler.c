@@ -1152,16 +1152,25 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x02: /* LD (),A */
-            puts("LD (B)C,A");
+            printf("LD (BC) = 0x%x, A = 0x%x\n", u->mem.content[u->reg.BC],
+                   reg(u, 'A'));
+            u->mem.content[u->reg.BC] = reg(u, 'A');
             continue;
         case 0x12:
-            puts("LD (D)E,A");
+            printf("LD (DE) = 0x%x, A = 0x%x\n", u->mem.content[u->reg.DE],
+                   reg(u, 'A'));
+            u->mem.content[u->reg.DE] = reg(u, 'A');
             continue;
         case 0x22:
-            puts("LD (HL+),A");
+            printf("LD (HL+) = 0x%x, A = 0x%x\n", u->mem.content[u->reg.HL + 1],
+                   reg(u, 'A'));
+            u->mem.content[u->reg.HL++] = reg(u, 'A');
             continue;
+
         case 0x32:
-            puts("LD (SP-),A");
+            printf("LD (SP-) = 0x%x, A = 0x%x\n", u->mem.content[u->reg.SP - 1],
+                   reg(u, 'A'));
+            u->mem.content[u->reg.SP--] = reg(u, 'A');
             continue;
 
         case 0x03: /* INC 2 byte register */
@@ -1295,7 +1304,7 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x08: /* LD (a16),SP */
-            printf("LD (a16) = 0x%x,SP = 0x%x\n", u->mem.ptr);
+            printf("LD (a16) = 0x%x,SP = 0x%x\n", u->mem.ptr, u->reg.SP);
             u->reg.SP = u->mem.ptr++; /* XXX SP */
             /* TODO(keyehzy): see if we use u->st->ptr too? */
             continue;
@@ -1355,11 +1364,19 @@ int disassemble_rom(CPU *u)
             continue;
         }
         case 0x2A:
-            puts("LD A,(HL+)");
+            printf("LD A = 0x%x, (HL+) = 0x%x\n", reg(u, 'A'),
+                   u->mem.content[u->reg.HL + 1]);
+            uint8 A = u->mem.content[u->reg.HL++];
+            u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
         case 0x3A:
-            puts("LD A,(HL-)");
+        {
+            printf("LD A = 0x%x, (HL-) = 0x%x\n", reg(u, 'A'),
+                   u->mem.content[u->reg.HL - 1]);
+            uint8 A = u->mem.content[u->reg.HL--];
+            u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
+        }
 
         case 0x0B: /* DEC 2 byte register */
             printf("DEC BC = 0x%x\n", u->reg.BC);
@@ -1539,11 +1556,16 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0xE0: /* put memory */
-            puts("LDH (a8), A");
+            printf("LDH (a8) = 0x%x, A = 0x%x\n", u->mem.ptr, reg(u, 'A'));
+            u->mem.content[0xFF00 + m_consume8(u)] = reg(u, 'A');
             continue;
         case 0xF0:
-            puts("LDH A,(a8)");
+        {
+            printf("LDH A = 0x%x,(a8) = 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
+            uint8 A = u->mem.content[0xFF00 + m_consume8(u)];
+            u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
+        }
 
         case 0xC1: /* register POP */
             puts("POP BC");
@@ -1569,12 +1591,20 @@ int disassemble_rom(CPU *u)
             puts("JP NC,a16");
             continue;
 
-        case 0xE2: /* load addres to register */
-            puts("LD (C), A");
+        case 0xE2: /* load address to register */
+            printf("LD (C) = 0x%x, A = 0x%x\n", u->mem.content[reg(u, 'C')],
+                   reg(u, 'A'));
+            u->mem.content[0xFF00 + reg(u, 'C')] = reg(u, 'A');
             continue;
+
         case 0xF2:
-            puts("LD A,(C)");
+        {
+            printf("LD A = 0x%x,(C) = 0x%x\n", reg(u, 'A'),
+                   u->mem.content[reg(u, 'C')]);
+            uint8 A = reg(u, 'A') + u->mem.content[0xFF00 + reg(u, 'C')];
+            u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
+        }
 
         case 0xC3: /* JP a16 */
             printf("JP a16 = 0x%x\n", m_peek16(u, u->mem.ptr));
@@ -1720,8 +1750,8 @@ int disassemble_rom(CPU *u)
                    m_peek16(u, u->mem.ptr));
             if (get_flag(u, 'Z'))
             {
-                    s_push16(u->st, u->mem.ptr + 1);
-                    u->mem.ptr = m_peek16(u, u->mem.ptr);
+                s_push16(u->st, u->mem.ptr + 1);
+                u->mem.ptr = m_peek16(u, u->mem.ptr);
             }
             continue;
         case 0xDC:
@@ -1729,8 +1759,8 @@ int disassemble_rom(CPU *u)
                    m_peek16(u, u->mem.ptr));
             if (get_flag(u, 'C'))
             {
-                    s_push16(u->st, u->mem.ptr + 1);
-                    u->mem.ptr = m_peek16(u, u->mem.ptr);
+                s_push16(u->st, u->mem.ptr + 1);
+                u->mem.ptr = m_peek16(u, u->mem.ptr);
             }
             continue;
         case 0xCD:
