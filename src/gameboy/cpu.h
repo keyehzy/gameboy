@@ -37,14 +37,6 @@ typedef struct
 
     struct
     {
-        uint8 Z;
-        uint8 N;
-        uint8 H;
-        uint8 C;
-    } status_flag;
-
-    struct
-    {
         uint16 AF;
         uint16 BC;
         uint16 DE;
@@ -68,5 +60,7 @@ uint16 s_pop16(Stack *s);
 
 uint8 reg(CPU *u, char REG);
 uint16 reg_combine(uint8 high, uint8 low);
-void set_flags(CPU *u, uint8 Z, uint8 N, uint8 H, uint8 C);
+uint8 get_flag(CPU *u, char FLAG);
+void set_flag(CPU *u, char FLAG);
+void reset_flag(CPU *u, char FLAG);
 #endif

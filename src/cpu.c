@@ -87,12 +87,70 @@ uint16 reg_combine(uint8 high, uint8 low)
     return high + (low << 8);
 }
 
-void set_flags(CPU *u, uint8 Z, uint8 N, uint8 H, uint8 C)
+uint8 get_flag(CPU *u, char FLAG)
 {
-    u->status_flag.Z = Z;
-    u->status_flag.N = N;
-    u->status_flag.H = H;
-    u->status_flag.C = C;
+    uint8 F = reg(u, 'F');
+    switch (FLAG)
+    {
+    case 'Z':
+        return (F >> 7) & 0x01;
+    case 'N':
+        return (F >> 6) & 0x01;
+    case 'H':
+        return (F >> 5) & 0x01;
+    case 'C':
+        return (F >> 4) & 0x01;
+    default:
+        exit(1);
+    }
+}
+
+void set_flag(CPU *u, char FLAG)
+{
+    /* TODO(keyehzy): We can do better than this */
+    uint8 F = reg(u, 'F');
+    switch (FLAG)
+    {
+    case 'Z':
+        F = F | (1 << 7);
+        break;
+    case 'N':
+        F = F | (1 << 6);
+        break;
+    case 'H':
+        F = F | (1 << 5);
+        break;
+    case 'C':
+        F = F | (1 << 4);
+        break;
+    default:
+        exit(1);
+    }
+    u->reg.AF = reg_combine(reg(u, 'A'), F);
+}
+
+void reset_flag(CPU *u, char FLAG)
+{
+    /* TODO(keyehzy): We can do better than this */
+    uint8 F = reg(u, 'F');
+    switch (FLAG)
+    {
+    case 'Z':
+        F = F & ~(1 << 7);
+        break;
+    case 'N':
+        F = F & ~(1 << 6);
+        break;
+    case 'H':
+        F = F & ~(1 << 5);
+        break;
+    case 'C':
+        F = F & ~(1 << 4);
+        break;
+    default:
+        exit(1);
+    }
+    u->reg.AF = reg_combine(reg(u, 'A'), F);
 }
 
 int load_rom(CPU *u, char *path)
