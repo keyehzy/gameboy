@@ -1397,16 +1397,24 @@ int disassemble_rom(CPU *u)
         }
 
         case 0x0E: /* load 1 byte,d8 */
-            puts("LD C,d8");
+            printf("LD C = 0x%x, 0x%x\n", reg(u, 'C'), m_peek8(u, u->mem.ptr));
+            uint8 C = m_consume8(u);
+            u->reg.BC = reg_combine(reg(u, 'B'), C);
             continue;
         case 0x1E:
-            puts("LD E,d8");
+            printf("LD E = 0x%x, 0x%x\n", reg(u, 'E'), m_peek8(u, u->mem.ptr));
+            uint8 E = m_consume8(u);
+            u->reg.DE = reg_combine(reg(u, 'D'), E);
             continue;
         case 0x2E:
-            puts("LD L,d8");
+            printf("LD L = 0x%x, 0x%x\n", reg(u, 'L'), m_peek8(u, u->mem.ptr));
+            uint8 L = m_consume8(u);
+            u->reg.HL = reg_combine(reg(u, 'H'), L);
             continue;
         case 0x3E:
-            puts("LD A,d8");
+            printf("LD A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
+            uint8 A = m_consume8(u);
+            u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
 
         case 0x0F: /* 8bit rotation/shift */
@@ -1535,28 +1543,28 @@ int disassemble_rom(CPU *u)
 
         case 0xC6:
         { /* d8 arithmetic */
-            puts("ADD A,d8");
+            printf("ADD A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') + m_consume8(u);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
         }
         case 0xD6:
         {
-            puts("SUB A,d8");
+            printf("SUB A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') - m_consume8(u);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
         }
         case 0xE6:
         {
-            puts("AND A,d8");
+            printf("AND A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') & m_consume8(u);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
         }
         case 0xF6:
         {
-            puts("OR A,d8");
+            printf("OR A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') | m_consume8(u);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
@@ -1653,7 +1661,7 @@ int disassemble_rom(CPU *u)
 
         case 0xCE:
         { /* extra arithmetic d8 */
-            puts("ADC A,d8");
+            printf("ADC A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') + (m_consume8(u) + u->status_flag.C);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             /* set_flags(u, Z, N, H, C); */
@@ -1661,7 +1669,7 @@ int disassemble_rom(CPU *u)
         }
         case 0xDE:
         {
-            puts("SBC A,d8");
+            printf("SBC A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') - (m_consume8(u) + u->status_flag.C);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             /* set_flags(u, Z, N, H, C); */
@@ -1669,7 +1677,7 @@ int disassemble_rom(CPU *u)
         }
         case 0xEE:
         {
-            puts("XOR d8");
+            printf("XOR A = 0x%x, 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') ^ m_consume8(u);
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             /* set_flags(u, Z, N, H, C); */
@@ -1677,7 +1685,7 @@ int disassemble_rom(CPU *u)
         }
         case 0xFE:
         {
-            puts("CP d8");
+            printf("CP 0x%x\n", m_peek8(u, u->mem.ptr));
             uint8 A = reg(u, 'A') - m_consume8(u);
             /* set_flags(u, Z, N, H, C); */
             continue;
