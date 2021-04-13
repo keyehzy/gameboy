@@ -1118,13 +1118,13 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x20: /* JR r8 */
-            printf("JR NZ (Z = 0x%x), (r8) = 0x%x\n", get_flag(u, 'Z'),
+            printf("JR NZ (Z = 0x%x), r8 = 0x%x\n", get_flag(u, 'Z'),
                    m_peek8(u, u->mem.ptr));
             if (!get_flag(u, 'Z'))
                 u->mem.ptr += m_peek8(u, u->mem.ptr);
             continue;
         case 0x30:
-            printf("JR NC (C = 0x%x), (r8) = 0x%x\n", get_flag(u, 'C'),
+            printf("JR NC (C = 0x%x), r8 = 0x%x\n", get_flag(u, 'C'),
                    m_peek8(u, u->mem.ptr));
             if (!get_flag(u, 'C'))
                 u->mem.ptr += m_peek8(u, u->mem.ptr);
@@ -1300,7 +1300,8 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x37: /* set carry flag */
-            puts("SCF");
+            printf("SCF (FLAG C = 0x%x)\n", get_flag(u, 'C'));
+            set_flag(u, 'C');
             continue;
 
         case 0x08: /* LD (a16),SP */
@@ -1310,17 +1311,17 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x18: /* JR r8 */
-            printf("JR (r8) = 0x%x\n", m_peek8(u, u->mem.ptr));
+            printf("JR r8 = 0x%x\n", m_peek8(u, u->mem.ptr));
             u->mem.ptr += m_peek8(u, u->mem.ptr);
             continue;
         case 0x28:
-            printf("JR Z (Z = 0x%x), (r8) = 0x%x\n", get_flag(u, 'Z'),
+            printf("JR Z (Z = 0x%x), r8 = 0x%x\n", get_flag(u, 'Z'),
                    m_peek8(u, u->mem.ptr));
             if (get_flag(u, 'Z'))
                 u->mem.ptr += m_peek8(u, u->mem.ptr);
             continue;
         case 0x38:
-            printf("JR C (C = 0x%x), (r8) = 0x%x\n", get_flag(u, 'C'),
+            printf("JR C (C = 0x%x), r8 = 0x%x\n", get_flag(u, 'C'),
                    m_peek8(u, u->mem.ptr));
             if (get_flag(u, 'C'))
                 u->mem.ptr += m_peek8(u, u->mem.ptr);
@@ -1556,12 +1557,15 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0xE0: /* put memory */
-            printf("LDH (a8) = 0x%x, A = 0x%x\n", u->mem.ptr, reg(u, 'A'));
+            printf("LDH (a8) = 0x%x, A = 0x%x\n",
+                   u->mem.content[0xFF00 + m_peek8(u, u->mem.ptr)],
+                   reg(u, 'A'));
             u->mem.content[0xFF00 + m_consume8(u)] = reg(u, 'A');
             continue;
         case 0xF0:
         {
-            printf("LDH A = 0x%x,(a8) = 0x%x\n", reg(u, 'A'), m_peek8(u, u->mem.ptr));
+            printf("LDH A = 0x%x,(a8) = 0x%x\n", reg(u, 'A'),
+                   u->mem.content[0xFF00 + m_peek8(u, u->mem.ptr)]);
             uint8 A = u->mem.content[0xFF00 + m_consume8(u)];
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
@@ -1735,12 +1739,12 @@ int disassemble_rom(CPU *u)
 
         case 0xEA: /* load a16 to register*/
             puts("LD (a16),A");
-            u->mem.content[u->mem.ptr] = reg(u, 'A');
+            u->mem.content[m_consume16(u)] = reg(u, 'A');
             continue;
         case 0xFA:
         {
             puts("LD A,(a16)");
-            uint8 A = m_consume16(u);
+            uint8 A = u->mem.content[m_consume16(u)];
             u->reg.AF = reg_combine(A, reg(u, 'F'));
             continue;
         }
