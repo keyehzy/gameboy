@@ -1294,8 +1294,16 @@ int disassemble_rom(CPU *u)
             puts("RLCA");
             continue;
         case 0x17:
-            puts("RLA");
+        {
+            /* see rotating section of
+             * http://www.linux-kongress.org/2009/slides/compiler_survey_felix_von_leitner.pdf
+             */
+            printf("RLA (A = 0x%x)\n", reg(u, 'A'));
+            uint8 A = reg(u, 'A');
+            uint8 rotl_A = (A << 1) | (A >> 7);
+            u->reg.AF = reg_combine(rotl_A, reg(u, 'F'));
             continue;
+        }
 
         case 0x27: /* decimal adjust A */
             puts("DAA");
@@ -1505,8 +1513,13 @@ int disassemble_rom(CPU *u)
             puts("RRCA");
             continue;
         case 0x1F:
-            puts("RRA");
+        {
+            printf("RRA (A = 0x%x)\n", reg(u, 'A'));
+            uint8 A = reg(u, 'A');
+            uint8 rotr_A = (A >> 1) | (A << 7);
+            u->reg.AF = reg_combine(rotr_A, reg(u, 'F'));
             continue;
+        }
 
         case 0x2F: /* complement */
             puts("CPL");
