@@ -89,40 +89,40 @@ uint16 combine_reg(uint8 high, uint8 low)
 
 void set_reg(CPU *u, char REG, uint8 VAL)
 {
-    switch(REG)
+    switch (REG)
     {
-        case 'A':
-            u->reg.AF = combine_reg(VAL, reg(u, 'F'));
-            break;
-        case 'F':
-            u->reg.AF = combine_reg(reg(u, 'A'), VAL);
-            break;
-        case 'B':
-            u->reg.BC = combine_reg(VAL, reg(u, 'C'));
-            break;
-        case 'C':
-            u->reg.BC = combine_reg(reg(u, 'B'), VAL);
-            break;
-        case 'D':
-            u->reg.DE = combine_reg(VAL, reg(u, 'E'));
-            break;
-        case 'E':
-            u->reg.DE = combine_reg(reg(u, 'D'), VAL);
-            break;
-        case 'H':
-            u->reg.HL = combine_reg(VAL, reg(u, 'L'));
-            break;
-        case 'L':
-            u->reg.HL = combine_reg(reg(u, 'H'), VAL);
-            break;
-        case 'S':
-            u->reg.SP = combine_reg(VAL, reg(u, 'P'));
-            break;
-        case 'P':
-            u->reg.SP = combine_reg(reg(u, 'S'), VAL);
-            break;
-        default:
-            exit(1);
+    case 'A':
+        u->reg.AF = combine_reg(VAL, reg(u, 'F'));
+        break;
+    case 'F':
+        u->reg.AF = combine_reg(reg(u, 'A'), VAL);
+        break;
+    case 'B':
+        u->reg.BC = combine_reg(VAL, reg(u, 'C'));
+        break;
+    case 'C':
+        u->reg.BC = combine_reg(reg(u, 'B'), VAL);
+        break;
+    case 'D':
+        u->reg.DE = combine_reg(VAL, reg(u, 'E'));
+        break;
+    case 'E':
+        u->reg.DE = combine_reg(reg(u, 'D'), VAL);
+        break;
+    case 'H':
+        u->reg.HL = combine_reg(VAL, reg(u, 'L'));
+        break;
+    case 'L':
+        u->reg.HL = combine_reg(reg(u, 'H'), VAL);
+        break;
+    case 'S':
+        u->reg.SP = combine_reg(VAL, reg(u, 'P'));
+        break;
+    case 'P':
+        u->reg.SP = combine_reg(reg(u, 'S'), VAL);
+        break;
+    default:
+        exit(1);
     }
 }
 
