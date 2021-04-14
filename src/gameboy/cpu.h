@@ -54,12 +54,15 @@ int run_rom(CPU *u);
 uint8 m_consume8(CPU *u);
 uint16 m_consume16(CPU *u);
 uint8 m_peek8(CPU *u, uint16 n);
+
 uint16 m_peek16(CPU *u, uint16 n);
 void s_push16(Stack *s, uint16 n);
 uint16 s_pop16(Stack *s);
 
 uint8 reg(CPU *u, char REG);
-uint16 reg_combine(uint8 high, uint8 low);
+uint16 combine_reg(uint8 high, uint8 low);
+void set_reg(CPU *u, char REG, uint8 VAL);
+
 uint8 get_flag(CPU *u, char FLAG);
 void set_flag(CPU *u, char FLAG);
 void reset_flag(CPU *u, char FLAG);

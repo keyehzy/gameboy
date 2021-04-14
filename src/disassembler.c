@@ -10,114 +10,98 @@ void LD_B_C(CPU *u, uint8 byte)
     case 0x0:
     {
         printf("\t\tLD B,B\n");
-        uint8 B = reg(u, 'B');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'B'));
         break;
     }
     case 0x1:
     {
         printf("\t\tLD B,C\n");
-        uint8 B = reg(u, 'C');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'C'));
         break;
     }
     case 0x2:
     {
         printf("\t\tLD B,D\n");
-        uint8 B = reg(u, 'D');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'D'));
         break;
     }
     case 0x3:
     {
         printf("\t\tLD B,E\n");
-        uint8 B = reg(u, 'E');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'E'));
         break;
     }
     case 0x4:
     {
         printf("\t\tLD B,H\n");
-        uint8 B = reg(u, 'H');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'H'));
         break;
     }
     case 0x5:
     {
         printf("\t\tLD B,L\n");
-        uint8 B = reg(u, 'L');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'L'));
         break;
     }
     case 0x6:
     {
         printf("\t\tLD B, (HL)\n");
-        uint8 B = u->mem.content[u->reg.HL];
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', u->mem.content[u->reg.HL]);
         break;
     }
     case 0x7:
     {
         printf("\t\tLD B,A\n");
-        uint8 B = reg(u, 'A');
-        u->reg.BC = reg_combine(B, reg(u, 'C'));
+        set_reg(u, 'B', reg(u, 'A'));
         break;
     }
 
     case 0x8:
     {
         printf("\t\tLD C,B\n");
-        uint8 C = reg(u, 'B');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'B'));
         break;
     }
     case 0x9:
     {
         printf("\t\tLD C,C\n");
-        uint8 C = reg(u, 'C');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'C'));
         break;
     }
     case 0xA:
     {
         printf("\t\tLD C,D\n");
-        uint8 C = reg(u, 'D');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'D'));
         break;
     }
     case 0xB:
     {
         printf("\t\tLD C,E\n");
-        uint8 C = reg(u, 'E');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'E'));
         break;
     }
     case 0xC:
     {
         printf("\t\tLD C,H\n");
-        uint8 C = reg(u, 'H');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'H'));
         break;
     }
     case 0xD:
     {
         printf("\t\tLD C,L\n");
-        uint8 C = reg(u, 'L');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'L'));
         break;
     }
     case 0xE:
     {
         printf("\t\tLD C, (HL)\n");
-        uint8 C = u->mem.content[u->reg.HL];
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', u->mem.content[u->reg.HL]);
         break;
     }
     case 0xF:
     {
         printf("\t\tLD C,L\n");
-        uint8 C = reg(u, 'A');
-        u->reg.BC = reg_combine(reg(u, 'B'), C);
+        set_reg(u, 'C', reg(u, 'A'));
         break;
     }
     }
@@ -130,114 +114,98 @@ void LD_D_E(CPU *u, uint8 byte)
     case 0x0:
     {
         printf("\t\tLD D,B\n");
-        uint8 D = reg(u, 'B');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'B'));
         break;
     }
     case 0x1:
     {
         printf("\t\tLD D,C\n");
-        uint8 D = reg(u, 'C');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'C'));
         break;
     }
     case 0x2:
     {
         printf("\t\tLD D,D\n");
-        uint8 D = reg(u, 'D');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'D'));
         break;
     }
     case 0x3:
     {
         printf("\t\tLD D,E\n");
-        uint8 D = reg(u, 'E');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'E'));
         break;
     }
     case 0x4:
     {
         printf("\t\tLD D,H\n");
-        uint8 D = reg(u, 'H');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'H'));
         break;
     }
     case 0x5:
     {
         printf("\t\tLD D,L\n");
-        uint8 D = reg(u, 'L');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'L'));
         break;
     }
     case 0x6:
     {
         printf("\t\tLD D, (HL)\n");
-        uint8 D = u->mem.content[u->reg.HL];
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', u->mem.content[u->reg.HL]);
         break;
     }
     case 0x7:
     {
         printf("\t\tLD D,A\n");
-        uint8 D = reg(u, 'A');
-        u->reg.DE = reg_combine(D, reg(u, 'E'));
+        set_reg(u, 'D', reg(u, 'A'));
         break;
     }
 
     case 0x8:
     {
         printf("\t\tLD E,B\n");
-        uint8 E = reg(u, 'B');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'B'));
         break;
     }
     case 0x9:
     {
         printf("\t\tLD E,C\n");
-        uint8 E = reg(u, 'C');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'C'));
         break;
     }
     case 0xA:
     {
         printf("\t\tLD E,D\n");
-        uint8 E = reg(u, 'D');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'D'));
         break;
     }
     case 0xB:
     {
         printf("\t\tLD E,E\n");
-        uint8 E = reg(u, 'E');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'E'));
         break;
     }
     case 0xC:
     {
         printf("\t\tLD E,H\n");
-        uint8 E = reg(u, 'H');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'H'));
         break;
     }
     case 0xD:
     {
         printf("\t\tLD E,L\n");
-        uint8 E = reg(u, 'L');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'L'));
         break;
     }
     case 0xE:
     {
         printf("\t\tLD E, (HL)\n");
-        uint8 E = u->mem.content[u->reg.HL];
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', u->mem.content[u->reg.HL]);
         break;
     }
     case 0xF:
     {
         printf("\t\tLD E,A\n");
-        uint8 E = reg(u, 'A');
-        u->reg.DE = reg_combine(reg(u, 'D'), E);
+        set_reg(u, 'E', reg(u, 'A'));
         break;
     }
     }
@@ -250,114 +218,98 @@ void LD_H_L(CPU *u, uint8 byte)
     case 0x0:
     {
         printf("\t\tLD H,B\n");
-        uint8 H = reg(u, 'B');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'B'));
         break;
     }
     case 0x1:
     {
         printf("\t\tLD H,C\n");
-        uint8 H = reg(u, 'C');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'C'));
         break;
     }
     case 0x2:
     {
         printf("\t\tLD H,D\n");
-        uint8 H = reg(u, 'D');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'D'));
         break;
     }
     case 0x3:
     {
         printf("\t\tLD H,E\n");
-        uint8 H = reg(u, 'E');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'E'));
         break;
     }
     case 0x4:
     {
         printf("\t\tLD H,H\n");
-        uint8 H = reg(u, 'H');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'H'));
         break;
     }
     case 0x5:
     {
         printf("\t\tLD H,L\n");
-        uint8 H = reg(u, 'L');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'L'));
         break;
     }
     case 0x6:
     {
         printf("\t\tLD H, (HL)\n");
-        uint8 H = u->mem.content[u->reg.HL];
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', u->mem.content[u->reg.HL]);
         break;
     }
     case 0x7:
     {
         printf("\t\tLD H,A\n");
-        uint8 H = reg(u, 'A');
-        u->reg.HL = reg_combine(H, reg(u, 'L'));
+        set_reg(u, 'H', reg(u, 'A'));
         break;
     }
 
     case 0x8:
     {
         printf("\t\tLD L,B\n");
-        uint8 L = reg(u, 'B');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'B'));
         break;
     }
     case 0x9:
     {
         printf("\t\tLD L,C\n");
-        uint8 L = reg(u, 'C');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'C'));
         break;
     }
     case 0xA:
     {
         printf("\t\tLD L,D\n");
-        uint8 L = reg(u, 'D');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'D'));
         break;
     }
     case 0xB:
     {
         printf("\t\tLD L,E\n");
-        uint8 L = reg(u, 'E');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'E'));
         break;
     }
     case 0xC:
     {
         printf("\t\tLD L,H\n");
-        uint8 L = reg(u, 'H');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'H'));
         break;
     }
     case 0xD:
     {
         printf("\t\tLD L,L\n");
-        uint8 L = reg(u, 'L');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'L'));
         break;
     }
     case 0xE:
     {
         printf("\t\tLD L, (HL)\n");
-        uint8 L = u->mem.content[u->reg.HL];
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', u->mem.content[u->reg.HL]);
         break;
     }
     case 0xF:
     {
         printf("\t\tLD L,A\n");
-        uint8 L = reg(u, 'A');
-        u->reg.HL = reg_combine(reg(u, 'H'), L);
+        set_reg(u, 'L', reg(u, 'A'));
         break;
     }
     }
@@ -418,57 +370,49 @@ void LD_HL_A(CPU *u, uint8 byte)
     case 0x8:
     {
         printf("\t\tLD A,B\n");
-        uint8 A = reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'B'));
         break;
     }
     case 0x9:
     {
         printf("\t\tLD A,C\n");
-        uint8 A = reg(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'C'));
         break;
     }
     case 0xA:
     {
         printf("\t\tLD A,D\n");
-        uint8 A = reg(u, 'D');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'D'));
         break;
     }
     case 0xB:
     {
         printf("\t\tLD A,E\n");
-        uint8 A = reg(u, 'E');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'E'));
         break;
     }
     case 0xC:
     {
         printf("\t\tLD A,H\n");
-        uint8 A = reg(u, 'H');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'H'));
         break;
     }
     case 0xD:
     {
         printf("\t\tLD A,L\n");
-        uint8 A = reg(u, 'L');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'L'));
         break;
     }
     case 0xE:
     {
         printf("\t\tLD A, (HL)\n");
-        uint8 A = u->mem.content[u->reg.HL];
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', u->mem.content[u->reg.HL]);
         break;
     }
     case 0xF:
     {
         printf("\t\tLD A,A\n");
-        uint8 A = reg(u, 'A');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A'));
         break;
     }
     }
@@ -481,8 +425,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x0:
     { /* add B to A */
         printf("\t\tADD A,B\n");
-        uint8 A = reg(u, 'A') + reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -490,8 +433,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x1:
     { /* add C to A */
         printf("\t\tADD A,C\n");
-        uint8 A = reg(u, 'A') + reg(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -499,8 +441,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x2:
     { /* add D to A */
         printf("\t\tADD A,D\n");
-        uint8 A = reg(u, 'A') + reg(u, 'D');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'D'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -508,8 +449,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x3:
     { /* add E to A */
         printf("\t\tADD A,E\n");
-        uint8 A = reg(u, 'A') + reg(u, 'E');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'E'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -517,8 +457,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x4:
     { /* add H to A */
         printf("\t\tADD A,H\n");
-        uint8 A = reg(u, 'A') + reg(u, 'H');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'H'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -526,8 +465,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x5:
     { /* add L to A */
         printf("\t\tADD A,L\n");
-        uint8 A = reg(u, 'A') + reg(u, 'L');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'L'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -535,8 +473,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x6:
     { /* add (HL) to A */
         printf("\t\tADD A, (HL)\n");
-        uint8 A = reg(u, 'A') + u->mem.content[u->reg.HL];
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + u->mem.content[u->reg.HL]);
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -544,8 +481,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x7:
     { /* add A to A */
         printf("\t\tADD A,A\n");
-        uint8 A = reg(u, 'A') + reg(u, 'A');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'A'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -553,8 +489,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x8:
     { /* adc B to A */
         printf("\t\tADC A,B\n");
-        uint8 A = reg(u, 'A') + reg(u, 'B') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'B') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -562,8 +497,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0x9:
     { /* adc C to A */
         printf("\t\tADC A,C\n");
-        uint8 A = reg(u, 'A') + reg(u, 'C') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'C') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -571,8 +505,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0xA:
     { /* adc D to A */
         printf("\t\tADC A,D\n");
-        uint8 A = reg(u, 'A') + reg(u, 'D') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'D') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -580,8 +513,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0xB:
     { /* adc E to A */
         printf("\t\tADC A,E\n");
-        uint8 A = reg(u, 'A') + reg(u, 'E') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'E') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -589,8 +521,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0xC:
     { /* adc H to A */
         printf("\t\tADC A,H\n");
-        uint8 A = reg(u, 'A') + reg(u, 'H') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'H') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -598,8 +529,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0xD:
     { /* adc L to A */
         printf("\t\tADC A,L\n");
-        uint8 A = reg(u, 'A') + reg(u, 'L') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'L') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -607,8 +537,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0xE:
     { /* adc (HL) to A */
         printf("\t\tADC A, (HL)\n");
-        uint8 A = reg(u, 'A') + u->mem.content[u->reg.HL] + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + u->mem.content[u->reg.HL] + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -616,8 +545,7 @@ void ADD_ADC_CASE(CPU *u, uint8 byte)
     case 0xF:
     { /* adc A to A */
         printf("\t\tADC A,A\n");
-        uint8 A = reg(u, 'A') + reg(u, 'A') + get_flag(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') + reg(u, 'A') + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -631,8 +559,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x0:
     { /* sub B to A */
         printf("\t\tSUB A,B\n");
-        uint8 A = reg(u, 'A') - reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -640,8 +567,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x1:
     { /* sub C to A */
         printf("\t\tSUB A,C\n");
-        uint8 A = reg(u, 'A') - reg(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -649,8 +575,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x2:
     { /* sub D to A */
         printf("\t\tSUB A,D\n");
-        uint8 A = reg(u, 'A') - reg(u, 'D');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'D'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -658,8 +583,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x3:
     { /* sub E to A */
         printf("\t\tSUB A,E\n");
-        uint8 A = reg(u, 'A') - reg(u, 'E');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'E'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -667,8 +591,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x4:
     { /* sub H to A */
         printf("\t\tSUB A,H\n");
-        uint8 A = reg(u, 'A') - reg(u, 'H');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'H'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -676,8 +599,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x5:
     { /* sub L to A */
         printf("\t\tSUB A,L\n");
-        uint8 A = reg(u, 'A') - reg(u, 'L');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'L'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -685,8 +607,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x6:
     { /* sub (HL) to A */
         printf("\t\tSUB A, (HL)\n");
-        uint8 A = reg(u, 'A') - u->mem.content[u->reg.HL];
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - u->mem.content[u->reg.HL]);
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -694,8 +615,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x7:
     { /* sub A to A */
         printf("\t\tSUB A,A\n");
-        uint8 A = reg(u, 'A') - reg(u, 'A');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'A'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -703,8 +623,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x8:
     { /* sbc B to A */
         printf("\t\tSBC A,B\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'B') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'B') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -712,8 +631,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0x9:
     { /* sbc C to A */
         printf("\t\tSBC A,C\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'C') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'C') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -721,8 +639,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0xA:
     { /* sbc D to A */
         printf("\t\tSBC A,D\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'D') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'D') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -730,8 +647,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0xB:
     { /* sbc E to A */
         printf("\t\tSBC A,E\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'E') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'E') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -739,8 +655,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0xC:
     { /* sbc H to A */
         printf("\t\tSBC A,H\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'H') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'H') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -748,8 +663,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0xD:
     { /* sbc L to A */
         printf("\t\tSBC A,L\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'L') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'L') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -757,8 +671,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0xE:
     { /* sbc (HL) to A */
         printf("\t\tSBC A, (HL)\n");
-        uint8 A = reg(u, 'A') - (u->mem.content[u->reg.HL] + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (u->mem.content[u->reg.HL] + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -766,8 +679,7 @@ void SUB_SBC_CASE(CPU *u, uint8 byte)
     case 0xF:
     { /* sbc A to A */
         printf("\t\tSBC A,A\n");
-        uint8 A = reg(u, 'A') - (reg(u, 'B') + get_flag(u, 'C'));
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'B') + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -781,8 +693,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x0:
     { /* and B to A */
         printf("\t\tAND A,B\n");
-        uint8 A = reg(u, 'A') & reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -790,8 +701,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x1:
     { /* and C to A */
         printf("\t\tAND A,C\n");
-        uint8 A = reg(u, 'A') & reg(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -799,8 +709,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x2:
     { /* and D to A */
         printf("\t\tAND A,D\n");
-        uint8 A = reg(u, 'A') & reg(u, 'D');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'D'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -808,8 +717,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x3:
     { /* and E to A */
         printf("\t\tAND A,E\n");
-        uint8 A = reg(u, 'A') & reg(u, 'E');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'E'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -817,8 +725,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x4:
     { /* and H to A */
         printf("\t\tAND A,H\n");
-        uint8 A = reg(u, 'A') & reg(u, 'H');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'H'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -826,8 +733,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x5:
     { /* and L to A */
         printf("\t\tAND A,L\n");
-        uint8 A = reg(u, 'A') & reg(u, 'L');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'L'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -835,8 +741,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x6:
     { /* and (HL) to A */
         printf("\t\tAND A, (HL)\n");
-        uint8 A = reg(u, 'A') & u->mem.content[u->reg.HL];
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & u->mem.content[u->reg.HL]);
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -844,8 +749,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x7:
     { /* and A to A */
         printf("\t\tAND A,A\n");
-        uint8 A = reg(u, 'A') & reg(u, 'A');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') & reg(u, 'A'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -853,8 +757,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x8:
     { /* XOR B to A */
         printf("\t\tXOR A,B\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -862,8 +765,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0x9:
     { /* XOR C to A */
         printf("\t\tXOR A,C\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -871,8 +773,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0xA:
     { /* XOR D to A */
         printf("\t\tXOR A,D\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'D');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'D'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -880,8 +781,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0xB:
     { /* XOR E to A */
         printf("\t\tXOR A,E\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'E');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'E'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -889,8 +789,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0xC:
     { /* XOR H to A */
         printf("\t\tXOR A,H\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'H');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'H'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -898,8 +797,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0xD:
     { /* XOR L to A */
         printf("\t\tXOR A,L\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'L');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'L'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -907,8 +805,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0xE:
     { /* XOR (HL) to A */
         printf("\t\tXOR A, (HL)\n");
-        uint8 A = reg(u, 'A') ^ u->mem.content[u->reg.HL];
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ u->mem.content[u->reg.HL]);
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -916,8 +813,7 @@ void AND_XOR_CASE(CPU *u, uint8 byte)
     case 0xF:
     { /* XOR A to A */
         printf("\t\tXOR A,A\n");
-        uint8 A = reg(u, 'A') ^ reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -931,8 +827,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x0:
     { /* OR B to A */
         printf("\t\tOR A,B\n");
-        uint8 A = reg(u, 'A') | reg(u, 'B');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -940,8 +835,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x1:
     { /* OR C to A */
         printf("\t\tOR A,C\n");
-        uint8 A = reg(u, 'A') | reg(u, 'C');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -949,8 +843,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x2:
     { /* OR D to A */
         printf("\t\tOR A,D\n");
-        uint8 A = reg(u, 'A') | reg(u, 'D');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'D'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -958,8 +851,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x3:
     { /* OR E to A */
         printf("\t\tOR A,E\n");
-        uint8 A = reg(u, 'A') | reg(u, 'E');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'E'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -967,8 +859,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x4:
     { /* OR H to A */
         printf("\t\tOR A,H\n");
-        uint8 A = reg(u, 'A') | reg(u, 'H');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'H'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -976,8 +867,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x5:
     { /* OR L to A */
         printf("\t\tOR A,L\n");
-        uint8 A = reg(u, 'A') | reg(u, 'L');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'L'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -985,8 +875,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x6:
     { /* OR (HL) to A */
         printf("\t\tOR A, (HL)\n");
-        uint8 A = reg(u, 'A') | u->mem.content[u->reg.HL];
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | u->mem.content[u->reg.HL]);
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -994,8 +883,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x7:
     { /* OR A to A */
         printf("\t\tOR A,A\n");
-        uint8 A = reg(u, 'A') | reg(u, 'A');
-        u->reg.AF = reg_combine(A, reg(u, 'F'));
+        set_reg(u, 'A', reg(u, 'A') | reg(u, 'A'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1003,7 +891,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x8:
     { /* CP B to A */
         printf("\t\tCP A,B\n");
-        uint8 A = reg(u, 'A') - reg(u, 'B');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1011,7 +899,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0x9:
     { /* CP C to A */
         printf("\t\tCP A,C\n");
-        uint8 A = reg(u, 'A') - reg(u, 'C');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1019,7 +907,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0xA:
     { /* CP D to A */
         printf("\t\tCP A,D\n");
-        uint8 A = reg(u, 'A') - reg(u, 'D');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'D'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1027,7 +915,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0xB:
     { /* CP E to A */
         printf("\t\tCP A,E\n");
-        uint8 A = reg(u, 'A') - reg(u, 'E');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'E'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1035,7 +923,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0xC:
     { /* CP H to A */
         printf("\t\tCP A,H\n");
-        uint8 A = reg(u, 'A') - reg(u, 'H');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'H'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1043,7 +931,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0xD:
     { /* CP L to A */
         printf("\t\tCP A,L\n");
-        uint8 A = reg(u, 'A') - reg(u, 'L');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'L'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1051,7 +939,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0xE:
     { /* CP (HL) to A */
         printf("\t\tCP A, (HL)\n");
-        uint8 A = reg(u, 'A') - u->mem.content[u->reg.HL];
+        set_reg(u, 'A', reg(u, 'A') - u->mem.content[u->reg.HL]);
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1059,7 +947,7 @@ void OR_CP_CASE(CPU *u, uint8 byte)
     case 0xF:
     { /* CP A to A */
         printf("\t\tCP A,A\n");
-        uint8 A = reg(u, 'A') - reg(u, 'B');
+        set_reg(u, 'A', reg(u, 'A') - reg(u, 'B'));
         /* set_flags(u, Z, N, H, C); */
         break;
     }
@@ -1174,24 +1062,21 @@ int disassemble_rom(CPU *u)
         case 0x04:
         { /* INC 1 byte register */
             printf("\t\tINC B\n");
-            uint8 B = reg(u, 'B') + 1;
-            u->reg.BC = reg_combine(B, reg(u, 'C'));
+            set_reg(u, 'B', reg(u, 'B') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x14:
         {
             printf("\t\tINC D\n");
-            uint8 D = reg(u, 'D') + 1;
-            u->reg.DE = reg_combine(D, reg(u, 'E'));
+            set_reg(u, 'D', reg(u, 'D') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x24:
         {
             printf("\t\tINC H\n");
-            uint8 H = reg(u, 'H') + 1;
-            u->reg.HL = reg_combine(H, reg(u, 'L'));
+            set_reg(u, 'H', reg(u, 'H') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1206,24 +1091,21 @@ int disassemble_rom(CPU *u)
         case 0x05:
         { /* DEC 1 byte register */
             printf("\t\tDEC B\n");
-            uint8 B = reg(u, 'B') - 1;
-            u->reg.BC = reg_combine(B, reg(u, 'C'));
+            set_reg(u, 'B', reg(u, 'B') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x15:
         {
             printf("\t\tDEC D\n");
-            uint8 D = reg(u, 'D') - 1;
-            u->reg.DE = reg_combine(D, reg(u, 'E'));
+            set_reg(u, 'D', reg(u, 'D') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x25:
         {
             printf("\t\tDEC H\n");
-            uint8 H = reg(u, 'H') - 1;
-            u->reg.HL = reg_combine(H, reg(u, 'L'));
+            set_reg(u, 'H', reg(u, 'H') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1239,24 +1121,21 @@ int disassemble_rom(CPU *u)
         { /* LD 1 byte register,d8 */
             printf(" $%02x\t\tLD B,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 B = m_consume8(u);
-            u->reg.BC = reg_combine(B, reg(u, 'C'));
+            set_reg(u, 'B', m_consume8(u));
             continue;
         }
         case 0x16:
         {
             printf(" $%02x\t\tLD D,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 D = m_consume8(u);
-            u->reg.DE = reg_combine(D, reg(u, 'E'));
+            set_reg(u, 'D', m_consume8(u));
             continue;
         }
         case 0x26:
         {
             printf(" $%02x\t\tLD H,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 H = m_consume8(u);
-            u->reg.HL = reg_combine(H, reg(u, 'L'));
+            set_reg(u, 'H', m_consume8(u));
             continue;
         }
         case 0x36:
@@ -1274,9 +1153,7 @@ int disassemble_rom(CPU *u)
              * http://www.linux-kongress.org/2009/slides/compiler_survey_felix_von_leitner.pdf
              */
             printf("\t\tRLA (A)\n");
-            uint8 A = reg(u, 'A');
-            uint8 rotl_A = (A << 1) | (A >> 7);
-            u->reg.AF = reg_combine(rotl_A, reg(u, 'F'));
+            set_reg(u, 'A', (reg(u, 'A') << 1) | (reg(u, 'A') >> 7));
             continue;
         }
 
@@ -1338,27 +1215,23 @@ int disassemble_rom(CPU *u)
         case 0x0A:
         { /* load A to (2 byte) */
             printf("\t\tLD A, (BC)\n");
-            uint8 A = u->mem.content[u->reg.BC];
-            u->reg.AF = reg_combine(A, reg(u, 'A'));
+            set_reg(u, 'A', u->mem.content[u->reg.BC]);
             continue;
         }
         case 0x1A:
         {
             printf("\t\tLD A, (DE)\n");
-            uint8 A = u->mem.content[u->reg.DE];
-            u->reg.AF = reg_combine(A, reg(u, 'A'));
+            set_reg(u, 'A', u->mem.content[u->reg.DE]);
             continue;
         }
         case 0x2A:
             printf("\t\tLD A, (HL+)\n");
-            uint8 A = u->mem.content[u->reg.HL++];
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', u->mem.content[u->reg.HL++]);
             continue;
         case 0x3A:
         {
             printf("\t\tLD A, (HL-)\n");
-            uint8 A = u->mem.content[u->reg.HL--];
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', u->mem.content[u->reg.HL--]);
             continue;
         }
 
@@ -1386,32 +1259,28 @@ int disassemble_rom(CPU *u)
         case 0x0C:
         { /* INC 1 byte register */
             printf("\t\tINC C\n");
-            uint8 C = reg(u, 'C') + 1;
-            u->reg.BC = reg_combine(reg(u, 'B'), C);
+            set_reg(u, 'C', reg(u, 'C') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x1C:
         {
             printf("\t\tINC E\n");
-            uint8 E = reg(u, 'E') + 1;
-            u->reg.DE = reg_combine(reg(u, 'D'), E);
+            set_reg(u, 'E', reg(u, 'E') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x2C:
         {
             printf("\t\tINC L\n");
-            uint8 L = reg(u, 'L') + 1;
-            u->reg.HL = reg_combine(reg(u, 'H'), L);
+            set_reg(u, 'L', reg(u, 'L') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x3C:
         {
             printf("\t\tINC A\n");
-            uint8 A = reg(u, 'A') + 1;
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1419,32 +1288,28 @@ int disassemble_rom(CPU *u)
         case 0x0D:
         { /* DEC 1 byte register */
             printf("\t\tDEC C\n");
-            uint8 C = reg(u, 'C') - 1;
-            u->reg.BC = reg_combine(reg(u, 'B'), C);
+            set_reg(u, 'C', reg(u, 'C') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x1D:
         {
             printf("\t\tDEC E\n");
-            uint8 E = reg(u, 'E') - 1;
-            u->reg.DE = reg_combine(reg(u, 'D'), E);
+            set_reg(u, 'E', reg(u, 'E') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x2D:
         {
             printf("\t\tDEC L\n");
-            uint8 L = reg(u, 'L') - 1;
-            u->reg.HL = reg_combine(reg(u, 'H'), L);
+            set_reg(u, 'L', reg(u, 'L') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x3D:
         {
             printf("\t\tDEC A\n");
-            uint8 A = reg(u, 'A') - 1;
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1453,32 +1318,28 @@ int disassemble_rom(CPU *u)
         { /* load 1 byte,d8 */
             printf(" $%02x\t\tLD C,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 C = m_consume8(u);
-            u->reg.BC = reg_combine(reg(u, 'B'), C);
+            set_reg(u, 'C', m_consume8(u));
             continue;
         }
         case 0x1E:
         {
             printf(" $%02x\t\tLD E,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 E = m_consume8(u);
-            u->reg.DE = reg_combine(reg(u, 'D'), E);
+            set_reg(u, 'E', m_consume8(u));
             continue;
         }
         case 0x2E:
         {
             printf(" $%02x\t\tLD L,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 L = m_consume8(u);
-            u->reg.HL = reg_combine(reg(u, 'H'), L);
+            set_reg(u, 'L', m_consume8(u));
             continue;
         }
         case 0x3E:
         {
             printf(" $%02x\t\tLD A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = m_consume8(u);
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', m_consume8(u));
             continue;
         }
 
@@ -1488,9 +1349,7 @@ int disassemble_rom(CPU *u)
         case 0x1F:
         {
             printf("\t\tRRA (A)\n");
-            uint8 A = reg(u, 'A');
-            uint8 rotr_A = (A >> 1) | (A << 7);
-            u->reg.AF = reg_combine(rotr_A, reg(u, 'F'));
+            set_reg(u, 'A', (reg(u, 'A') >> 1) | (reg(u, 'A') << 7));
             continue;
         }
 
@@ -1553,8 +1412,7 @@ int disassemble_rom(CPU *u)
         {
             printf(" $%02x\tLDH A,($%02x)\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = u->mem.content[0xFF00 + m_consume8(u)];
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', u->mem.content[0xFF00 + m_consume8(u)]);
             continue;
         }
 
@@ -1592,8 +1450,7 @@ int disassemble_rom(CPU *u)
         case 0xF2:
         {
             printf("\t\tLD A,(C)\n");
-            uint8 A = reg(u, 'A') + u->mem.content[0xFF00 + reg(u, 'C')];
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') + u->mem.content[0xFF00 + reg(u, 'C')]);
             continue;
         }
 
@@ -1633,32 +1490,28 @@ int disassemble_rom(CPU *u)
         { /* d8 arithmetic */
             printf(" $%02x\tADD A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') + m_consume8(u);
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') + m_consume8(u));
             continue;
         }
         case 0xD6:
         {
             printf(" $%02x\tSUB A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') - m_consume8(u);
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') - m_consume8(u));
             continue;
         }
         case 0xE6:
         {
             printf(" $%02x\tAND A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') & m_consume8(u);
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') & m_consume8(u));
             continue;
         }
         case 0xF6:
         {
             printf(" $%02x\tOR A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') | m_consume8(u);
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') | m_consume8(u));
             continue;
         }
 
@@ -1736,8 +1589,7 @@ int disassemble_rom(CPU *u)
         case 0xFA:
         {
             puts("\t\tLD A,(a16)");
-            uint8 A = u->mem.content[m_consume16(u)];
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', u->mem.content[m_consume16(u)]);
             continue;
         }
 
@@ -1770,8 +1622,7 @@ int disassemble_rom(CPU *u)
         { /* extra arithmetic d8 */
             printf(" $%02x\tADC A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') + (m_consume8(u) + get_flag(u, 'C'));
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') + (m_consume8(u) + get_flag(u, 'C')));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1779,8 +1630,7 @@ int disassemble_rom(CPU *u)
         {
             printf(" $%02x\tSBC A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') - (m_consume8(u) + get_flag(u, 'C'));
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') - (m_consume8(u) + get_flag(u, 'C')));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1788,8 +1638,7 @@ int disassemble_rom(CPU *u)
         {
             printf(" $%02x\tXOR A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') ^ m_consume8(u);
-            u->reg.AF = reg_combine(A, reg(u, 'F'));
+            set_reg(u, 'A', reg(u, 'A') ^ m_consume8(u));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1797,7 +1646,7 @@ int disassemble_rom(CPU *u)
         {
             printf(" $%02x\t\tCP $%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            uint8 A = reg(u, 'A') - m_consume8(u);
+            set_reg(u, 'A', reg(u, 'A') - m_consume8(u));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }

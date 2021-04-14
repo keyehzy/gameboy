@@ -82,9 +82,48 @@ uint8 reg(CPU *u, char REG)
     }
 }
 
-uint16 reg_combine(uint8 high, uint8 low)
+uint16 combine_reg(uint8 high, uint8 low)
 {
     return high + (low << 8);
+}
+
+void set_reg(CPU *u, char REG, uint8 VAL)
+{
+    switch(REG)
+    {
+        case 'A':
+            u->reg.AF = combine_reg(VAL, reg(u, 'F'));
+            break;
+        case 'F':
+            u->reg.AF = combine_reg(reg(u, 'A'), VAL);
+            break;
+        case 'B':
+            u->reg.BC = combine_reg(VAL, reg(u, 'C'));
+            break;
+        case 'C':
+            u->reg.BC = combine_reg(reg(u, 'B'), VAL);
+            break;
+        case 'D':
+            u->reg.DE = combine_reg(VAL, reg(u, 'E'));
+            break;
+        case 'E':
+            u->reg.DE = combine_reg(reg(u, 'D'), VAL);
+            break;
+        case 'H':
+            u->reg.HL = combine_reg(VAL, reg(u, 'L'));
+            break;
+        case 'L':
+            u->reg.HL = combine_reg(reg(u, 'H'), VAL);
+            break;
+        case 'S':
+            u->reg.SP = combine_reg(VAL, reg(u, 'P'));
+            break;
+        case 'P':
+            u->reg.SP = combine_reg(reg(u, 'S'), VAL);
+            break;
+        default:
+            exit(1);
+    }
 }
 
 uint8 get_flag(CPU *u, char FLAG)
@@ -126,7 +165,7 @@ void set_flag(CPU *u, char FLAG)
     default:
         exit(1);
     }
-    u->reg.AF = reg_combine(reg(u, 'A'), F);
+    u->reg.AF = combine_reg(reg(u, 'A'), F);
 }
 
 void reset_flag(CPU *u, char FLAG)
@@ -150,7 +189,7 @@ void reset_flag(CPU *u, char FLAG)
     default:
         exit(1);
     }
-    u->reg.AF = reg_combine(reg(u, 'A'), F);
+    u->reg.AF = combine_reg(reg(u, 'A'), F);
 }
 
 int load_rom(CPU *u, char *path)
