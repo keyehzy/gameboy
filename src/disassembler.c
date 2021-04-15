@@ -61,6 +61,176 @@ uint8 value_from_letter_seq(CPU *u, uint8 byte)
     }
 }
 
+void PREFIX_CB_CASE(CPU *u, uint8 byte)
+{
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
+    switch (byte >> 4)
+    {
+    case 0x0:
+        if (byte < 0x8)
+        {
+            printf("\t\tRLC %s", letter);
+        }
+        else
+        {
+            printf("\t\tRRC %s", letter);
+        }
+        break;
+    case 0x1:
+        if (byte < 0x8)
+        {
+            printf("\t\tRL %s", letter);
+        }
+        else
+        {
+            printf("\t\tRR %s", letter);
+        }
+        break;
+    case 0x2:
+        if (byte < 0x8)
+        {
+            printf("\t\tSLA %s", letter);
+        }
+        else
+        {
+            printf("\t\tSRA %s", letter);
+        }
+        break;
+    case 0x3:
+        if (byte < 0x8)
+        {
+            printf("\t\tSWAP %s", letter);
+        }
+        else
+        {
+            printf("\t\tSRL %s", letter);
+        }
+        break;
+    case 0x4:
+        if (byte < 0x8)
+        {
+            printf("\t\tBIT 0,%s", letter);
+        }
+        else
+        {
+            printf("\t\tBIT 1,%s", letter);
+        }
+        break;
+    case 0x5:
+        if (byte < 0x8)
+        {
+            printf("\t\tBIT 2,%s", letter);
+        }
+        else
+        {
+            printf("\t\tBIT 3,%s", letter);
+        }
+        break;
+    case 0x6:
+        if (byte < 0x8)
+        {
+            printf("\t\tBIT 4,%s", letter);
+        }
+        else
+        {
+            printf("\t\tBIT 5,%s", letter);
+        }
+        break;
+    case 0x7:
+        if (byte < 0x8)
+        {
+            printf("\t\tBIT 6,%s", letter);
+        }
+        else
+        {
+            printf("\t\tBIT 7,%s", letter);
+        }
+        break;
+    case 0x8:
+        if (byte < 0x8)
+        {
+            printf("\t\tRES 0,%s", letter);
+        }
+        else
+        {
+            printf("\t\tRES 1,%s", letter);
+        }
+        break;
+    case 0x9:
+        if (byte < 0x8)
+        {
+            printf("\t\tRES 2,%s", letter);
+        }
+        else
+        {
+            printf("\t\tRES 3,%s", letter);
+        }
+        break;
+    case 0xA:
+        if (byte < 0x8)
+        {
+            printf("\t\tRES 4,%s", letter);
+        }
+        else
+        {
+            printf("\t\tRES 5,%s", letter);
+        }
+        break;
+    case 0xB:
+        if (byte < 0x8)
+        {
+            printf("\t\tRES 6,%s", letter);
+        }
+        else
+        {
+            printf("\t\tRES 7,%s", letter);
+        }
+        break;
+    case 0xC:
+        if (byte < 0x8)
+        {
+            printf("\t\tSET 0,%s", letter);
+        }
+        else
+        {
+            printf("\t\tSET 1,%s", letter);
+        }
+        break;
+    case 0xD:
+        if (byte < 0x8)
+        {
+            printf("\t\tSET 2,%s", letter);
+        }
+        else
+        {
+            printf("\t\tSET 3,%s", letter);
+        }
+        break;
+    case 0xE:
+        if (byte < 0x8)
+        {
+            printf("\t\tSET 4,%s", letter);
+        }
+        else
+        {
+            printf("\t\tSET 5,%s", letter);
+        }
+        break;
+    case 0xF:
+        if (byte < 0x8)
+        {
+            printf("\t\tSET 6,%s", letter);
+        }
+        else
+        {
+            printf("\t\tSET 7,%s", letter);
+        }
+        break;
+    default:
+        exit(1);
+    }
+}
 void LD_B_C(CPU *u, uint8 byte)
 {
     char *letter = letter_from_seq(byte);
@@ -241,8 +411,9 @@ int disassemble_rom(CPU *u)
             puts("\t\tHALT");
             continue;
         case 0xCB:
-            puts("\t\tPREFIX CB");
-            m_consume8(u); /* XXX */
+            printf(" $%02x", m_peek8(u, u->mem.ptr));
+            PREFIX_CB_CASE(u, m_consume8(u)); /* XXX */
+            printf("\n");
             continue;
         case 0xF3:
             puts("\t\tDI");
