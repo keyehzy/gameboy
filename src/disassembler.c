@@ -3,956 +3,205 @@
 
 #include <gameboy/cpu.h>
 
-void LD_B_C(CPU *u, uint8 byte)
+char *letter_from_seq(uint8 byte)
 {
-    switch (byte)
+    switch (byte % 0x8)
     {
     case 0x0:
-    {
-        printf("\t\tLD B,B\n");
-        set_reg(u, 'B', reg(u, 'B'));
+        return "B";
         break;
-    }
     case 0x1:
-    {
-        printf("\t\tLD B,C\n");
-        set_reg(u, 'B', reg(u, 'C'));
+        return "C";
         break;
-    }
     case 0x2:
-    {
-        printf("\t\tLD B,D\n");
-        set_reg(u, 'B', reg(u, 'D'));
+        return "D";
         break;
-    }
     case 0x3:
-    {
-        printf("\t\tLD B,E\n");
-        set_reg(u, 'B', reg(u, 'E'));
+        return "E";
         break;
-    }
     case 0x4:
-    {
-        printf("\t\tLD B,H\n");
-        set_reg(u, 'B', reg(u, 'H'));
+        return "H";
         break;
-    }
     case 0x5:
-    {
-        printf("\t\tLD B,L\n");
-        set_reg(u, 'B', reg(u, 'L'));
+        return "L";
         break;
-    }
     case 0x6:
-    {
-        printf("\t\tLD B, (HL)\n");
-        set_reg(u, 'B', u->mem.content[u->reg.HL]);
+        return "(HL)";
         break;
-    }
     case 0x7:
-    {
-        printf("\t\tLD B,A\n");
-        set_reg(u, 'B', reg(u, 'A'));
+        return "A";
         break;
+    default:
+        exit(1);
     }
+}
 
-    case 0x8:
+uint8 value_from_letter_seq(CPU *u, uint8 byte)
+{
+    switch (byte % 0x8)
     {
-        printf("\t\tLD C,B\n");
-        set_reg(u, 'C', reg(u, 'B'));
-        break;
+    case 0x0:
+        return reg(u, 'B');
+    case 0x1:
+        return reg(u, 'C');
+    case 0x2:
+        return reg(u, 'D');
+    case 0x3:
+        return reg(u, 'E');
+    case 0x4:
+        return reg(u, 'H');
+    case 0x5:
+        return reg(u, 'L');
+    case 0x6:
+        return u->mem.content[u->reg.HL];
+    case 0x7:
+        return reg(u, 'A');
+    default:
+        exit(1);
     }
-    case 0x9:
+}
+
+void LD_B_C(CPU *u, uint8 byte)
+{
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
+
+    if (byte < 0x8)
     {
-        printf("\t\tLD C,C\n");
-        set_reg(u, 'C', reg(u, 'C'));
-        break;
+        printf("\t\tLD B, %s\n", letter);
+        set_reg(u, 'B', value_of_letter);
     }
-    case 0xA:
+    else
     {
-        printf("\t\tLD C,D\n");
-        set_reg(u, 'C', reg(u, 'D'));
-        break;
-    }
-    case 0xB:
-    {
-        printf("\t\tLD C,E\n");
-        set_reg(u, 'C', reg(u, 'E'));
-        break;
-    }
-    case 0xC:
-    {
-        printf("\t\tLD C,H\n");
-        set_reg(u, 'C', reg(u, 'H'));
-        break;
-    }
-    case 0xD:
-    {
-        printf("\t\tLD C,L\n");
-        set_reg(u, 'C', reg(u, 'L'));
-        break;
-    }
-    case 0xE:
-    {
-        printf("\t\tLD C, (HL)\n");
-        set_reg(u, 'C', u->mem.content[u->reg.HL]);
-        break;
-    }
-    case 0xF:
-    {
-        printf("\t\tLD C,L\n");
-        set_reg(u, 'C', reg(u, 'A'));
-        break;
-    }
+        printf("\t\tLD C, %s\n", letter);
+        set_reg(u, 'C', value_of_letter);
     }
 }
 
 void LD_D_E(CPU *u, uint8 byte)
 {
-    switch (byte)
-    {
-    case 0x0:
-    {
-        printf("\t\tLD D,B\n");
-        set_reg(u, 'D', reg(u, 'B'));
-        break;
-    }
-    case 0x1:
-    {
-        printf("\t\tLD D,C\n");
-        set_reg(u, 'D', reg(u, 'C'));
-        break;
-    }
-    case 0x2:
-    {
-        printf("\t\tLD D,D\n");
-        set_reg(u, 'D', reg(u, 'D'));
-        break;
-    }
-    case 0x3:
-    {
-        printf("\t\tLD D,E\n");
-        set_reg(u, 'D', reg(u, 'E'));
-        break;
-    }
-    case 0x4:
-    {
-        printf("\t\tLD D,H\n");
-        set_reg(u, 'D', reg(u, 'H'));
-        break;
-    }
-    case 0x5:
-    {
-        printf("\t\tLD D,L\n");
-        set_reg(u, 'D', reg(u, 'L'));
-        break;
-    }
-    case 0x6:
-    {
-        printf("\t\tLD D, (HL)\n");
-        set_reg(u, 'D', u->mem.content[u->reg.HL]);
-        break;
-    }
-    case 0x7:
-    {
-        printf("\t\tLD D,A\n");
-        set_reg(u, 'D', reg(u, 'A'));
-        break;
-    }
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
 
-    case 0x8:
+    if (byte < 0x8)
     {
-        printf("\t\tLD E,B\n");
-        set_reg(u, 'E', reg(u, 'B'));
-        break;
+        printf("\t\tLD D, %s\n", letter);
+        set_reg(u, 'D', value_of_letter);
     }
-    case 0x9:
+    else
     {
-        printf("\t\tLD E,C\n");
-        set_reg(u, 'E', reg(u, 'C'));
-        break;
-    }
-    case 0xA:
-    {
-        printf("\t\tLD E,D\n");
-        set_reg(u, 'E', reg(u, 'D'));
-        break;
-    }
-    case 0xB:
-    {
-        printf("\t\tLD E,E\n");
-        set_reg(u, 'E', reg(u, 'E'));
-        break;
-    }
-    case 0xC:
-    {
-        printf("\t\tLD E,H\n");
-        set_reg(u, 'E', reg(u, 'H'));
-        break;
-    }
-    case 0xD:
-    {
-        printf("\t\tLD E,L\n");
-        set_reg(u, 'E', reg(u, 'L'));
-        break;
-    }
-    case 0xE:
-    {
-        printf("\t\tLD E, (HL)\n");
-        set_reg(u, 'E', u->mem.content[u->reg.HL]);
-        break;
-    }
-    case 0xF:
-    {
-        printf("\t\tLD E,A\n");
-        set_reg(u, 'E', reg(u, 'A'));
-        break;
-    }
+        printf("\t\tLD E, %s\n", letter);
+        set_reg(u, 'E', value_of_letter);
     }
 }
 
 void LD_H_L(CPU *u, uint8 byte)
 {
-    switch (byte)
-    {
-    case 0x0:
-    {
-        printf("\t\tLD H,B\n");
-        set_reg(u, 'H', reg(u, 'B'));
-        break;
-    }
-    case 0x1:
-    {
-        printf("\t\tLD H,C\n");
-        set_reg(u, 'H', reg(u, 'C'));
-        break;
-    }
-    case 0x2:
-    {
-        printf("\t\tLD H,D\n");
-        set_reg(u, 'H', reg(u, 'D'));
-        break;
-    }
-    case 0x3:
-    {
-        printf("\t\tLD H,E\n");
-        set_reg(u, 'H', reg(u, 'E'));
-        break;
-    }
-    case 0x4:
-    {
-        printf("\t\tLD H,H\n");
-        set_reg(u, 'H', reg(u, 'H'));
-        break;
-    }
-    case 0x5:
-    {
-        printf("\t\tLD H,L\n");
-        set_reg(u, 'H', reg(u, 'L'));
-        break;
-    }
-    case 0x6:
-    {
-        printf("\t\tLD H, (HL)\n");
-        set_reg(u, 'H', u->mem.content[u->reg.HL]);
-        break;
-    }
-    case 0x7:
-    {
-        printf("\t\tLD H,A\n");
-        set_reg(u, 'H', reg(u, 'A'));
-        break;
-    }
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
 
-    case 0x8:
+    if (byte < 0x8)
     {
-        printf("\t\tLD L,B\n");
-        set_reg(u, 'L', reg(u, 'B'));
-        break;
+        printf("\t\tLD H, %s\n", letter);
+        set_reg(u, 'H', value_of_letter);
     }
-    case 0x9:
+    else
     {
-        printf("\t\tLD L,C\n");
-        set_reg(u, 'L', reg(u, 'C'));
-        break;
-    }
-    case 0xA:
-    {
-        printf("\t\tLD L,D\n");
-        set_reg(u, 'L', reg(u, 'D'));
-        break;
-    }
-    case 0xB:
-    {
-        printf("\t\tLD L,E\n");
-        set_reg(u, 'L', reg(u, 'E'));
-        break;
-    }
-    case 0xC:
-    {
-        printf("\t\tLD L,H\n");
-        set_reg(u, 'L', reg(u, 'H'));
-        break;
-    }
-    case 0xD:
-    {
-        printf("\t\tLD L,L\n");
-        set_reg(u, 'L', reg(u, 'L'));
-        break;
-    }
-    case 0xE:
-    {
-        printf("\t\tLD L, (HL)\n");
-        set_reg(u, 'L', u->mem.content[u->reg.HL]);
-        break;
-    }
-    case 0xF:
-    {
-        printf("\t\tLD L,A\n");
-        set_reg(u, 'L', reg(u, 'A'));
-        break;
-    }
+        printf("\t\tLD L, %s\n", letter);
+        set_reg(u, 'L', value_of_letter);
     }
 }
 
 void LD_HL_A(CPU *u, uint8 byte)
 {
-    switch (byte)
-    {
-    case 0x0:
-    {
-        printf("\t\tLD (HL),B\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'B'); XXX */
-        break;
-    }
-    case 0x1:
-    {
-        printf("\t\tLD (HL),C\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'C'); XXX */
-        break;
-    }
-    case 0x2:
-    {
-        printf("\t\tLD (HL),D\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'D'); XXX */
-        break;
-    }
-    case 0x3:
-    {
-        printf("\t\tLD (HL),E\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'E'); XXX */
-        break;
-    }
-    case 0x4:
-    {
-        printf("\t\tLD (HL),H\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'H'); XXX */
-        break;
-    }
-    case 0x5:
-    {
-        printf("\t\tLD (HL),L\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'L'); XXX */
-        break;
-    }
-    case 0x6:
-    {
-        puts("\t\tHALT should've been handled elsewhere.");
-        exit(1);
-    }
-    case 0x7:
-    {
-        printf("\t\tLD (HL),A\n");
-        /* u->mem.content[u->reg.HL] = reg(u, 'A'); XXX */
-        break;
-    }
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
 
-    case 0x8:
+    if (byte < 0x8)
     {
-        printf("\t\tLD A,B\n");
-        set_reg(u, 'A', reg(u, 'B'));
-        break;
+        printf("\t\tLD (HL), %s\n", letter);
+        /* u->mem.content[u->reg.HL] = value_of_letter; XXX */
     }
-    case 0x9:
+    else
     {
-        printf("\t\tLD A,C\n");
-        set_reg(u, 'A', reg(u, 'C'));
-        break;
-    }
-    case 0xA:
-    {
-        printf("\t\tLD A,D\n");
-        set_reg(u, 'A', reg(u, 'D'));
-        break;
-    }
-    case 0xB:
-    {
-        printf("\t\tLD A,E\n");
-        set_reg(u, 'A', reg(u, 'E'));
-        break;
-    }
-    case 0xC:
-    {
-        printf("\t\tLD A,H\n");
-        set_reg(u, 'A', reg(u, 'H'));
-        break;
-    }
-    case 0xD:
-    {
-        printf("\t\tLD A,L\n");
-        set_reg(u, 'A', reg(u, 'L'));
-        break;
-    }
-    case 0xE:
-    {
-        printf("\t\tLD A, (HL)\n");
-        set_reg(u, 'A', u->mem.content[u->reg.HL]);
-        break;
-    }
-    case 0xF:
-    {
-        printf("\t\tLD A,A\n");
-        set_reg(u, 'A', reg(u, 'A'));
-        break;
-    }
+        printf("\t\tLD A, %s\n", letter);
+        set_reg(u, 'A', value_of_letter);
     }
 }
 
 void ADD_ADC_CASE(CPU *u, uint8 byte)
 {
-    switch (byte)
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
+
+    if (byte < 0x8)
     {
-    case 0x0:
-    { /* add B to A */
-        printf("\t\tADD A,B\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'B'));
+        printf("\t\tADD A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') + value_of_letter);
         /* set_flags(u, Z, N, H, C); */
-        break;
     }
-
-    case 0x1:
-    { /* add C to A */
-        printf("\t\tADD A,C\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'C'));
+    else
+    {
+        printf("\t\tADC A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') + value_of_letter + get_flag(u, 'C'));
         /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x2:
-    { /* add D to A */
-        printf("\t\tADD A,D\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'D'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x3:
-    { /* add E to A */
-        printf("\t\tADD A,E\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'E'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x4:
-    { /* add H to A */
-        printf("\t\tADD A,H\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'H'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x5:
-    { /* add L to A */
-        printf("\t\tADD A,L\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'L'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x6:
-    { /* add (HL) to A */
-        printf("\t\tADD A, (HL)\n");
-        set_reg(u, 'A', reg(u, 'A') + u->mem.content[u->reg.HL]);
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x7:
-    { /* add A to A */
-        printf("\t\tADD A,A\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'A'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x8:
-    { /* adc B to A */
-        printf("\t\tADC A,B\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'B') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x9:
-    { /* adc C to A */
-        printf("\t\tADC A,C\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'C') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xA:
-    { /* adc D to A */
-        printf("\t\tADC A,D\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'D') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xB:
-    { /* adc E to A */
-        printf("\t\tADC A,E\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'E') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xC:
-    { /* adc H to A */
-        printf("\t\tADC A,H\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'H') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xD:
-    { /* adc L to A */
-        printf("\t\tADC A,L\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'L') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xE:
-    { /* adc (HL) to A */
-        printf("\t\tADC A, (HL)\n");
-        set_reg(u, 'A',
-                reg(u, 'A') + u->mem.content[u->reg.HL] + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xF:
-    { /* adc A to A */
-        printf("\t\tADC A,A\n");
-        set_reg(u, 'A', reg(u, 'A') + reg(u, 'A') + get_flag(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
     }
 }
 
 void SUB_SBC_CASE(CPU *u, uint8 byte)
 {
-    switch (byte)
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
+
+    if (byte < 0x8)
     {
-    case 0x0:
-    { /* sub B to A */
-        printf("\t\tSUB A,B\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'B'));
+        printf("\t\tSUB A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') - value_of_letter);
         /* set_flags(u, Z, N, H, C); */
-        break;
     }
-
-    case 0x1:
-    { /* sub C to A */
-        printf("\t\tSUB A,C\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'C'));
+    else
+    {
+        printf("\t\tSBC A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') - (value_of_letter + get_flag(u, 'C')));
         /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x2:
-    { /* sub D to A */
-        printf("\t\tSUB A,D\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'D'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x3:
-    { /* sub E to A */
-        printf("\t\tSUB A,E\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'E'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x4:
-    { /* sub H to A */
-        printf("\t\tSUB A,H\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'H'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x5:
-    { /* sub L to A */
-        printf("\t\tSUB A,L\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'L'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x6:
-    { /* sub (HL) to A */
-        printf("\t\tSUB A, (HL)\n");
-        set_reg(u, 'A', reg(u, 'A') - u->mem.content[u->reg.HL]);
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x7:
-    { /* sub A to A */
-        printf("\t\tSUB A,A\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'A'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x8:
-    { /* sbc B to A */
-        printf("\t\tSBC A,B\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'B') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x9:
-    { /* sbc C to A */
-        printf("\t\tSBC A,C\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'C') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xA:
-    { /* sbc D to A */
-        printf("\t\tSBC A,D\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'D') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xB:
-    { /* sbc E to A */
-        printf("\t\tSBC A,E\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'E') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xC:
-    { /* sbc H to A */
-        printf("\t\tSBC A,H\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'H') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xD:
-    { /* sbc L to A */
-        printf("\t\tSBC A,L\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'L') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xE:
-    { /* sbc (HL) to A */
-        printf("\t\tSBC A, (HL)\n");
-        set_reg(u, 'A',
-                reg(u, 'A') - (u->mem.content[u->reg.HL] + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xF:
-    { /* sbc A to A */
-        printf("\t\tSBC A,A\n");
-        set_reg(u, 'A', reg(u, 'A') - (reg(u, 'B') + get_flag(u, 'C')));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
     }
 }
 
 void AND_XOR_CASE(CPU *u, uint8 byte)
 {
-    switch (byte)
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
+
+    if (byte < 0x8)
     {
-    case 0x0:
-    { /* and B to A */
-        printf("\t\tAND A,B\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'B'));
+        printf("\t\tAND A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') & value_of_letter);
         /* set_flags(u, Z, N, H, C); */
-        break;
     }
-
-    case 0x1:
-    { /* and C to A */
-        printf("\t\tAND A,C\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'C'));
+    else
+    {
+        printf("\t\tXOR A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') ^ value_of_letter);
         /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x2:
-    { /* and D to A */
-        printf("\t\tAND A,D\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'D'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x3:
-    { /* and E to A */
-        printf("\t\tAND A,E\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'E'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x4:
-    { /* and H to A */
-        printf("\t\tAND A,H\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'H'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x5:
-    { /* and L to A */
-        printf("\t\tAND A,L\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'L'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x6:
-    { /* and (HL) to A */
-        printf("\t\tAND A, (HL)\n");
-        set_reg(u, 'A', reg(u, 'A') & u->mem.content[u->reg.HL]);
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x7:
-    { /* and A to A */
-        printf("\t\tAND A,A\n");
-        set_reg(u, 'A', reg(u, 'A') & reg(u, 'A'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x8:
-    { /* XOR B to A */
-        printf("\t\tXOR A,B\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'B'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x9:
-    { /* XOR C to A */
-        printf("\t\tXOR A,C\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xA:
-    { /* XOR D to A */
-        printf("\t\tXOR A,D\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'D'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xB:
-    { /* XOR E to A */
-        printf("\t\tXOR A,E\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'E'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xC:
-    { /* XOR H to A */
-        printf("\t\tXOR A,H\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'H'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xD:
-    { /* XOR L to A */
-        printf("\t\tXOR A,L\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'L'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xE:
-    { /* XOR (HL) to A */
-        printf("\t\tXOR A, (HL)\n");
-        set_reg(u, 'A', reg(u, 'A') ^ u->mem.content[u->reg.HL]);
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xF:
-    { /* XOR A to A */
-        printf("\t\tXOR A,A\n");
-        set_reg(u, 'A', reg(u, 'A') ^ reg(u, 'B'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
     }
 }
 
 void OR_CP_CASE(CPU *u, uint8 byte)
 {
-    switch (byte)
+    char *letter = letter_from_seq(byte);
+    uint8 value_of_letter = value_from_letter_seq(u, byte);
+
+    if (byte < 0x8)
     {
-    case 0x0:
-    { /* OR B to A */
-        printf("\t\tOR A,B\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'B'));
+        printf("\t\tOR A,%s\n", letter);
+        set_reg(u, 'A', reg(u, 'A') | value_of_letter);
         /* set_flags(u, Z, N, H, C); */
-        break;
     }
-
-    case 0x1:
-    { /* OR C to A */
-        printf("\t\tOR A,C\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'C'));
+    else
+    {
+        printf("\t\tCP A,%s\n", letter);
+        /* no result */
         /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x2:
-    { /* OR D to A */
-        printf("\t\tOR A,D\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'D'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x3:
-    { /* OR E to A */
-        printf("\t\tOR A,E\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'E'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x4:
-    { /* OR H to A */
-        printf("\t\tOR A,H\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'H'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x5:
-    { /* OR L to A */
-        printf("\t\tOR A,L\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'L'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x6:
-    { /* OR (HL) to A */
-        printf("\t\tOR A, (HL)\n");
-        set_reg(u, 'A', reg(u, 'A') | u->mem.content[u->reg.HL]);
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x7:
-    { /* OR A to A */
-        printf("\t\tOR A,A\n");
-        set_reg(u, 'A', reg(u, 'A') | reg(u, 'A'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x8:
-    { /* CP B to A */
-        printf("\t\tCP A,B\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'B'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0x9:
-    { /* CP C to A */
-        printf("\t\tCP A,C\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'C'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xA:
-    { /* CP D to A */
-        printf("\t\tCP A,D\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'D'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xB:
-    { /* CP E to A */
-        printf("\t\tCP A,E\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'E'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xC:
-    { /* CP H to A */
-        printf("\t\tCP A,H\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'H'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xD:
-    { /* CP L to A */
-        printf("\t\tCP A,L\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'L'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xE:
-    { /* CP (HL) to A */
-        printf("\t\tCP A, (HL)\n");
-        set_reg(u, 'A', reg(u, 'A') - u->mem.content[u->reg.HL]);
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
-
-    case 0xF:
-    { /* CP A to A */
-        printf("\t\tCP A,A\n");
-        set_reg(u, 'A', reg(u, 'A') - reg(u, 'B'));
-        /* set_flags(u, Z, N, H, C); */
-        break;
-    }
     }
 }
 
