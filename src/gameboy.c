@@ -7,9 +7,9 @@
 
 void help_instruction()
 {
-    char* d_usage = "\t-d PATH: \tDisassemble ROM in PATH\n";
-    char* e_usage = "\t-e PATH: \tEmulate ROM in PATH\n";
-    char* help = "\t-h: \t\tHelp message\n";
+    char *d_usage = "\t-d PATH: \tDisassemble ROM in PATH\n";
+    char *e_usage = "\t-e PATH: \tEmulate ROM in PATH\n";
+    char *help = "\t-h: \t\tHelp message\n";
     printf("Gameboy Emulator\nUsage:\n %s %s %s", d_usage, e_usage, help);
 }
 

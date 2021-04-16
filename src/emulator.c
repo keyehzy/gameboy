@@ -41,21 +41,21 @@ static uint8 value_from_letter_seq(CPU *u, uint8 byte)
     switch (byte % 0x8)
     {
     case 0x0:
-        return reg(u, 'B');
+        return u->reg.B;
     case 0x1:
-        return reg(u, 'C');
+        return u->reg.C;
     case 0x2:
-        return reg(u, 'D');
+        return u->reg.D;
     case 0x3:
-        return reg(u, 'E');
+        return u->reg.E;
     case 0x4:
-        return reg(u, 'H');
+        return u->reg.H;
     case 0x5:
-        return reg(u, 'L');
+        return u->reg.L;
     case 0x6:
         return u->mem.content[u->reg.HL];
     case 0x7:
-        return reg(u, 'A');
+        return u->reg.A;
     default:
         exit(1);
     }
@@ -234,88 +234,87 @@ static void PREFIX_CB_CASE(CPU *u, uint8 byte)
 
 static void LD_B_C(CPU *u, uint8 byte)
 {
-    char *letter = letter_from_seq(byte);
     uint8 value_of_letter = value_from_letter_seq(u, byte);
 
     if (byte < 0x8)
     {
-        printf("\t\tLD B, %s\n", letter);
-        set_reg(u, 'B', value_of_letter);
+        u->reg.B = value_of_letter;
     }
     else
     {
-        printf("\t\tLD C, %s\n", letter);
-        set_reg(u, 'C', value_of_letter);
+        u->reg.C = value_of_letter;
     }
 }
 
 static void LD_D_E(CPU *u, uint8 byte)
 {
-    char *letter = letter_from_seq(byte);
     uint8 value_of_letter = value_from_letter_seq(u, byte);
 
     if (byte < 0x8)
     {
-        printf("\t\tLD D, %s\n", letter);
-        set_reg(u, 'D', value_of_letter);
+        u->reg.D = value_of_letter;
     }
     else
     {
-        printf("\t\tLD E, %s\n", letter);
-        set_reg(u, 'E', value_of_letter);
+        u->reg.E = value_of_letter;
     }
 }
 
 static void LD_H_L(CPU *u, uint8 byte)
 {
-    char *letter = letter_from_seq(byte);
     uint8 value_of_letter = value_from_letter_seq(u, byte);
 
     if (byte < 0x8)
     {
-        printf("\t\tLD H, %s\n", letter);
-        set_reg(u, 'H', value_of_letter);
+        u->reg.H = value_of_letter;
     }
     else
     {
-        printf("\t\tLD L, %s\n", letter);
-        set_reg(u, 'L', value_of_letter);
+        u->reg.L = value_of_letter;
     }
 }
 
 static void LD_HL_A(CPU *u, uint8 byte)
 {
-    char *letter = letter_from_seq(byte);
     uint8 value_of_letter = value_from_letter_seq(u, byte);
 
     if (byte < 0x8)
     {
-        printf("\t\tLD (HL), %s\n", letter);
-        /* u->mem.content[u->reg.HL] = value_of_letter; XXX */
+        u->mem.content[u->reg.HL] = value_of_letter;
     }
     else
     {
-        printf("\t\tLD A, %s\n", letter);
-        set_reg(u, 'A', value_of_letter);
+        u->reg.A = value_of_letter;
     }
+}
+
+static void set_Z_flag(CPU *u, uint8 res)
+{
+    if (res == 0)
+        u->reg.FZ = 1;
 }
 
 static void ADD_ADC_CASE(CPU *u, uint8 byte)
 {
-    char *letter = letter_from_seq(byte);
     uint8 value_of_letter = value_from_letter_seq(u, byte);
 
     if (byte < 0x8)
     {
-        printf("\t\tADD A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') + value_of_letter);
+        uint8 res = u->reg.A + value_of_letter;
+        set_reg(u, 'A', res);
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        reset_flag(u, 'N');
     }
     else
     {
-        printf("\t\tADC A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') + value_of_letter + get_flag(u, 'C'));
+        uint8 res = u->reg.A + value_of_letter + get_flag(u, 'C');
+        set_reg(u, 'A', res);
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        reset_flag(u, 'N');
     }
 }
 
@@ -327,14 +326,22 @@ static void SUB_SBC_CASE(CPU *u, uint8 byte)
     if (byte < 0x8)
     {
         printf("\t\tSUB A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') - value_of_letter);
+        uint8 res = u->reg.A - value_of_letter;
+
         /* set_flags(u, Z, N, H, C); */
+        set_reg(u, 'A', res);
+        set_Z_flag(u, res);
+        set_flag(u, 'N');
     }
     else
     {
         printf("\t\tSBC A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') - (value_of_letter + get_flag(u, 'C')));
+        uint8 res = u->reg.A - (value_of_letter + get_flag(u, 'C'));
+        set_reg(u, 'A', res);
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        set_flag(u, 'N');
     }
 }
 
@@ -346,14 +353,26 @@ static void AND_XOR_CASE(CPU *u, uint8 byte)
     if (byte < 0x8)
     {
         printf("\t\tAND A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') & value_of_letter);
+        uint8 res = u->reg.A & value_of_letter;
+        set_reg(u, 'A', res);
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        reset_flag(u, 'N');
+        set_flag(u, 'H');
+        reset_flag(u, 'C');
     }
     else
     {
         printf("\t\tXOR A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') ^ value_of_letter);
+        uint8 res = u->reg.A ^ value_of_letter;
+        set_reg(u, 'A', res);
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        reset_flag(u, 'N');
+        reset_flag(u, 'H');
+        reset_flag(u, 'C');
     }
 }
 
@@ -365,14 +384,24 @@ static void OR_CP_CASE(CPU *u, uint8 byte)
     if (byte < 0x8)
     {
         printf("\t\tOR A,%s\n", letter);
-        set_reg(u, 'A', reg(u, 'A') | value_of_letter);
+        uint8 res = u->reg.A | value_of_letter;
+        set_reg(u, 'A', res);
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        reset_flag(u, 'N');
+        reset_flag(u, 'H');
+        reset_flag(u, 'C');
     }
     else
     {
         printf("\t\tCP A,%s\n", letter);
+        uint8 res = 0x0; /* XXX */
         /* no result */
+
         /* set_flags(u, Z, N, H, C); */
+        set_Z_flag(u, res);
+        set_flag(u, 'N');
     }
 }
 
@@ -465,20 +494,20 @@ int emulate_rom(CPU *u)
 
         case 0x02: /* LD (),A */
             printf("\t\tLD (BC),A\n");
-            /* u->mem.content[u->reg.BC] = reg(u, 'A'); XXX */
+            /* u->mem.content[u->reg.BC] = u->reg.A; XXX */
             continue;
         case 0x12:
             printf("\t\tLD (DE),A\n");
-            /* u->mem.content[u->reg.DE] = reg(u, 'A'); XXX */
+            /* u->mem.content[u->reg.DE] = u->reg.A; XXX */
             continue;
         case 0x22:
             printf("\t\tLD (HL+),A\n");
-            /* u->mem.content[u->reg.HL++] = reg(u, 'A'); XXX */
+            /* u->mem.content[u->reg.HL++] = u->reg.A; XXX */
             continue;
 
         case 0x32:
             printf("\t\tLD (SP-),A\n");
-            /* u->mem.content[u->reg.SP--] = reg(u, 'A'); XXX */
+            /* u->mem.content[u->reg.SP--] = u->reg.A; XXX */
             continue;
 
         case 0x03: /* INC 2 byte register */
@@ -505,21 +534,21 @@ int emulate_rom(CPU *u)
         case 0x04:
         { /* INC 1 byte register */
             printf("\t\tINC B\n");
-            set_reg(u, 'B', reg(u, 'B') + 1);
+            set_reg(u, 'B', u->reg.B + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x14:
         {
             printf("\t\tINC D\n");
-            set_reg(u, 'D', reg(u, 'D') + 1);
+            set_reg(u, 'D', u->reg.D + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x24:
         {
             printf("\t\tINC H\n");
-            set_reg(u, 'H', reg(u, 'H') + 1);
+            set_reg(u, 'H', u->reg.H + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -534,21 +563,21 @@ int emulate_rom(CPU *u)
         case 0x05:
         { /* DEC 1 byte register */
             printf("\t\tDEC B\n");
-            set_reg(u, 'B', reg(u, 'B') - 1);
+            set_reg(u, 'B', u->reg.B - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x15:
         {
             printf("\t\tDEC D\n");
-            set_reg(u, 'D', reg(u, 'D') - 1);
+            set_reg(u, 'D', u->reg.D - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x25:
         {
             printf("\t\tDEC H\n");
-            set_reg(u, 'H', reg(u, 'H') - 1);
+            set_reg(u, 'H', u->reg.H - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -596,7 +625,7 @@ int emulate_rom(CPU *u)
              * http://www.linux-kongress.org/2009/slides/compiler_survey_felix_von_leitner.pdf
              */
             printf("\t\tRLA (A)\n");
-            set_reg(u, 'A', (reg(u, 'A') << 1) | (reg(u, 'A') >> 7));
+            set_reg(u, 'A', (u->reg.A << 1) | (u->reg.A >> 7));
             continue;
         }
 
@@ -710,28 +739,28 @@ int emulate_rom(CPU *u)
         case 0x0C:
         { /* INC 1 byte register */
             printf("\t\tINC C\n");
-            set_reg(u, 'C', reg(u, 'C') + 1);
+            set_reg(u, 'C', u->reg.C + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x1C:
         {
             printf("\t\tINC E\n");
-            set_reg(u, 'E', reg(u, 'E') + 1);
+            set_reg(u, 'E', u->reg.E + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x2C:
         {
             printf("\t\tINC L\n");
-            set_reg(u, 'L', reg(u, 'L') + 1);
+            set_reg(u, 'L', u->reg.L + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x3C:
         {
             printf("\t\tINC A\n");
-            set_reg(u, 'A', reg(u, 'A') + 1);
+            set_reg(u, 'A', u->reg.A + 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -739,28 +768,28 @@ int emulate_rom(CPU *u)
         case 0x0D:
         { /* DEC 1 byte register */
             printf("\t\tDEC C\n");
-            set_reg(u, 'C', reg(u, 'C') - 1);
+            set_reg(u, 'C', u->reg.C - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x1D:
         {
             printf("\t\tDEC E\n");
-            set_reg(u, 'E', reg(u, 'E') - 1);
+            set_reg(u, 'E', u->reg.E - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x2D:
         {
             printf("\t\tDEC L\n");
-            set_reg(u, 'L', reg(u, 'L') - 1);
+            set_reg(u, 'L', u->reg.L - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
         case 0x3D:
         {
             printf("\t\tDEC A\n");
-            set_reg(u, 'A', reg(u, 'A') - 1);
+            set_reg(u, 'A', u->reg.A - 1);
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -800,7 +829,7 @@ int emulate_rom(CPU *u)
         case 0x1F:
         {
             printf("\t\tRRA (A)\n");
-            set_reg(u, 'A', (reg(u, 'A') >> 1) | (reg(u, 'A') << 7));
+            set_reg(u, 'A', (u->reg.A >> 1) | (u->reg.A << 7));
             continue;
         }
 
@@ -858,7 +887,7 @@ int emulate_rom(CPU *u)
             printf(" $%02x\t\tLDH ($%02x),A\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
             m_consume8(u); /* XXX */
-            /* u->mem.content[0xFF00 + m_consume8(u)] = reg(u, 'A'); XXX */
+            /* u->mem.content[0xFF00 + m_consume8(u)] = u->reg.A; XXX */
             continue;
         case 0xF0:
         {
@@ -898,13 +927,13 @@ int emulate_rom(CPU *u)
 
         case 0xE2: /* load address to register */
             printf("\t\tLD (C),A\n");
-            /* u->mem.content[0xFF00 + reg(u, 'C')] = reg(u, 'A'); XXX */
+            /* u->mem.content[0xFF00 + u->reg.C] = u->reg.A; XXX */
             continue;
 
         case 0xF2:
         {
             printf("\t\tLD A,(C)\n");
-            set_reg(u, 'A', reg(u, 'A') + u->mem.content[0xFF00 + reg(u, 'C')]);
+            set_reg(u, 'A', u->reg.A + u->mem.content[0xFF00 + u->reg.C]);
             continue;
         }
 
@@ -947,28 +976,28 @@ int emulate_rom(CPU *u)
         { /* d8 arithmetic */
             printf(" $%02x\t\tADD A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') + m_consume8(u));
+            set_reg(u, 'A', u->reg.A + m_consume8(u));
             continue;
         }
         case 0xD6:
         {
             printf(" $%02x\t\tSUB A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') - m_consume8(u));
+            set_reg(u, 'A', u->reg.A - m_consume8(u));
             continue;
         }
         case 0xE6:
         {
             printf(" $%02x\t\tAND A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') & m_consume8(u));
+            set_reg(u, 'A', u->reg.A & m_consume8(u));
             continue;
         }
         case 0xF6:
         {
             printf(" $%02x\t\tOR A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') | m_consume8(u));
+            set_reg(u, 'A', u->reg.A | m_consume8(u));
             continue;
         }
 
@@ -1042,7 +1071,7 @@ int emulate_rom(CPU *u)
 
         case 0xEA: /* load a16 to register*/
             puts("\t\tLD (a16),A");
-            /* u->mem.content[m_consume16(u)] = reg(u, 'A'); XXX */
+            /* u->mem.content[m_consume16(u)] = u->reg.A; XXX */
             continue;
         case 0xFA:
         {
@@ -1083,7 +1112,7 @@ int emulate_rom(CPU *u)
         { /* extra arithmetic d8 */
             printf(" $%02x\t\tADC A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') + (m_consume8(u) + get_flag(u, 'C')));
+            set_reg(u, 'A', u->reg.A + (m_consume8(u) + get_flag(u, 'C')));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1091,7 +1120,7 @@ int emulate_rom(CPU *u)
         {
             printf(" $%02x\t\tSBC A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') - (m_consume8(u) + get_flag(u, 'C')));
+            set_reg(u, 'A', u->reg.A - (m_consume8(u) + get_flag(u, 'C')));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1099,7 +1128,7 @@ int emulate_rom(CPU *u)
         {
             printf(" $%02x\t\tXOR A,$%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') ^ m_consume8(u));
+            set_reg(u, 'A', u->reg.A ^ m_consume8(u));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }
@@ -1107,7 +1136,7 @@ int emulate_rom(CPU *u)
         {
             printf(" $%02x\t\tCP $%02x\n", m_peek8(u, u->mem.ptr),
                    m_peek8(u, u->mem.ptr));
-            set_reg(u, 'A', reg(u, 'A') - m_consume8(u));
+            set_reg(u, 'A', u->reg.A - m_consume8(u));
             /* set_flags(u, Z, N, H, C); */
             continue;
         }

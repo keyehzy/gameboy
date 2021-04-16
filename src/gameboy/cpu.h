@@ -34,13 +34,68 @@ typedef struct
 {
     Memory mem;
     Stack *st;
-
     struct
     {
-        uint16 AF;
-        uint16 BC;
-        uint16 DE;
-        uint16 HL;
+        union
+        {
+            struct
+            {
+                uint8 A;
+
+                union
+                {
+                    struct
+                    {
+                       unsigned _B0 : 1;
+                       unsigned _B1 : 1;
+                       unsigned _B2 : 1;
+                       unsigned _B3 : 1;
+                       unsigned FC : 1;
+                       unsigned FH : 1;
+                       unsigned FN : 1;
+                       unsigned FZ : 1;
+                    };
+
+                    uint8 F;
+                };
+            };
+
+            uint16 AF;
+        };
+
+        union
+        {
+            struct
+            {
+                uint8 B;
+                uint8 C;
+            };
+
+            uint16 BC;
+        };
+
+        union
+        {
+            struct
+            {
+                uint8 D;
+                uint8 E;
+            };
+
+            uint16 DE;
+        };
+
+        union
+        {
+            struct
+            {
+                uint8 H;
+                uint8 L;
+            };
+
+            uint16 HL;
+        };
+
         uint16 SP; /* XXX we need to use our own stack pointer */
         uint16 PC;
     } reg;
