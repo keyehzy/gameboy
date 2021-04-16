@@ -36,7 +36,7 @@ static char *letter_from_seq(uint8 byte)
     }
 }
 
-static void value_from_letter_seq(CPU *u, uint8 byte)
+static uint8 value_from_letter_seq(CPU *u, uint8 byte)
 {
     switch (byte % 0x8)
     {
@@ -376,7 +376,7 @@ static void OR_CP_CASE(CPU *u, uint8 byte)
     }
 }
 
-static int disassemble_rom(CPU *u)
+int emulate_rom(CPU *u)
 {
     printf("ADDRESS\t\tOPCODE\t\tINSTRUCTION\n");
 

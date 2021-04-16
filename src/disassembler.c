@@ -319,7 +319,7 @@ static void OR_CP_CASE(uint8 byte)
     }
 }
 
-static int disassemble_rom(CPU *u)
+int disassemble_rom(CPU *u)
 {
     printf("ADDRESS\t\tOPCODE\t\tINSTRUCTION\n");
 
