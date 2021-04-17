@@ -99,6 +99,8 @@ uint8_t m_peek8(CPU *u);
 uint16_t m_peek16(CPU *u);
 uint8_t m_get8(CPU *u, uint16_t n);
 uint16_t m_get16(CPU *u, uint16_t n);
+void m_set8(CPU *u, uint16_t n, uint8_t val);
+void m_set16(CPU *u, uint16_t n, uint16_t val);
 
 void s_push8(Stack *s, uint8_t n);
 uint8_t s_pop8(Stack *s);

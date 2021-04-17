@@ -214,7 +214,7 @@ static void LD_HL_A(CPU *u, uint8_t byte)
 
     if (byte < 0x8)
     {
-        u->mem.content[u->reg.HL] = value_of_letter;
+        m_set8(u, u->reg.HL, value_of_letter);
     }
     else
     {
@@ -426,16 +426,16 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0x02: /* LD (BC),A */
-            u->mem.content[u->reg.BC] = u->reg.A;
+            m_set8(u, u->reg.BC, u->reg.A);
             continue;
         case 0x12: /* LD (DE),A */
-            u->mem.content[u->reg.DE] = u->reg.A;
+            m_set8(u, u->reg.DE, u->reg.A);
             continue;
         case 0x22: /* LD (HL+),A */
-            u->mem.content[u->reg.HL++] = u->reg.A;
+            m_set8(u, u->reg.HL++, u->reg.A);
             continue;
         case 0x32: /* LD (HL-),A */
-            u->mem.content[u->reg.HL--] = u->reg.A;
+            m_set8(u, u->reg.HL--, u->reg.A);
             continue;
 
         case 0x03: /* INC BC */
@@ -539,7 +539,7 @@ int emulate_rom(CPU *u)
             u->reg.H = m_read8(u);
             continue;
         case 0x36: /* LD (HL),d8 */
-            u->mem.content[u->reg.HL] = m_read8(u);
+            m_set8(u, u->reg.HL, m_read8(u));
             continue;
 
         case 0x07: /* RLCA */
@@ -559,7 +559,7 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0x08: /* LD (a16),SP */
-            u->mem.content[m_read16(u)] = u->reg.SP;
+            m_set8(u, m_read16(u), u->reg.SP);
             /* TODO(keyehzy): We need to roll our own */
             continue;
 
@@ -818,7 +818,7 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xE0: /* LDH (a8),A */ /* SIGN XXX */
-            u->mem.content[0xFF00 + m_read8(u)] = u->reg.A;
+            m_set8(u, 0xFF00 + m_read8(u), u->reg.A);
             continue;
         case 0xF0: /* LDH A,(a8) */ /* SIGN XXX */
             u->reg.A = u->mem.content[0xFF00 + m_read8(u)];
@@ -860,7 +860,7 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xE2: /* LD (C), A */
-            u->mem.content[0xFF00 + u->reg.C] = u->reg.A;
+            m_set8(u, 0xFF00 + u->reg.C, u->reg.A);
             continue;
 
         case 0xF2: /* LD A,(C) */
@@ -993,7 +993,7 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xEA: /* LD (a16),A */
-            u->mem.content[m_read16(u)] = u->reg.A;
+            m_set8(u, m_read16(u), u->reg.A);
             continue;
         case 0xFA: /* LD A,(a16) */
             u->reg.A = u->mem.content[m_read16(u)];
@@ -1068,7 +1068,7 @@ int emulate_rom(CPU *u)
             uint16_t res = (uint16_t)(u->reg.A - next8);
             uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (next8 & 0xF));
 
-            if (u->reg.A - m_read8(u) == 0)
+            if (res == 0)
                 u->reg.F |= Z_FLAG;
             u->reg.F |= N_FLAG;
             if (wrap > 0xF)

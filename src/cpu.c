@@ -4,14 +4,42 @@
 #include <string.h>
 
 /* memory specific */
+void MEMORY_CONTROL(uint16_t n) 
+{
+    if (n < 0x800)
+    {
+        puts("Writing to readonly memory.");
+        exit(1);
+    }
+    if ((n >= 0xFEA0) && (n < 0xFEFF))
+    {
+        puts("Writing to non-usable part of memory.");
+        exit(1);
+    }
+}
+
+void ECHO_RAM(CPU *u, uint16_t n, uint8_t val) 
+{
+    if((n >= 0xE000) && (n < 0xFE00))
+    {
+        m_set8(u, n - 0x2000, val);
+    }
+}
+
 uint8_t m_peek8(CPU *u)
 {
     return u->mem.content[u->mem.ptr];
 }
-
 uint8_t m_get8(CPU *u, uint16_t n)
 {
     return u->mem.content[n];
+}
+
+void m_set8(CPU *u, uint16_t n, uint8_t val)
+{
+    MEMORY_CONTROL(n);
+    ECHO_RAM(u, n, val);
+    u->mem.content[n] = val;
 }
 
 uint8_t m_read8(CPU *u)
@@ -29,6 +57,12 @@ uint16_t m_get16(CPU *u, uint16_t n)
 {
     /* https://stackoverflow.com/a/1935457 */
     return m_get8(u, n) + (m_get8(u, n + 1) << 8);
+}
+
+void m_set16(CPU *u, uint16_t n, uint16_t val)
+{
+    m_set8(u, n, val >> 8);
+    m_set8(u, n + 1, val);
 }
 
 uint16_t m_read16(CPU *u)
