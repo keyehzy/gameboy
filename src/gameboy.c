@@ -2,8 +2,8 @@
 #include <gameboy/disassembler.h>
 #include <gameboy/emulator.h>
 
+#include <getopt.h>
 #include <stdio.h>
-#include <unistd.h>
 
 void help_instruction()
 {
@@ -13,26 +13,48 @@ void help_instruction()
     printf("Gameboy Emulator\nUsage:\n %s %s %s", d_usage, e_usage, help);
 }
 
+static int info_flag;
+
 int main(int argc, char **argv)
 {
-    int dis_flag = 0;
-    int emu_flag = 0;
-    int c = 0;
+    int c;
 
     CPU u;
     boot_cpu(&u);
 
-    while ((c = getopt(argc, argv, "d:e:")) != -1)
+    while (1)
     {
+        static struct option long_options[] = {
+            {"info", no_argument, &info_flag, 1},
+            {"help", no_argument, 0, 'h'},
+            {"emulate", required_argument, 0, 'e'},
+            {"disassemble", required_argument, 0, 'd'},
+            {0, 0, 0, 0}};
+
+        int option_index = 0;
+
+        c = getopt_long(argc, argv, "d:e:h", long_options, &option_index);
+
+        if (c == -1)
+        {
+            help_instruction();
+            break;
+        }
+
         switch (c)
         {
+        case 0:
+            if (long_options[option_index].flag != 0)
+                break;
+            help_instruction();
+            break;
         case 'd':
-            dis_flag = 1;
-            load_rom(&u, optarg);
+            load_rom(&u, optarg, info_flag);
+            disassemble_rom(&u);
             break;
         case 'e':
-            emu_flag = 1;
-            load_rom(&u, optarg);
+            load_rom(&u, optarg, info_flag);
+            emulate_rom(&u);
             break;
         case 'h':
         default:
@@ -40,26 +62,5 @@ int main(int argc, char **argv)
             return 1;
         }
     }
-
-    for (int index = optind; index < argc; index++)
-    {
-        printf("Non-option argument: %s\n", argv[index]);
-        help_instruction();
-        return 1;
-    }
-
-    if (dis_flag)
-    {
-        disassemble_rom(&u);
-    }
-    else if (emu_flag)
-    {
-        emulate_rom(&u);
-    }
-    else
-    {
-        help_instruction();
-    }
-
     return 0;
 }

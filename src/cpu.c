@@ -4,7 +4,7 @@
 #include <string.h>
 
 /* memory specific */
-void MEMORY_CONTROL(uint16_t n) 
+void MEMORY_CONTROL(uint16_t n)
 {
     if (n < 0x800)
     {
@@ -18,11 +18,15 @@ void MEMORY_CONTROL(uint16_t n)
     }
 }
 
-void ECHO_RAM(CPU *u, uint16_t n, uint8_t val) 
+void ECHO_RAM(CPU *u, uint16_t n, uint8_t val)
 {
-    if((n >= 0xE000) && (n < 0xFE00))
+    if ((n >= 0xc000) && (n < 0xde00))
     {
-        m_set8(u, n - 0x2000, val);
+        u->mem.content[n + 0x2000] = val;
+    }
+    else if ((n >= 0xe000) && (n < 0xfe00))
+    {
+        u->mem.content[n - 0x2000] = val;
     }
 }
 
@@ -102,7 +106,174 @@ uint16_t s_peek16(Stack *s, uint16_t n)
     return s_peek8(s, 2 * n) + (s_peek8(s, 2 * n + 1) << 8);
 }
 
-int load_rom(CPU *u, char *path)
+char *rom_type(uint8_t byte)
+{
+    switch (byte)
+    {
+    case 0x0:
+        return "ROM ONLY";
+    case 0x1:
+        return "ROM+MBC";
+    case 0x2:
+        return "ROM+MBC1+RAM";
+    case 0x3:
+        return "ROM+MBC1+RAM+BATT";
+    case 0x5:
+        return "ROM+MBC2";
+    case 0x6:
+        return "ROM+MBC2+BATTERY";
+    case 0x8:
+        return "ROM+RAM";
+    case 0x9:
+        return "ROM+RAM+BATTERY";
+    case 0xB:
+        return "ROM+MMM01";
+    case 0xC:
+        return "ROM+MMM01+SRAM";
+    case 0xD:
+        return "ROM+MMM01+SRAM+BATT";
+    case 0xF:
+        return "ROM+MBC3+TIMER+BATT";
+    case 0x10:
+        return "ROM+MBC3+TIMER+RAM+BATT";
+    case 0x11:
+        return "ROM+MBC3";
+    case 0x12:
+        return "ROM+MBC3+RAM";
+    case 0x13:
+        return "ROM+MBC3+RAM+BATT";
+    case 0x19:
+        return "ROM+MBC5";
+    case 0x1A:
+        return "ROM+MBC5+RAM";
+    case 0x1B:
+        return "ROM+MBC5+RAM+BATT";
+    case 0x1C:
+        return "ROM+MBC5+RUMBLE";
+    case 0x1D:
+        return "ROM+MBC5+RUMBLE+SRAM";
+    case 0x1E:
+        return "ROM+MBC5+RUMBLE+SRAM+BATT";
+    case 0x1F:
+        return "Pocket Camera";
+    case 0xFD:
+        return "Bandai TAMA5";
+    case 0xFE:
+        return "Hudson HuC-3";
+    case 0xFF:
+        return "Hudson HuC-1";
+    default:
+        return "Unknown";
+    }
+}
+
+char *rom_size(uint8_t byte)
+{
+    switch (byte)
+    {
+    case 0x0:
+        return "32KByte";
+    case 0x1:
+        return "64KByte";
+    case 0x2:
+        return "128KByte";
+    case 0x3:
+        return "256KByte";
+    case 0x4:
+        return "512KByte";
+    case 0x5:
+        return "1MByte";
+    case 0x6:
+        return "2MByte";
+    case 0x52:
+        return "1.1MByte";
+    case 0x53:
+        return "1.2MByte";
+    case 0x54:
+        return "1.5MByte";
+    default:
+        return "Unknown";
+    }
+}
+
+char *ram_size(uint8_t byte)
+{
+    switch (byte)
+    {
+    case 0x0:
+        return "None";
+    case 0x1:
+        return "2kB";
+    case 0x2:
+        return "8kB";
+    case 0x3:
+        return "32kB";
+    case 0x4:
+        return "128kB";
+    default:
+        return "Unknown";
+    }
+}
+
+GameInfo rom_info(CPU *u)
+{
+    GameInfo info;
+
+    for (int i = 0; i < 16; i++)
+    {
+        u->info.title[i] = m_get8(u, 0x0134 + i);
+    }
+
+    info.gb_color = m_get8(u, 0x143) == 0x80;
+    info.license[0] = m_get8(u, 0x144);
+    info.license[1] = m_get8(u, 0x145);
+    info.gb_sgb_indicator = m_get8(u, 0x146);
+    info.cartridge_type = m_get8(u, 0x147);
+    info.rom_size = m_get8(u, 0x148);
+    info.ram_size = m_get8(u, 0x149);
+    info.destintion = m_get8(u, 0x14a);
+    info.license[2] = m_get8(u, 0x14b);
+
+    return info;
+}
+
+void dump_info(GameInfo info)
+{
+    printf("Game Title: %s\n", info.title);
+    printf("Color GB: %s\n", info.gb_color ? "Color" : "No Color");
+
+    if (info.gb_sgb_indicator == 0)
+    {
+        printf("Mode: GameBoy\n");
+    }
+    else if (info.gb_sgb_indicator == 3)
+    {
+        printf("Mode: Super GameBoy\n");
+    }
+
+    printf("Catridge Type: %s\n", rom_type(info.cartridge_type));
+    printf("ROM Size: %s\n", rom_size(info.cartridge_type));
+    printf("RAM Size: %s\n", ram_size(info.cartridge_type));
+    printf("Destination: %s\n", info.destintion ? "Non-Japanese" : "Japanese");
+
+    switch (info.license[2])
+    {
+    case 0x33:
+        printf("License code: %02x %02x\n", info.license[1], info.license[2]);
+        break;
+    case 0x79:
+        puts("Accolade");
+        break;
+    case 0xA4:
+        puts("Konami");
+        break;
+    default:
+        printf("License code: %02x %02x\n", info.license[1], info.license[2]);
+        break;
+    }
+}
+
+int load_rom(CPU *u, char *path, int flag)
 {
     FILE *f = fopen(path, "rb");
 
@@ -119,6 +290,13 @@ int load_rom(CPU *u, char *path)
     {
         printf("Could not find ROM in path: %s\n", path);
         exit(1);
+    }
+
+    u->info = rom_info(u);
+
+    if (flag)
+    {
+        dump_info(u->info);
     }
     return 0;
 }

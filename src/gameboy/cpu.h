@@ -9,6 +9,19 @@
 
 typedef struct
 {
+    uint8_t title[16];
+    uint8_t gb_color;
+    uint8_t gb_sgb_indicator;
+    uint8_t cartridge_type;
+    uint8_t rom_size;
+    uint8_t ram_size;
+    uint8_t destintion;
+    uint8_t license[3];
+
+} GameInfo;
+
+typedef struct
+{
     uint16_t ptr;
     uint8_t content[0x10000];
 } Stack;
@@ -35,6 +48,7 @@ typedef struct
 
 typedef struct
 {
+    GameInfo info;
     Memory mem;
     Stack *st;
     struct
@@ -90,7 +104,7 @@ typedef struct
 } CPU;
 
 int boot_cpu(CPU *u);
-int load_rom(CPU *u, char *path);
+int load_rom(CPU *u, char *path, int flag);
 int run_rom(CPU *u);
 
 uint8_t m_read8(CPU *u);

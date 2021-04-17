@@ -357,7 +357,16 @@ static void OR_CP_CASE(CPU *u, uint8_t byte)
 
 int emulate_rom(CPU *u)
 {
+    if (u->info.cartridge_type !=
+        0) /* TODO(keyenzy): Implement multiple ROM Banks */
+    {
+        puts("Multiple ROM banks not implemented yet.");
+        exit(1);
+    }
+
     printf("ADDRESS\tOPCODE\tBYTES\t\tAF\tBC\tDE\tHL\tSP\tPC\tZNHC\n");
+
+    printf("ADDRESS\tOPCODE\tBYTES\t\tFLAGS(ZNHC)\n");
 
     while (1)
     {
@@ -1098,5 +1107,5 @@ int emulate_rom(CPU *u)
 
         printf("\t\tdunno $%02x\n", op);
     }
-    return 1;
+    return 0;
 }
