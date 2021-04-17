@@ -323,8 +323,6 @@ int disassemble_rom(CPU *u)
 {
     printf("ADDRESS\t\tOPCODE\t\tINSTRUCTION\n");
 
-    u->mem.ptr = 0x000; /* entry point */
-
     while (1)
     {
         if (u->mem.ptr == 0x8000)

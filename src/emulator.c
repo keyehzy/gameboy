@@ -337,8 +337,6 @@ static void OR_CP_CASE(CPU *u, uint8_t byte)
 
 int emulate_rom(CPU *u)
 {
-    u->mem.ptr = 0x100; /* entry point */
-
     printf("ADDRESS\tOPCODE\tBYTES\t\tAF\tBC\tDE\tHL\tSP\tPC\tZNHC\n");
 
     while (1)

@@ -97,5 +97,44 @@ int boot_cpu(CPU *u)
         puts("Failed to boot.");
         exit(1);
     }
+
+    /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
+    u->reg.AF=0x01B0;
+    u->reg.BC=0x0013;
+    u->reg.DE=0x00D8;
+    u->reg.HL=0x014D;
+    /* u->st->ptr=0xFFFE; */
+    u->mem.ptr = 0x100;
+    u->mem.content[0xFF05] = 0x00;
+    u->mem.content[0xFF06] = 0x00;
+    u->mem.content[0xFF07] = 0x00;
+    u->mem.content[0xFF10] = 0x80;
+    u->mem.content[0xFF11] = 0xBF;
+    u->mem.content[0xFF12] = 0xF3;
+    u->mem.content[0xFF14] = 0xBF;
+    u->mem.content[0xFF16] = 0x3F;
+    u->mem.content[0xFF17] = 0x00;
+    u->mem.content[0xFF19] = 0xBF;
+    u->mem.content[0xFF1A] = 0x7F;
+    u->mem.content[0xFF1B] = 0xFF;
+    u->mem.content[0xFF1C] = 0x9F;
+    u->mem.content[0xFF1E] = 0xBF;
+    u->mem.content[0xFF20] = 0xFF;
+    u->mem.content[0xFF21] = 0x00;
+    u->mem.content[0xFF22] = 0x00;
+    u->mem.content[0xFF23] = 0xBF;
+    u->mem.content[0xFF24] = 0x77;
+    u->mem.content[0xFF25] = 0xF3;
+    u->mem.content[0xFF26] = 0xF1;
+    u->mem.content[0xFF40] = 0x91;
+    u->mem.content[0xFF42] = 0x00;
+    u->mem.content[0xFF43] = 0x00;
+    u->mem.content[0xFF45] = 0x00;
+    u->mem.content[0xFF47] = 0xFC;
+    u->mem.content[0xFF48] = 0xFF;
+    u->mem.content[0xFF49] = 0xFF;
+    u->mem.content[0xFF4A] = 0x00;
+    u->mem.content[0xFF4B] = 0x00;
+    u->mem.content[0xFFFF] = 0x00; 
     return 0;
 }
