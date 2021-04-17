@@ -98,12 +98,14 @@ int boot_cpu(CPU *u)
         exit(1);
     }
 
+    u->st = (Stack *)malloc(sizeof(Stack));
+    u->st->ptr = 0xFFFE;
+
     /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
-    u->reg.AF=0x01B0;
-    u->reg.BC=0x0013;
-    u->reg.DE=0x00D8;
-    u->reg.HL=0x014D;
-    /* u->st->ptr=0xFFFE; */
+    u->reg.AF = 0x01B0;
+    u->reg.BC = 0x0013;
+    u->reg.DE = 0x00D8;
+    u->reg.HL = 0x014D;
     u->mem.ptr = 0x100;
     u->mem.content[0xFF05] = 0x00;
     u->mem.content[0xFF06] = 0x00;
@@ -135,6 +137,6 @@ int boot_cpu(CPU *u)
     u->mem.content[0xFF49] = 0xFF;
     u->mem.content[0xFF4A] = 0x00;
     u->mem.content[0xFF4B] = 0x00;
-    u->mem.content[0xFFFF] = 0x00; 
+    u->mem.content[0xFFFF] = 0x00;
     return 0;
 }

@@ -2,10 +2,15 @@
 #define CPU_H
 #include <stdint.h>
 
+#define Z_FLAG 0x80
+#define N_FLAG 0x40
+#define H_FLAG 0x20
+#define C_FLAG 0x10
+
 typedef struct
 {
     uint16_t ptr;
-    uint8_t content[256];
+    uint8_t content[0x10000];
 } Stack;
 
 typedef struct
@@ -39,23 +44,7 @@ typedef struct
             struct
             {
                 uint8_t A;
-
-                union
-                {
-                    struct
-                    {
-                        unsigned _B0 : 1;
-                        unsigned _B1 : 1;
-                        unsigned _B2 : 1;
-                        unsigned _B3 : 1;
-                        unsigned FC : 1;
-                        unsigned FH : 1;
-                        unsigned FN : 1;
-                        unsigned FZ : 1;
-                    };
-
-                    uint8_t F;
-                };
+                uint8_t F;
             };
 
             uint16_t AF;

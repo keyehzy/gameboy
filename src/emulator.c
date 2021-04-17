@@ -235,22 +235,29 @@ static void ADD_ADC_CASE(CPU *u, uint8_t byte)
         uint16_t wrap = (uint16_t)((u->reg.A & 0xF) + (value_of_letter & 0xF));
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 0;
-        u->reg.FH = wrap > 0xF;
-        u->reg.FC = res > 0xFF;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F &= ~N_FLAG;
+        if (wrap > 0xF)
+            u->reg.F |= H_FLAG;
+        if (res > 0xFF)
+            u->reg.F |= C_FLAG;
     }
     else /* ADC */
     {
-        uint16_t res = (uint16_t)(u->reg.A + value_of_letter + u->reg.FC);
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) +
-                                   ((value_of_letter + u->reg.FC) & 0xF));
+        uint16_t res =
+            (uint16_t)(u->reg.A + value_of_letter + (u->reg.F & C_FLAG));
+        uint16_t wrap = (uint16_t)(
+            (u->reg.A & 0xF) + ((value_of_letter + (u->reg.F & C_FLAG)) & 0xF));
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 0;
-        u->reg.FH = wrap > 0xF;
-        u->reg.FC = res > 0xFF;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F &= ~N_FLAG;
+        if (wrap > 0xF)
+            u->reg.F |= H_FLAG;
+        if (res > 0xFF)
+            u->reg.F |= C_FLAG;
     }
 }
 
@@ -264,22 +271,29 @@ static void SUB_SBC_CASE(CPU *u, uint8_t byte)
         uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (value_of_letter & 0xF));
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 1;
-        u->reg.FH = wrap > 0xF;
-        u->reg.FC = res > 0xFF;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F |= N_FLAG;
+        if (wrap > 0xF)
+            u->reg.F |= H_FLAG;
+        if (res > 0xFF)
+            u->reg.F |= C_FLAG;
     }
     else /* SBC */
     {
-        uint16_t res = (uint16_t)(u->reg.A - (value_of_letter + u->reg.FC));
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) -
-                                   ((value_of_letter + u->reg.FC) & 0xF));
+        uint16_t res =
+            (uint16_t)(u->reg.A - (value_of_letter + (u->reg.F & C_FLAG)));
+        uint16_t wrap = (uint16_t)(
+            (u->reg.A & 0xF) - ((value_of_letter + (u->reg.F & C_FLAG)) & 0xF));
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 1;
-        u->reg.FH = wrap > 0xF;
-        u->reg.FC = res > 0xFF;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F |= N_FLAG;
+        if (wrap > 0xF)
+            u->reg.F |= H_FLAG;
+        if (res > 0xFF)
+            u->reg.F |= C_FLAG;
     }
 }
 
@@ -292,20 +306,22 @@ static void AND_XOR_CASE(CPU *u, uint8_t byte)
         uint16_t res = (uint16_t)(u->reg.A & value_of_letter);
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 1;
-        u->reg.FC = 0;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F &= ~N_FLAG;
+        u->reg.F |= H_FLAG;
+        u->reg.F &= ~C_FLAG;
     }
     else /* XOR */
     {
         uint16_t res = (uint16_t)(u->reg.A ^ value_of_letter);
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 0;
-        u->reg.FC = 0;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F &= ~N_FLAG;
+        u->reg.F &= ~H_FLAG;
+        u->reg.F &= ~C_FLAG;
     }
 }
 
@@ -318,20 +334,24 @@ static void OR_CP_CASE(CPU *u, uint8_t byte)
         uint16_t res = (uint16_t)(u->reg.A | value_of_letter);
         u->reg.A = (uint8_t)res;
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 0;
-        u->reg.FC = 0;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F &= ~N_FLAG;
+        u->reg.F &= ~H_FLAG;
+        u->reg.F &= ~C_FLAG;
     }
     else /* CP */
     {
         uint16_t res = (uint16_t)(u->reg.A - value_of_letter);
         uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (value_of_letter & 0xF));
 
-        u->reg.FZ = res == 0;
-        u->reg.FN = 1;
-        u->reg.FH = wrap > 0xF;
-        u->reg.FC = res > 0xFF;
+        if (res == 0)
+            u->reg.F |= Z_FLAG;
+        u->reg.F |= N_FLAG;
+        if (wrap > 0xF)
+            u->reg.F |= H_FLAG;
+        if (res > 0xFF)
+            u->reg.F |= C_FLAG;
     }
 }
 
@@ -348,11 +368,10 @@ int emulate_rom(CPU *u)
         }
 
         printf("$%04x\t$%02x\t$%02x "
-               "$%02x\t\t%04x\t%04x\t%04x\t%04x\t%04x\t%04x\t%d%d%d%d\n",
+               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%02x\n",
                u->mem.ptr, m_peek8(u), m_get8(u, u->mem.ptr + 1),
                m_get8(u, u->mem.ptr + 2), u->reg.AF, u->reg.BC, u->reg.DE,
-               u->reg.HL, u->reg.SP, u->reg.PC, u->reg.FZ, u->reg.FN, u->reg.FH,
-               u->reg.FC);
+               u->reg.HL, u->reg.SP, u->reg.PC, u->reg.F);
 
         uint8_t op = m_read8(u);
 
@@ -373,15 +392,23 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0x20: /* JR NZ (Z),d8 */
-            if (!u->reg.FZ)
+            if (!(u->reg.F & Z_FLAG))
             {
-                u->mem.ptr += m_peek8(u);
+                u->mem.ptr += m_read8(u);
+            }
+            else
+            {
+                m_read8(u);
             }
             continue;
         case 0x30: /* JR NZ (C),a8 */
-            if (!u->reg.FC)
+            if (!(u->reg.F & C_FLAG))
             {
-                u->mem.ptr += m_peek8(u);
+                u->mem.ptr += m_read8(u);
+            }
+            else
+            {
+                m_read8(u);
             }
             continue;
 
@@ -427,63 +454,79 @@ int emulate_rom(CPU *u)
         case 0x04: /* INC B */
             u->reg.B++;
 
-            u->reg.FZ = u->reg.B == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.B & 0xF) == 0; /* XXX */
+            if (u->reg.B == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.B & 0xF) == 0)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
         case 0x14: /* INC D */
             u->reg.D++;
 
-            u->reg.FZ = u->reg.D == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.D & 0xF) == 0; /* XXX */
+            if (u->reg.D == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.D & 0xF) == 0)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
         case 0x24: /* INC H */
             u->reg.H++;
 
-            u->reg.FZ = u->reg.H == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.H & 0xF) == 0; /* XXX */
+            if (u->reg.H == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.H & 0xF) == 0)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
         case 0x34: /* INC (HL) */
             u->mem.content[u->reg.HL]++;
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->mem.content[u->reg.HL] == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->mem.content[u->reg.HL] & 0xF) == 0; /* XXX */
+            if (u->mem.content[u->reg.HL] == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->mem.content[u->reg.HL] & 0xF) == 0)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
 
         case 0x05: /* DEC B */
             u->reg.B--;
 
-            u->reg.FZ = u->reg.B == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.B & 0xF) == 0xF; /* XXX */
+            if (u->reg.B == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.B & 0xF) == 0xF)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
         case 0x15: /* DEC D */
             u->reg.D = u->reg.D - 1;
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.D == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.D & 0xF) == 0xF; /* XXX */
+            if (u->reg.D == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.D & 0xF) == 0xF)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
         case 0x25: /* DEC H */
             u->reg.H = u->reg.H - 1;
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.H == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.H & 0xF) == 0xF; /* XXX */
+            if (u->reg.H == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.H & 0xF) == 0xF)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
         case 0x35: /* DEC (HL) */
             u->mem.content[u->reg.HL]--;
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->mem.content[u->reg.HL] == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->mem.content[u->reg.HL] & 0xF) == 0xF; /* XXX */
+            if (u->mem.content[u->reg.HL] == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->mem.content[u->reg.HL] & 0xF) == 0xF)
+                u->reg.F |= H_FLAG; /* XXX */
             continue;
 
         case 0x06: /* LD B,d8 */
@@ -512,7 +555,7 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0x37: /* SCF (FLAG C) */
-            u->reg.FC = 1;
+            u->reg.F |= C_FLAG;
             continue;
 
         case 0x08: /* LD (a16),SP */
@@ -521,18 +564,26 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0x18: /* JR r8 */ /* XXX signed? */
-            u->mem.ptr += m_peek8(u);
+            u->mem.ptr += m_read8(u);
             continue;
         case 0x28: /* JR Z,d8 */
-            if (u->reg.FZ)
+            if (u->reg.F & Z_FLAG)
             {
-                u->mem.ptr += m_peek8(u);
+                u->mem.ptr += m_read8(u);
+            }
+            else
+            {
+                m_read8(u);
             }
             continue;
         case 0x38: /* JR C,d8 */
-            if (u->reg.FC)
+            if (u->reg.F & C_FLAG)
             {
-                u->mem.ptr += m_peek8(u);
+                u->mem.ptr += m_read8(u);
+            }
+            else
+            {
+                m_read8(u);
             }
             continue;
 
@@ -543,9 +594,11 @@ int emulate_rom(CPU *u)
                 (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.BC & 0xFFF));
             u->reg.HL = (uint16_t)res;
 
-            u->reg.FN = 0;
-            u->reg.FH = wrap > 0x0FF;
-            u->reg.FC = res > 0xFFFF;
+            u->reg.F &= ~N_FLAG;
+            if (wrap > 0x0FF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFFFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
         case 0x19: /* ADD HL,DE */
@@ -555,9 +608,11 @@ int emulate_rom(CPU *u)
                 (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.DE & 0xFFF));
             u->reg.HL = (uint16_t)res;
 
-            u->reg.FN = 0;
-            u->reg.FH = wrap > 0x0FF;
-            u->reg.FC = res > 0xFFFF;
+            u->reg.F &= ~N_FLAG;
+            if (wrap > 0x0FF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFFFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
         case 0x29: /* ADD HL, HL */
@@ -567,9 +622,11 @@ int emulate_rom(CPU *u)
                 (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.HL & 0xFFF));
             u->reg.HL = (uint16_t)res;
 
-            u->reg.FN = 0;
-            u->reg.FH = wrap > 0x0FF;
-            u->reg.FC = res > 0xFFFF;
+            u->reg.F &= ~N_FLAG;
+            if (wrap > 0x0FF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFFFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
         case 0x39: /* ADD HL,SP */
@@ -579,9 +636,11 @@ int emulate_rom(CPU *u)
                 (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.SP & 0xFFF));
             u->reg.HL = (uint16_t)res;
 
-            u->reg.FN = 0;
-            u->reg.FH = wrap > 0x0FF;
-            u->reg.FC = res > 0xFFFF;
+            u->reg.F &= ~N_FLAG;
+            if (wrap > 0x0FF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFFFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
 
@@ -592,7 +651,6 @@ int emulate_rom(CPU *u)
             u->reg.A = u->mem.content[u->reg.DE];
             continue;
         case 0x2A: /* LD A,(HL+) */
-            printf("\t\tLD A, (HL+)\n");
             u->reg.A = u->mem.content[u->reg.HL++];
             continue;
         case 0x3A: /* LD A,(HL-) */
@@ -615,59 +673,75 @@ int emulate_rom(CPU *u)
         case 0x0C: /* INC C */
             u->reg.C++;
 
-            u->reg.FZ = u->reg.C == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.C & 0xF) == 0;
+            if (u->reg.C == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.C & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
         case 0x1C: /* INC E */
             u->reg.E++;
 
-            u->reg.FZ = u->reg.E == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.E & 0xF) == 0;
+            if (u->reg.E == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.E & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
         case 0x2C: /* INC L */
             u->reg.L++;
 
-            u->reg.FZ = u->reg.L == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.L & 0xF) == 0;
+            if (u->reg.L == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.L & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
         case 0x3C: /* INC A */
             u->reg.A++;
 
-            u->reg.FZ = u->reg.A == 0;
-            u->reg.FN = 0;
-            u->reg.FH = (u->reg.A & 0xF) == 0;
+            if (u->reg.A == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if ((u->reg.A & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
 
         case 0x0D: /* DEC C */
             u->reg.C--;
 
-            u->reg.FZ = u->reg.C == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.C & 0xF) == 0;
+            if (u->reg.C == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.C & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
         case 0x1D: /* DEC E */
             u->reg.E--;
 
-            u->reg.FZ = u->reg.E == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.E & 0xF) == 0;
+            if (u->reg.E == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.E & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
         case 0x2D: /* DEC L */
             u->reg.L--;
 
-            u->reg.FZ = u->reg.L == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.L & 0xF) == 0;
+            if (u->reg.L == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.L & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
         case 0x3D: /* DEC A */
             u->reg.A--;
 
-            u->reg.FZ = u->reg.A == 0;
-            u->reg.FN = 1;
-            u->reg.FH = (u->reg.A & 0xF) == 0;
+            if (u->reg.A == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if ((u->reg.A & 0xF) == 0)
+                u->reg.F |= H_FLAG;
             continue;
 
         case 0x0E: /* LD C,d8 */
@@ -731,13 +805,13 @@ int emulate_rom(CPU *u)
         switch (op)
         {
         case 0xC0: /* RET NZ */
-            if (!u->reg.FZ)
+            if (!(u->reg.F & Z_FLAG))
             {
                 u->mem.ptr = s_pop16(u->st);
             }
             continue;
         case 0xD0: /* RET NC */
-            if (!u->reg.FC)
+            if (!(u->reg.F & C_FLAG))
             {
                 u->mem.ptr = s_pop16(u->st);
             }
@@ -764,15 +838,24 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xC2: /* JP NZ,a16 */
-            if (!u->reg.FZ)
+            if (!(u->reg.F & Z_FLAG))
             {
                 u->mem.ptr = m_read16(u);
             }
+            else
+            {
+                m_read16(u);
+            }
             continue;
         case 0xD2: /* JP NC,a16 */
-            if (!u->reg.FC)
+            printf("%02x %02x %d\n", u->reg.F, C_FLAG, u->reg.F & C_FLAG);
+            if (!(u->reg.F & C_FLAG))
             {
                 u->mem.ptr = m_read16(u);
+            }
+            else
+            {
+                m_read16(u);
             }
             continue;
 
@@ -793,10 +876,14 @@ int emulate_rom(CPU *u)
             u->mem.ptr = m_read16(u);
             continue;
         case 0xD4: /* CALL NC,a16 */
-            if (!u->reg.FC)
+            if (!(u->reg.F & C_FLAG))
             {
                 s_push16(u->st, u->mem.ptr + 1);
                 u->mem.ptr = m_read16(u);
+            }
+            else
+            {
+                m_read16(u);
             }
             continue;
 
@@ -844,13 +931,13 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xC8: /* RET Z */
-            if (u->reg.FZ)
+            if (u->reg.F & Z_FLAG)
             {
                 u->mem.ptr = s_pop16(u->st);
             }
             continue;
         case 0xD8: /* RET C */
-            if (u->reg.FC)
+            if (u->reg.F & C_FLAG)
             {
                 u->mem.ptr = s_pop16(u->st);
             }
@@ -860,20 +947,20 @@ int emulate_rom(CPU *u)
             u->reg.SP += m_read8(u);
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = 0;
-            u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            u->reg.F |= H_FLAG; /* XXX */
+            u->reg.F |= C_FLAG; /* XXX */
             continue;
 
         case 0xF8: /* LD HL,SP+r8 */
             u->reg.HL = u->reg.SP + m_read8(u);
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = 0;
-            u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            u->reg.F |= H_FLAG; /* XXX */
+            u->reg.F |= C_FLAG; /* XXX */
             continue;
 
         case 0xC9: /* RET */
@@ -893,13 +980,13 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xCA: /* JP Z,a16 */
-            if (u->reg.FZ)
+            if (u->reg.F & Z_FLAG)
             {
                 u->mem.ptr = m_read16(u);
             }
             continue;
         case 0xDA: /* JP C,a16 */
-            if (u->reg.FZ)
+            if (u->reg.F & Z_FLAG)
             {
                 u->mem.ptr = m_read16(u);
             }
@@ -913,14 +1000,14 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xCC: /* CALL Z,a16 */
-            if (u->reg.FZ)
+            if (u->reg.F & Z_FLAG)
             {
                 s_push16(u->st, u->mem.ptr + 1);
                 u->mem.ptr = m_peek16(u);
             }
             continue;
         case 0xDC: /* CALL C,a16 */
-            if (u->reg.FC)
+            if (u->reg.F & C_FLAG)
             {
                 s_push16(u->st, u->mem.ptr + 1);
                 u->mem.ptr = m_peek16(u);
@@ -934,39 +1021,46 @@ int emulate_rom(CPU *u)
         case 0xCE: /* ADC A,d8 */
         {
             uint8_t next8 = m_read8(u);
-            uint16_t res = (uint16_t)(u->reg.A + next8 + u->reg.FC);
-            uint16_t wrap =
-                (uint16_t)((u->reg.A & 0xF) + ((next8 + u->reg.FC) & 0xF));
+            uint16_t res = (uint16_t)(u->reg.A + next8 + (u->reg.F & C_FLAG));
+            uint16_t wrap = (uint16_t)((u->reg.A & 0xF) +
+                                       ((next8 + (u->reg.F & C_FLAG)) & 0xF));
             u->reg.A = (uint8_t)res;
 
-            u->reg.FZ = u->reg.A == 0;
-            u->reg.FN = 0;
-            u->reg.FH = wrap > 0xF;
-            u->reg.FC = res > 0xFF;
+            if (u->reg.A == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            if (wrap > 0xF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
         case 0xDE: /* SBC A,d8 */
         {
             uint8_t next8 = m_read8(u);
-            uint16_t res = (uint16_t)(u->reg.A - (next8 + u->reg.FC));
-            uint16_t wrap =
-                (uint16_t)((u->reg.A & 0xF) - ((next8 + u->reg.FC) & 0xF));
+            uint16_t res = (uint16_t)(u->reg.A - (next8 + (u->reg.F & C_FLAG)));
+            uint16_t wrap = (uint16_t)((u->reg.A & 0xF) -
+                                       ((next8 + (u->reg.F & C_FLAG)) & 0xF));
             u->reg.A = (uint8_t)res;
 
-            u->reg.FZ = u->reg.A == 0;
-            u->reg.FN = 1;
-            u->reg.FH = wrap > 0xF;
-            u->reg.FC = res > 0xFF;
+            if (u->reg.A == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if (wrap > 0xF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
         case 0xEE: /* XOR A,d8 */
             u->reg.A ^= m_read8(u);
 
             /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.A == 0;
-            u->reg.FN = 0;
-            u->reg.FH = 0;
-            u->reg.FC = 0;
+            if (u->reg.A == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F &= ~N_FLAG;
+            u->reg.F |= H_FLAG;
+            u->reg.F |= C_FLAG;
             continue;
         case 0xFE: /* CP d8 */
         {
@@ -974,10 +1068,13 @@ int emulate_rom(CPU *u)
             uint16_t res = (uint16_t)(u->reg.A - next8);
             uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (next8 & 0xF));
 
-            u->reg.FZ = u->reg.A - m_read8(u) == 0;
-            u->reg.FN = 1;
-            u->reg.FH = wrap > 0xF;
-            u->reg.FC = res > 0xFF;
+            if (u->reg.A - m_read8(u) == 0)
+                u->reg.F |= Z_FLAG;
+            u->reg.F |= N_FLAG;
+            if (wrap > 0xF)
+                u->reg.F |= H_FLAG;
+            if (res > 0xFF)
+                u->reg.F |= C_FLAG;
             continue;
         }
 
