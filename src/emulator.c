@@ -228,11 +228,12 @@ static void ADD_ADC_CASE(CPU *u, uint8_t byte)
 
     if (byte < 0x8) /* ADD */
     {
-        uint8_t res = u->reg.A + value_of_letter;
+        uint16_t res = (uint16_t)(u->reg.A + value_of_letter);
         /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
-        /* https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry */
-        uint8_t wrap = (u->reg.A&0xF) + (value_of_letter&0xF);
-        u->reg.A = res;
+        /* https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
+         */
+        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) + (value_of_letter & 0xF));
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 0;
@@ -241,9 +242,10 @@ static void ADD_ADC_CASE(CPU *u, uint8_t byte)
     }
     else /* ADC */
     {
-        uint8_t res = u->reg.A + value_of_letter + u->reg.FC;
-        uint8_t wrap = (u->reg.A&0xF) + ((value_of_letter+u->reg.FC)&0xF);
-        u->reg.A = res;
+        uint16_t res = (uint16_t)(u->reg.A + value_of_letter + u->reg.FC);
+        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) +
+                                   ((value_of_letter + u->reg.FC) & 0xF));
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 0;
@@ -258,9 +260,9 @@ static void SUB_SBC_CASE(CPU *u, uint8_t byte)
 
     if (byte < 0x8) /* SUB */
     {
-        uint8_t res = u->reg.A - value_of_letter;
-        uint8_t wrap = (u->reg.A&0xF) - (value_of_letter&0xF);
-        u->reg.A = res;
+        uint16_t res = (uint16_t)(u->reg.A - value_of_letter);
+        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (value_of_letter & 0xF));
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 1;
@@ -269,9 +271,10 @@ static void SUB_SBC_CASE(CPU *u, uint8_t byte)
     }
     else /* SBC */
     {
-        uint8_t res = u->reg.A - (value_of_letter + u->reg.FC);
-        uint8_t wrap = (u->reg.A&0xF) - ((value_of_letter + u->reg.FC)&0xF);
-        u->reg.A = res;
+        uint16_t res = (uint16_t)(u->reg.A - (value_of_letter + u->reg.FC));
+        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) -
+                                   ((value_of_letter + u->reg.FC) & 0xF));
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 1;
@@ -286,8 +289,8 @@ static void AND_XOR_CASE(CPU *u, uint8_t byte)
 
     if (byte < 0x8) /* AND */
     {
-        uint8_t res = u->reg.A & value_of_letter;
-        u->reg.A = res;
+        uint16_t res = (uint16_t)(u->reg.A & value_of_letter);
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 0;
@@ -296,8 +299,8 @@ static void AND_XOR_CASE(CPU *u, uint8_t byte)
     }
     else /* XOR */
     {
-        uint8_t res = u->reg.A ^ value_of_letter;
-        u->reg.A = res;
+        uint16_t res = (uint16_t)(u->reg.A ^ value_of_letter);
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 0;
@@ -312,8 +315,8 @@ static void OR_CP_CASE(CPU *u, uint8_t byte)
 
     if (byte < 0x8) /* OR */
     {
-        uint8_t res = u->reg.A | value_of_letter;
-        u->reg.A = res;
+        uint16_t res = (uint16_t)(u->reg.A | value_of_letter);
+        u->reg.A = (uint8_t)res;
 
         u->reg.FZ = res == 0;
         u->reg.FN = 0;
@@ -322,8 +325,8 @@ static void OR_CP_CASE(CPU *u, uint8_t byte)
     }
     else /* CP */
     {
-        uint8_t res = u->reg.A - value_of_letter;
-        uint8_t wrap = (u->reg.A&0xF) - (value_of_letter&0xF);
+        uint16_t res = (uint16_t)(u->reg.A - value_of_letter);
+        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (value_of_letter & 0xF));
 
         u->reg.FZ = res == 0;
         u->reg.FN = 1;
@@ -346,12 +349,12 @@ int emulate_rom(CPU *u)
             return 0;
         }
 
-        printf("$%04x\t$%02x\t$%02x $%02x\t\t%04x\t%04x\t%04x\t%04x\t%04x\t%04x\t%d%d%d%d\n",
-                u->mem.ptr,
-               m_peek8(u), m_get8(u, u->mem.ptr + 1), m_get8(u, u->mem.ptr + 2),
-               u->reg.AF, u->reg.BC, u->reg.DE, u->reg.HL, u->reg.SP, u->reg.PC,
-               u->reg.FZ, u->reg.FN, u->reg.FH, u->reg.FC
-               );
+        printf("$%04x\t$%02x\t$%02x "
+               "$%02x\t\t%04x\t%04x\t%04x\t%04x\t%04x\t%04x\t%d%d%d%d\n",
+               u->mem.ptr, m_peek8(u), m_get8(u, u->mem.ptr + 1),
+               m_get8(u, u->mem.ptr + 2), u->reg.AF, u->reg.BC, u->reg.DE,
+               u->reg.HL, u->reg.SP, u->reg.PC, u->reg.FZ, u->reg.FN, u->reg.FH,
+               u->reg.FC);
 
         uint8_t op = m_read8(u);
 
@@ -363,7 +366,7 @@ int emulate_rom(CPU *u)
             continue;
         case 0x76: /* HALT */
             continue;
-        case 0xCB:                            /* PREFIX CB */
+        case 0xCB:                         /* PREFIX CB */
             PREFIX_CB_CASE(u, m_read8(u)); /* XXX */
             continue;
         case 0xF3: /* DI */
@@ -428,21 +431,21 @@ int emulate_rom(CPU *u)
 
             u->reg.FZ = u->reg.B == 0;
             u->reg.FN = 0;
-            u->reg.FH = (u->reg.B&0xF) == 0; /* XXX */
+            u->reg.FH = (u->reg.B & 0xF) == 0; /* XXX */
             continue;
         case 0x14: /* INC D */
             u->reg.D++;
 
             u->reg.FZ = u->reg.D == 0;
             u->reg.FN = 0;
-            u->reg.FH = (u->reg.D&0xF) == 0; /* XXX */
+            u->reg.FH = (u->reg.D & 0xF) == 0; /* XXX */
             continue;
         case 0x24: /* INC H */
             u->reg.H++;
 
             u->reg.FZ = u->reg.H == 0;
             u->reg.FN = 0;
-            u->reg.FH = (u->reg.H&0xF) == 0; /* XXX */
+            u->reg.FH = (u->reg.H & 0xF) == 0; /* XXX */
             continue;
         case 0x34: /* INC (HL) */
             u->mem.content[u->reg.HL]++;
@@ -450,7 +453,7 @@ int emulate_rom(CPU *u)
             /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->mem.content[u->reg.HL] == 0;
             u->reg.FN = 0;
-            u->reg.FH = (u->mem.content[u->reg.HL]&0xF) == 0; /* XXX */
+            u->reg.FH = (u->mem.content[u->reg.HL] & 0xF) == 0; /* XXX */
             continue;
 
         case 0x05: /* DEC B */
@@ -458,7 +461,7 @@ int emulate_rom(CPU *u)
 
             u->reg.FZ = u->reg.B == 0;
             u->reg.FN = 1;
-            u->reg.FH = (u->reg.B&0xF == 0xF); /* XXX */
+            u->reg.FH = (u->reg.B & 0xF) == 0xF; /* XXX */
             continue;
         case 0x15: /* DEC D */
             u->reg.D = u->reg.D - 1;
@@ -466,7 +469,7 @@ int emulate_rom(CPU *u)
             /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.D == 0;
             u->reg.FN = 1;
-            u->reg.FH = (u->reg.D&0xF == 0xF); /* XXX */
+            u->reg.FH = (u->reg.D & 0xF) == 0xF; /* XXX */
             continue;
         case 0x25: /* DEC H */
             u->reg.H = u->reg.H - 1;
@@ -474,7 +477,7 @@ int emulate_rom(CPU *u)
             /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.H == 0;
             u->reg.FN = 1;
-            u->reg.FH = (u->reg.H&0xF == 0xF); /* XXX */
+            u->reg.FH = (u->reg.H & 0xF) == 0xF; /* XXX */
             continue;
         case 0x35: /* DEC (HL) */
             u->mem.content[u->reg.HL]--;
@@ -482,7 +485,7 @@ int emulate_rom(CPU *u)
             /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->mem.content[u->reg.HL] == 0;
             u->reg.FN = 1;
-            u->reg.FH = (u->mem.content[u->reg.HL]&0xF == 0xF); /* XXX */
+            u->reg.FH = (u->mem.content[u->reg.HL] & 0xF) == 0xF; /* XXX */
             continue;
 
         case 0x06: /* LD B,d8 */
@@ -536,37 +539,53 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0x09: /* ADD HL,BC */
-            u->reg.HL += u->reg.BC;
+        {
+            uint32_t res = (uint32_t)(u->reg.HL + u->reg.BC);
+            uint32_t wrap =
+                (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.BC & 0xFFF));
+            u->reg.HL = (uint16_t)res;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0x0FF;
+            u->reg.FC = res > 0xFFFF;
             continue;
+        }
         case 0x19: /* ADD HL,DE */
-            u->reg.HL += u->reg.DE;
+        {
+            uint32_t res = (uint32_t)(u->reg.HL + u->reg.DE);
+            uint32_t wrap =
+                (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.DE & 0xFFF));
+            u->reg.HL = (uint16_t)res;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0x0FF;
+            u->reg.FC = res > 0xFFFF;
             continue;
+        }
         case 0x29: /* ADD HL, HL */
-            u->reg.HL += u->reg.HL;
+        {
+            uint32_t res = (uint32_t)(u->reg.HL + u->reg.HL);
+            uint32_t wrap =
+                (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.HL & 0xFFF));
+            u->reg.HL = (uint16_t)res;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0x0FF;
+            u->reg.FC = res > 0xFFFF;
             continue;
+        }
         case 0x39: /* ADD HL,SP */
-            u->reg.HL += u->reg.SP;
+        {
+            uint32_t res = (uint32_t)(u->reg.HL + u->reg.SP);
+            uint32_t wrap =
+                (uint32_t)((u->reg.HL & 0xFFF) + (u->reg.SP & 0xFFF));
+            u->reg.HL = (uint16_t)res;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0x0FF;
+            u->reg.FC = res > 0xFFFF;
             continue;
+        }
 
         case 0x0A: /* LD A, (BC) */
             u->reg.A = u->mem.content[u->reg.BC];
@@ -598,67 +617,59 @@ int emulate_rom(CPU *u)
         case 0x0C: /* INC C */
             u->reg.C++;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.C == 0;
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.C & 0xF) == 0;
             continue;
         case 0x1C: /* INC E */
             u->reg.E++;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.E == 0;
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.E & 0xF) == 0;
             continue;
         case 0x2C: /* INC L */
             u->reg.L++;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.L == 0;
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.L & 0xF) == 0;
             continue;
         case 0x3C: /* INC A */
             u->reg.A++;
 
-            /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.L == 0;
+            u->reg.FZ = u->reg.A == 0;
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.A & 0xF) == 0;
             continue;
 
         case 0x0D: /* DEC C */
             u->reg.C--;
 
-            /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.L == 0;
+            u->reg.FZ = u->reg.C == 0;
             u->reg.FN = 1;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.C & 0xF) == 0;
             continue;
         case 0x1D: /* DEC E */
             u->reg.E--;
 
-            /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.L == 0;
+            u->reg.FZ = u->reg.E == 0;
             u->reg.FN = 1;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.E & 0xF) == 0;
             continue;
         case 0x2D: /* DEC L */
             u->reg.L--;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.L == 0;
             u->reg.FN = 1;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.L & 0xF) == 0;
             continue;
         case 0x3D: /* DEC A */
             u->reg.A--;
 
-            /* set_flags(u, Z, N, H, C); */
-            u->reg.FZ = u->reg.L == 0;
+            u->reg.FZ = u->reg.A == 0;
             u->reg.FN = 1;
-            u->reg.FH = 0; /* XXX */
+            u->reg.FH = (u->reg.A & 0xF) == 0;
             continue;
 
         case 0x0E: /* LD C,d8 */
@@ -734,10 +745,10 @@ int emulate_rom(CPU *u)
             }
             continue;
 
-        case 0xE0: /* LDH (a8),A */ /* CHECK XXX */
+        case 0xE0: /* LDH (a8),A */ /* SIGN XXX */
             u->mem.content[0xFF00 + m_read8(u)] = u->reg.A;
             continue;
-        case 0xF0: /* LDH A,(a8) */
+        case 0xF0: /* LDH A,(a8) */ /* SIGN XXX */
             u->reg.A = u->mem.content[0xFF00 + m_read8(u)];
             continue;
 
@@ -923,23 +934,33 @@ int emulate_rom(CPU *u)
             continue;
 
         case 0xCE: /* ADC A,d8 */
-            u->reg.A += (m_read8(u) + u->reg.FC);
+        {
+            uint8_t next8 = m_read8(u);
+            uint16_t res = (uint16_t)(u->reg.A + next8 + u->reg.FC);
+            uint16_t wrap =
+                (uint16_t)((u->reg.A & 0xF) + ((next8 + u->reg.FC) & 0xF));
+            u->reg.A = (uint8_t)res;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.A == 0;
             u->reg.FN = 0;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0xF;
+            u->reg.FC = res > 0xFF;
             continue;
+        }
         case 0xDE: /* SBC A,d8 */
-            u->reg.A -= (m_read8(u) + u->reg.FC);
+        {
+            uint8_t next8 = m_read8(u);
+            uint16_t res = (uint16_t)(u->reg.A - (next8 + u->reg.FC));
+            uint16_t wrap =
+                (uint16_t)((u->reg.A & 0xF) - ((next8 + u->reg.FC) & 0xF));
+            u->reg.A = (uint8_t)res;
 
-            /* set_flags(u, Z, N, H, C); */
             u->reg.FZ = u->reg.A == 0;
             u->reg.FN = 1;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0xF;
+            u->reg.FC = res > 0xFF;
             continue;
+        }
         case 0xEE: /* XOR A,d8 */
             u->reg.A ^= m_read8(u);
 
@@ -950,12 +971,17 @@ int emulate_rom(CPU *u)
             u->reg.FC = 0;
             continue;
         case 0xFE: /* CP d8 */
-            /* set_flags(u, Z, N, H, C); */
+        {
+            uint8_t next8 = m_read8(u);
+            uint16_t res = (uint16_t)(u->reg.A - next8);
+            uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (next8 & 0xF));
+
             u->reg.FZ = u->reg.A - m_read8(u) == 0;
             u->reg.FN = 1;
-            u->reg.FH = 0; /* XXX */
-            u->reg.FC = 0; /* XXX */
+            u->reg.FH = wrap > 0xF;
+            u->reg.FC = res > 0xFF;
             continue;
+        }
 
         case 0xCF: /* RST $08 */
             s_push16(u->st, u->mem.ptr);
