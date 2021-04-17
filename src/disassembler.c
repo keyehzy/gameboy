@@ -340,7 +340,7 @@ int disassemble_rom(CPU *u)
             continue;
         }
 
-        printf("$%04x\t\t$%02x", u->mem.ptr, m_peek8(u, u->mem.ptr));
+        printf("$%04x\t\t$%02x", u->mem.ptr, m_peek8(u));
         uint8 op = m_consume8(u);
 
         switch (op)
@@ -355,7 +355,7 @@ int disassemble_rom(CPU *u)
             puts("\t\tHALT");
             continue;
         case 0xCB:
-            printf(" $%02x", m_peek8(u, u->mem.ptr));
+            printf(" $%02x", m_peek8(u));
             PREFIX_CB_CASE(m_consume8(u));
             printf("\n");
             continue;
@@ -367,34 +367,28 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x20: /* JR r8 */
-            printf(" $%02x\t\tJR NZ (Z),$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tJR NZ (Z),$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         case 0x30:
-            printf(" $%02x\t\tJR NC (C),$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tJR NC (C),$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
 
         case 0x01: /* LD reg,d16 */
-            printf(" $%04x\tLD BC,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tLD BC,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0x11:
-            printf(" $%04x\tLD DE,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tLD DE,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0x21:
-            printf(" $%04x\tLD HL,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tLD HL,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0x31:
-            printf(" $%04x\tLD SP,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tLD SP,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
 
@@ -409,7 +403,7 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x32:
-            printf("\t\tLD (SP-),A\n");
+            printf("\t\tLD (HL-),A\n");
             continue;
 
         case 0x03: /* INC 2 byte register */
@@ -469,28 +463,24 @@ int disassemble_rom(CPU *u)
 
         case 0x06:
         { /* LD 1 byte register,d8 */
-            printf(" $%02x\t\tLD B,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD B,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0x16:
         {
-            printf(" $%02x\t\tLD D,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD D,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0x26:
         {
-            printf(" $%02x\t\tLD H,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD H,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0x36:
-            printf(" $%02x\t\tLD (HL),$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD (HL),$%02x\n", m_peek8(u), m_peek8(u));
             continue;
 
         case 0x07: /* 8bit rotation/shift */
@@ -514,24 +504,20 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0x08: /* LD (a16),SP */
-            printf(" $%04x\tLD ($%04x),SP\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tLD ($%04x),SP\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
 
         case 0x18: /* JR r8 */
-            printf(" $%02x\t\tJR $%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tJR $%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         case 0x28:
-            printf(" $%02x\t\tJR Z (Z),$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tJR Z (Z),$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         case 0x38:
-            printf(" $%02x\t\tJR C (C),$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tJR C (C),$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
 
@@ -624,29 +610,25 @@ int disassemble_rom(CPU *u)
 
         case 0x0E:
         { /* load 1 byte,d8 */
-            printf(" $%02x\t\tLD C,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD C,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0x1E:
         {
-            printf(" $%02x\t\tLD E,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD E,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0x2E:
         {
-            printf(" $%02x\t\tLD L,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD L,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0x3E:
         {
-            printf(" $%02x\t\tLD A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
@@ -711,14 +693,12 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0xE0: /* put memory */
-            printf(" $%02x\t\tLDH ($%02x),A\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLDH ($%02x),A\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         case 0xF0:
         {
-            printf(" $%02x\t\tLDH A,($%02x)\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLDH A,($%02x)\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
@@ -737,13 +717,11 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0xC2: /* jp a16 */
-            printf(" $%04x\tJP NZ,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tJP NZ,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0xD2:
-            printf(" $%04x\tJP NC,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tJP NC,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
 
@@ -758,19 +736,16 @@ int disassemble_rom(CPU *u)
         }
 
         case 0xC3: /* JP a16 */
-            printf(" $%04x\tJP $%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tJP $%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
 
         case 0xC4: /* CALL a16 */
-            printf(" $%04x\tCALL NZ,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tCALL NZ,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0xD4:
-            printf(" $%04x\tCALL NC,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tCALL NC,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
 
@@ -789,29 +764,25 @@ int disassemble_rom(CPU *u)
 
         case 0xC6:
         { /* d8 arithmetic */
-            printf(" $%02x\t\tADD A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tADD A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0xD6:
         {
-            printf(" $%02x\t\tSUB A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tSUB A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0xE6:
         {
-            printf(" $%02x\t\tAND A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tAND A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0xF6:
         {
-            printf(" $%02x\t\tOR A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tOR A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
@@ -838,14 +809,12 @@ int disassemble_rom(CPU *u)
 
         case 0xE8:
             /* add SP, r8 */
-            printf(" $%02x\tADD SP,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\tADD SP,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
 
         case 0xF8: /* load HL,SP+r8 */
-            printf(" $%02x\t\tLD HL,SP+$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tLD HL,SP+$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
 
@@ -866,10 +835,10 @@ int disassemble_rom(CPU *u)
             continue;
 
         case 0xCA: /* jump flag,a16 */
-            puts("\t\tZ,a16");
+            puts("\t\tJP Z,a16");
             continue;
         case 0xDA:
-            puts("\t\tC,a16");
+            puts("\t\tJP C,a16");
             continue;
 
         case 0xEA: /* load a16 to register*/
@@ -883,46 +852,39 @@ int disassemble_rom(CPU *u)
         }
 
         case 0xCC: /* call a16 */
-            printf(" $%04x\tCALL Z,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tCALL Z,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0xDC:
-            printf(" $%04x\tCALL C,$%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tCALL C,$%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
         case 0xCD:
-            printf(" $%04x\tCALL $%04x\n", m_peek16(u, u->mem.ptr),
-                   m_peek16(u, u->mem.ptr));
+            printf(" $%04x\tCALL $%04x\n", m_peek16(u), m_peek16(u));
             m_consume16(u);
             continue;
 
         case 0xCE:
         { /* extra arithmetic d8 */
-            printf(" $%02x\t\tADC A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tADC A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0xDE:
         {
-            printf(" $%02x\t\tSBC A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tSBC A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0xEE:
         {
-            printf(" $%02x\t\tXOR A,$%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tXOR A,$%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }
         case 0xFE:
         {
-            printf(" $%02x\t\tCP $%02x\n", m_peek8(u, u->mem.ptr),
-                   m_peek8(u, u->mem.ptr));
+            printf(" $%02x\t\tCP $%02x\n", m_peek8(u), m_peek8(u));
             m_consume8(u);
             continue;
         }

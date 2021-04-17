@@ -4,7 +4,12 @@
 #include <string.h>
 
 /* memory specific */
-uint8 m_peek8(CPU *u, uint16 n)
+uint8 m_peek8(CPU *u)
+{
+    return u->mem.content[u->mem.ptr];
+}
+
+uint8 m_get8(CPU *u, uint16 n)
 {
     return u->mem.content[n];
 }
@@ -14,10 +19,16 @@ uint8 m_consume8(CPU *u)
     return u->mem.content[u->mem.ptr++];
 }
 
-uint16 m_peek16(CPU *u, uint16 n)
+uint16 m_peek16(CPU *u)
 {
     /* https://stackoverflow.com/a/1935457 */
-    return m_peek8(u, n) + (m_peek8(u, n + 1) << 8);
+    return m_get8(u, u->mem.ptr) + (m_get8(u, u->mem.ptr + 1) << 8);
+}
+
+uint16 m_get16(CPU *u, uint16 n)
+{
+    /* https://stackoverflow.com/a/1935457 */
+    return m_get8(u, n) + (m_get8(u, n + 1) << 8);
 }
 
 uint16 m_consume16(CPU *u)

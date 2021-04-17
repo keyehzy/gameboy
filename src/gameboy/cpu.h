@@ -108,9 +108,13 @@ int run_rom(CPU *u);
 
 uint8 m_consume8(CPU *u);
 uint16 m_consume16(CPU *u);
-uint8 m_peek8(CPU *u, uint16 n);
-uint16 m_peek16(CPU *u, uint16 n);
+uint8 m_peek8(CPU *u);
+uint16 m_peek16(CPU *u);
+uint8 m_get8(CPU *u, uint16 n);
+uint16 m_get16(CPU *u, uint16 n);
 
+void s_push8(Stack *s, uint8 n);
+uint8 s_pop8(Stack *s);
 void s_push16(Stack *s, uint16 n);
 uint16 s_pop16(Stack *s);
 #endif
