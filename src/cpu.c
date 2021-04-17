@@ -14,7 +14,7 @@ uint8 m_get8(CPU *u, uint16 n)
     return u->mem.content[n];
 }
 
-uint8 m_consume8(CPU *u)
+uint8 m_read8(CPU *u)
 {
     return u->mem.content[u->mem.ptr++];
 }
@@ -31,9 +31,9 @@ uint16 m_get16(CPU *u, uint16 n)
     return m_get8(u, n) + (m_get8(u, n + 1) << 8);
 }
 
-uint16 m_consume16(CPU *u)
+uint16 m_read16(CPU *u)
 {
-    return m_consume8(u) + (m_consume8(u) << 8);
+    return m_read8(u) + (m_read8(u) << 8);
 }
 
 /* stack specific */
@@ -84,7 +84,7 @@ int load_rom(CPU *u, char *path)
     else
     {
         printf("Could not find ROM in path: %s\n", path);
-        exit(1); 
+        exit(1);
     }
     return 0;
 }

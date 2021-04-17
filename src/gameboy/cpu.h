@@ -96,8 +96,8 @@ typedef struct
             uint16 HL;
         };
 
-        uint16 SP; /* XXX we need to use our own stack pointer */
-        uint16 PC;
+        uint16 SP; /* same as our st ptr */
+        uint16 PC; /* same as our mem ptr */
     } reg;
 
 } CPU;
@@ -106,8 +106,8 @@ int boot_cpu(CPU *u);
 int load_rom(CPU *u, char *path);
 int run_rom(CPU *u);
 
-uint8 m_consume8(CPU *u);
-uint16 m_consume16(CPU *u);
+uint8 m_read8(CPU *u);
+uint16 m_read16(CPU *u);
 uint8 m_peek8(CPU *u);
 uint16 m_peek16(CPU *u);
 uint8 m_get8(CPU *u, uint16 n);
