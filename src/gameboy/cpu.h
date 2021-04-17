@@ -6,7 +6,7 @@ typedef unsigned short uint16;
 
 typedef struct
 {
-    uint8 ptr;
+    uint16 ptr;
     uint8 content[256];
 } Stack;
 

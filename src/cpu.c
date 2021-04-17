@@ -42,12 +42,12 @@ void s_push8(Stack *s, uint8 n) /* TODO(keyehzy): check for errors */
     s->content[s->ptr++] = n;
 }
 
-uint8 s_pop8(Stack *s) /* TODO(keyezy) check for errors */
+uint8 s_pop8(Stack *s) /* TODO(keyezy): check for errors */
 {
     return s->content[--s->ptr];
 }
 
-uint8 s_peek8(Stack *s, uint8 n) /* TODO(keyehzy) check for errors */
+uint8 s_peek8(Stack *s, uint16 n) /* TODO(keyehzy): check for errors */
 {
     return s->content[s->ptr - n - 1];
 }
@@ -63,7 +63,7 @@ uint16 s_pop16(Stack *s)
     return s_pop8(s) + (s_pop8(s) << 8);
 }
 
-uint16 s_peek16(Stack *s, uint8 n)
+uint16 s_peek16(Stack *s, uint16 n)
 {
     return s_peek8(s, 2 * n) + (s_peek8(s, 2 * n + 1) << 8);
 }
@@ -72,12 +72,8 @@ int load_rom(CPU *u, char *path)
 {
     FILE *f = fopen(path, "rb");
 
-    /* See:
-     * https://medium.com/@raphaelstaebler/building-a-gameboy-from-scratch-part-2-the-cpu-d6986a5c6c74
-     */
     if (f)
     {
-        /* fseek(f, 0x0100, SEEK_CUR); */
         if (fread(u->mem.content, 0x8000, 1, f) == 0)
         { /* allocate 0x000 - 0x8000 to rom */
             fprintf(stderr, "Could not allocate rom into memory.\n");
@@ -88,7 +84,7 @@ int load_rom(CPU *u, char *path)
     else
     {
         printf("Could not find ROM in path: %s\n", path);
-        exit(1); /* ERROR */
+        exit(1); 
     }
     return 0;
 }
