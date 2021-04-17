@@ -1,13 +1,11 @@
 #ifndef CPU_H
 #define CPU_H
-
-typedef unsigned char uint8;
-typedef unsigned short uint16;
+#include <stdint.h>
 
 typedef struct
 {
-    uint16 ptr;
-    uint8 content[256];
+    uint16_t ptr;
+    uint8_t content[256];
 } Stack;
 
 typedef struct
@@ -26,8 +24,8 @@ typedef struct
                         0xFFFF - 0xFFFF Interrupt Enable Register
 
     */
-    uint16 ptr;
-    uint8 content[0x10000]; /* 64kB */
+    uint16_t ptr;
+    uint8_t content[0x10000]; /* 64kB */
 } Memory;
 
 typedef struct
@@ -40,7 +38,7 @@ typedef struct
         {
             struct
             {
-                uint8 A;
+                uint8_t A;
 
                 union
                 {
@@ -56,48 +54,48 @@ typedef struct
                         unsigned FZ : 1;
                     };
 
-                    uint8 F;
+                    uint8_t F;
                 };
             };
 
-            uint16 AF;
+            uint16_t AF;
         };
 
         union
         {
             struct
             {
-                uint8 B;
-                uint8 C;
+                uint8_t B;
+                uint8_t C;
             };
 
-            uint16 BC;
+            uint16_t BC;
         };
 
         union
         {
             struct
             {
-                uint8 D;
-                uint8 E;
+                uint8_t D;
+                uint8_t E;
             };
 
-            uint16 DE;
+            uint16_t DE;
         };
 
         union
         {
             struct
             {
-                uint8 H;
-                uint8 L;
+                uint8_t H;
+                uint8_t L;
             };
 
-            uint16 HL;
+            uint16_t HL;
         };
 
-        uint16 SP; /* same as our st ptr */
-        uint16 PC; /* same as our mem ptr */
+        uint16_t SP; /* same as our st ptr */
+        uint16_t PC; /* same as our mem ptr */
     } reg;
 
 } CPU;
@@ -106,15 +104,15 @@ int boot_cpu(CPU *u);
 int load_rom(CPU *u, char *path);
 int run_rom(CPU *u);
 
-uint8 m_read8(CPU *u);
-uint16 m_read16(CPU *u);
-uint8 m_peek8(CPU *u);
-uint16 m_peek16(CPU *u);
-uint8 m_get8(CPU *u, uint16 n);
-uint16 m_get16(CPU *u, uint16 n);
+uint8_t m_read8(CPU *u);
+uint16_t m_read16(CPU *u);
+uint8_t m_peek8(CPU *u);
+uint16_t m_peek16(CPU *u);
+uint8_t m_get8(CPU *u, uint16_t n);
+uint16_t m_get16(CPU *u, uint16_t n);
 
-void s_push8(Stack *s, uint8 n);
-uint8 s_pop8(Stack *s);
-void s_push16(Stack *s, uint16 n);
-uint16 s_pop16(Stack *s);
+void s_push8(Stack *s, uint8_t n);
+uint8_t s_pop8(Stack *s);
+void s_push16(Stack *s, uint16_t n);
+uint16_t s_pop16(Stack *s);
 #endif

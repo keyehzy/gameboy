@@ -4,66 +4,66 @@
 #include <string.h>
 
 /* memory specific */
-uint8 m_peek8(CPU *u)
+uint8_t m_peek8(CPU *u)
 {
     return u->mem.content[u->mem.ptr];
 }
 
-uint8 m_get8(CPU *u, uint16 n)
+uint8_t m_get8(CPU *u, uint16_t n)
 {
     return u->mem.content[n];
 }
 
-uint8 m_read8(CPU *u)
+uint8_t m_read8(CPU *u)
 {
     return u->mem.content[u->mem.ptr++];
 }
 
-uint16 m_peek16(CPU *u)
+uint16_t m_peek16(CPU *u)
 {
     /* https://stackoverflow.com/a/1935457 */
     return m_get8(u, u->mem.ptr) + (m_get8(u, u->mem.ptr + 1) << 8);
 }
 
-uint16 m_get16(CPU *u, uint16 n)
+uint16_t m_get16(CPU *u, uint16_t n)
 {
     /* https://stackoverflow.com/a/1935457 */
     return m_get8(u, n) + (m_get8(u, n + 1) << 8);
 }
 
-uint16 m_read16(CPU *u)
+uint16_t m_read16(CPU *u)
 {
     return m_read8(u) + (m_read8(u) << 8);
 }
 
 /* stack specific */
-void s_push8(Stack *s, uint8 n) /* TODO(keyehzy): check for errors */
+void s_push8(Stack *s, uint8_t n) /* TODO(keyehzy): check for errors */
 {
     s->content[s->ptr++] = n;
 }
 
-uint8 s_pop8(Stack *s) /* TODO(keyezy): check for errors */
+uint8_t s_pop8(Stack *s) /* TODO(keyezy): check for errors */
 {
     return s->content[--s->ptr];
 }
 
-uint8 s_peek8(Stack *s, uint16 n) /* TODO(keyehzy): check for errors */
+uint8_t s_peek8(Stack *s, uint16_t n) /* TODO(keyehzy): check for errors */
 {
     return s->content[s->ptr - n - 1];
 }
 
-void s_push16(Stack *s, uint16 n)
+void s_push16(Stack *s, uint16_t n)
 {
     s_push8(s, n >> 8);
     s_push8(s, n);
 }
 
-uint16 s_pop16(Stack *s)
+uint16_t s_pop16(Stack *s)
 {
     return s_pop8(s) + (s_pop8(s) << 8);
 }
 
-uint16 s_peek16(Stack *s, uint16 n)
+uint16_t s_peek16(Stack *s, uint16_t n)
 {
     return s_peek8(s, 2 * n) + (s_peek8(s, 2 * n + 1) << 8);
 }

@@ -3,7 +3,7 @@
 
 #include <gameboy/cpu.h>
 
-static uint8 ordered_reg_value(CPU *u, uint8 byte)
+static uint8_t ordered_reg_value(CPU *u, uint8_t byte)
 {
     switch (byte % 0x8)
     {
@@ -28,9 +28,9 @@ static uint8 ordered_reg_value(CPU *u, uint8 byte)
     }
 }
 
-static void PREFIX_CB_CASE(CPU *u, uint8 byte)
+static void PREFIX_CB_CASE(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
     switch (byte >> 4)
     {
     case 0x0: /* RLC */
@@ -166,9 +166,9 @@ static void PREFIX_CB_CASE(CPU *u, uint8 byte)
     }
 }
 
-static void LD_B_C(CPU *u, uint8 byte)
+static void LD_B_C(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8)
     {
@@ -180,9 +180,9 @@ static void LD_B_C(CPU *u, uint8 byte)
     }
 }
 
-static void LD_D_E(CPU *u, uint8 byte)
+static void LD_D_E(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8)
     {
@@ -194,9 +194,9 @@ static void LD_D_E(CPU *u, uint8 byte)
     }
 }
 
-static void LD_H_L(CPU *u, uint8 byte)
+static void LD_H_L(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8)
     {
@@ -208,9 +208,9 @@ static void LD_H_L(CPU *u, uint8 byte)
     }
 }
 
-static void LD_HL_A(CPU *u, uint8 byte)
+static void LD_HL_A(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8)
     {
@@ -222,16 +222,16 @@ static void LD_HL_A(CPU *u, uint8 byte)
     }
 }
 
-static void ADD_ADC_CASE(CPU *u, uint8 byte)
+static void ADD_ADC_CASE(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8) /* ADD */
     {
-        uint8 res = u->reg.A + value_of_letter;
+        uint8_t res = u->reg.A + value_of_letter;
         /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
         /* https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry */
-        uint8 wrap = (u->reg.A&0xF) + (value_of_letter&0xF);  
+        uint8_t wrap = (u->reg.A&0xF) + (value_of_letter&0xF);
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -241,8 +241,8 @@ static void ADD_ADC_CASE(CPU *u, uint8 byte)
     }
     else /* ADC */
     {
-        uint8 res = u->reg.A + value_of_letter + u->reg.FC;
-        uint8 wrap = (u->reg.A&0xF) + ((value_of_letter+u->reg.FC)&0xF);  
+        uint8_t res = u->reg.A + value_of_letter + u->reg.FC;
+        uint8_t wrap = (u->reg.A&0xF) + ((value_of_letter+u->reg.FC)&0xF);
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -252,14 +252,14 @@ static void ADD_ADC_CASE(CPU *u, uint8 byte)
     }
 }
 
-static void SUB_SBC_CASE(CPU *u, uint8 byte)
+static void SUB_SBC_CASE(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8) /* SUB */
     {
-        uint8 res = u->reg.A - value_of_letter;
-        uint8 wrap = (u->reg.A&0xF) - (value_of_letter&0xF);  
+        uint8_t res = u->reg.A - value_of_letter;
+        uint8_t wrap = (u->reg.A&0xF) - (value_of_letter&0xF);
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -269,8 +269,8 @@ static void SUB_SBC_CASE(CPU *u, uint8 byte)
     }
     else /* SBC */
     {
-        uint8 res = u->reg.A - (value_of_letter + u->reg.FC);
-        uint8 wrap = (u->reg.A&0xF) - ((value_of_letter + u->reg.FC)&0xF);  
+        uint8_t res = u->reg.A - (value_of_letter + u->reg.FC);
+        uint8_t wrap = (u->reg.A&0xF) - ((value_of_letter + u->reg.FC)&0xF);
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -280,13 +280,13 @@ static void SUB_SBC_CASE(CPU *u, uint8 byte)
     }
 }
 
-static void AND_XOR_CASE(CPU *u, uint8 byte)
+static void AND_XOR_CASE(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8) /* AND */
     {
-        uint8 res = u->reg.A & value_of_letter;
+        uint8_t res = u->reg.A & value_of_letter;
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -296,7 +296,7 @@ static void AND_XOR_CASE(CPU *u, uint8 byte)
     }
     else /* XOR */
     {
-        uint8 res = u->reg.A ^ value_of_letter;
+        uint8_t res = u->reg.A ^ value_of_letter;
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -306,13 +306,13 @@ static void AND_XOR_CASE(CPU *u, uint8 byte)
     }
 }
 
-static void OR_CP_CASE(CPU *u, uint8 byte)
+static void OR_CP_CASE(CPU *u, uint8_t byte)
 {
-    uint8 value_of_letter = ordered_reg_value(u, byte);
+    uint8_t value_of_letter = ordered_reg_value(u, byte);
 
     if (byte < 0x8) /* OR */
     {
-        uint8 res = u->reg.A | value_of_letter;
+        uint8_t res = u->reg.A | value_of_letter;
         u->reg.A = res;
 
         u->reg.FZ = res == 0;
@@ -322,8 +322,8 @@ static void OR_CP_CASE(CPU *u, uint8 byte)
     }
     else /* CP */
     {
-        uint8 res = u->reg.A - value_of_letter;
-        uint8 wrap = (u->reg.A&0xF) - (value_of_letter&0xF);  
+        uint8_t res = u->reg.A - value_of_letter;
+        uint8_t wrap = (u->reg.A&0xF) - (value_of_letter&0xF);
 
         u->reg.FZ = res == 0;
         u->reg.FN = 1;
@@ -353,7 +353,7 @@ int emulate_rom(CPU *u)
                u->reg.FZ, u->reg.FN, u->reg.FH, u->reg.FC
                );
 
-        uint8 op = m_read8(u);
+        uint8_t op = m_read8(u);
 
         switch (op)
         {

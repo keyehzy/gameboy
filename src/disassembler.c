@@ -3,7 +3,7 @@
 
 #include <gameboy/cpu.h>
 
-static char *letter_from_seq(uint8 byte)
+static char *letter_from_seq(uint8_t byte)
 {
     switch (byte % 0x8)
     {
@@ -36,7 +36,7 @@ static char *letter_from_seq(uint8 byte)
     }
 }
 
-static void PREFIX_CB_CASE(uint8 byte)
+static void PREFIX_CB_CASE(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
     switch (byte >> 4)
@@ -206,7 +206,7 @@ static void PREFIX_CB_CASE(uint8 byte)
     }
 }
 
-static void LD_B_C(uint8 byte)
+static void LD_B_C(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -220,7 +220,7 @@ static void LD_B_C(uint8 byte)
     }
 }
 
-static void LD_D_E(uint8 byte)
+static void LD_D_E(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -234,7 +234,7 @@ static void LD_D_E(uint8 byte)
     }
 }
 
-static void LD_H_L(uint8 byte)
+static void LD_H_L(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -248,7 +248,7 @@ static void LD_H_L(uint8 byte)
     }
 }
 
-static void LD_HL_A(uint8 byte)
+static void LD_HL_A(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -262,7 +262,7 @@ static void LD_HL_A(uint8 byte)
     }
 }
 
-static void ADD_ADC_CASE(uint8 byte)
+static void ADD_ADC_CASE(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -276,7 +276,7 @@ static void ADD_ADC_CASE(uint8 byte)
     }
 }
 
-static void SUB_SBC_CASE(uint8 byte)
+static void SUB_SBC_CASE(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -290,7 +290,7 @@ static void SUB_SBC_CASE(uint8 byte)
     }
 }
 
-static void AND_XOR_CASE(uint8 byte)
+static void AND_XOR_CASE(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -304,7 +304,7 @@ static void AND_XOR_CASE(uint8 byte)
     }
 }
 
-static void OR_CP_CASE(uint8 byte)
+static void OR_CP_CASE(uint8_t byte)
 {
     char *letter = letter_from_seq(byte);
 
@@ -341,7 +341,7 @@ int disassemble_rom(CPU *u)
         }
 
         printf("$%04x\t\t$%02x", u->mem.ptr, m_peek8(u));
-        uint8 op = m_read8(u);
+        uint8_t op = m_read8(u);
 
         switch (op)
         {
