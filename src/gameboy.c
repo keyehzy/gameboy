@@ -9,26 +9,26 @@ void help_instruction()
 {
     char *d_usage = "\t-d PATH: \tDisassemble ROM in PATH\n";
     char *e_usage = "\t-e PATH: \tEmulate ROM in PATH\n";
+    char *debug = "\t--debug: \tOutput debug logs\n";
     char *help = "\t-h: \t\tHelp message\n";
     char *info = "\t--info: \tDump ROM information\n";
-    printf("Gameboy Emulator\nUsage:\n %s %s %s %s", d_usage, e_usage, info,
-           help);
+    printf("Gameboy Emulator\nUsage:\n %s %s %s %s %s", d_usage, e_usage, info,
+           debug, help);
 }
 
 static int info_flag;
+static int debug_flag;
 
 int main(int argc, char **argv)
 {
     int c;
-
     CPU u;
-    boot_cpu(&u);
 
     while (1)
     {
         static struct option long_options[] = {
             {"info", no_argument, &info_flag, 1},
-            {"help", no_argument, 0, 'h'},
+            {"debug", no_argument, &debug_flag, 1},
             {"emulate", required_argument, 0, 'e'},
             {"disassemble", required_argument, 0, 'd'},
             {0, 0, 0, 0}};
@@ -39,7 +39,6 @@ int main(int argc, char **argv)
 
         if (c == -1)
         {
-            help_instruction();
             break;
         }
 
@@ -52,13 +51,15 @@ int main(int argc, char **argv)
             break;
         case 'd':
             load_rom(&u, optarg, info_flag);
+            boot_cpu(&u, debug_flag);
             disassemble_rom(&u);
             break;
         case 'e':
             load_rom(&u, optarg, info_flag);
+            boot_cpu(&u, debug_flag);
             emulate_rom(&u);
             break;
-        case 'h':
+        case '?':
         default:
             help_instruction();
             return 1;

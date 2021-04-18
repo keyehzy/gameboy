@@ -49,6 +49,7 @@ typedef struct
 typedef struct
 {
     GameInfo info;
+    int debug;
     Memory mem;
     Stack *st;
     struct
@@ -102,7 +103,7 @@ typedef struct
 
 } CPU;
 
-int boot_cpu(CPU *u);
+int boot_cpu(CPU *u, int debug_flag);
 int load_rom(CPU *u, char *path, int flag);
 int run_rom(CPU *u);
 

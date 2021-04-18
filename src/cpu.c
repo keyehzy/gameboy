@@ -301,7 +301,7 @@ int load_rom(CPU *u, char *path, int flag)
     return 0;
 }
 
-int boot_cpu(CPU *u)
+int boot_cpu(CPU *u, int debug_flag)
 {
     memset(u, 0, sizeof(*u));
     if (!u)
@@ -310,6 +310,7 @@ int boot_cpu(CPU *u)
         exit(1);
     }
 
+    u->debug = debug_flag;
     u->st = (Stack *)malloc(sizeof(Stack));
     u->st->ptr = 0xFFFE;
 
