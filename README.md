@@ -4,6 +4,7 @@ Usage:
 ```
 gameboy -d PATH: Disassemble ROM in PATH
 gameboy -e PATH: Emulate ROM in PATH
+gameboy --info:  Dump ROM information
 gameboy -h:      Help message
 ```
 
