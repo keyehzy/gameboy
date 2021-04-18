@@ -5,356 +5,141 @@
 #include <gameboy/cpu.h>
 #include <gameboy/emulator.h>
 
-static uint8_t ordered_reg_value(CPU *u, uint8_t byte)
+static void ADD_8(CPU *u, uint8_t *dst, uint8_t src)
 {
-    switch (byte % 0x8)
-    {
-    case 0x0:
-        return u->reg.B;
-    case 0x1:
-        return u->reg.C;
-    case 0x2:
-        return u->reg.D;
-    case 0x3:
-        return u->reg.E;
-    case 0x4:
-        return u->reg.H;
-    case 0x5:
-        return u->reg.L;
-    case 0x6:
-        return u->mem.content[u->reg.HL];
-    case 0x7:
-        return u->reg.A;
-    default:
-        exit(1);
-    }
-}
+    uint16_t res = (uint16_t)(*dst + src);
+    /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
+    /* https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
+     */
+    uint16_t wrap = (uint16_t)((*dst & 0xF) + (src & 0xF));
+    *dst = (uint8_t)res;
 
-static void PREFIX_CB_CASE(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-    switch (byte >> 4)
-    {
-    case 0x0: /* RLC */
-        if (byte < 0x8)
-        {
-        }
-        else /* RRC */
-        {
-        }
-        break;
-    case 0x1: /* RL */
-        if (byte < 0x8)
-        {
-        }
-        else /* RR */
-        {
-        }
-        break;
-    case 0x2: /* SLA */
-        if (byte < 0x8)
-        {
-        }
-        else /* SRA */
-        {
-        }
-        break;
-    case 0x3: /* SWAP */
-        if (byte < 0x8)
-        {
-        }
-        else /* SRL */
-        {
-        }
-        break;
-    case 0x4: /* BIT */
-        if (byte < 0x8)
-        {
-        }
-        else /* BIT */
-        {
-        }
-        break;
-    case 0x5: /* BIT */
-        if (byte < 0x8)
-        {
-        }
-        else /* BIT */
-        {
-        }
-        break;
-    case 0x6: /* BIT */
-        if (byte < 0x8)
-        {
-        }
-        else /* BIT */
-        {
-        }
-        break;
-    case 0x7: /* BIT */
-        if (byte < 0x8)
-        {
-        }
-        else /* BIT */
-        {
-        }
-        break;
-    case 0x8: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0x9: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0xA: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0xB: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0xC: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0xD: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0xE: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    case 0xF: /* RES */
-        if (byte < 0x8)
-        {
-        }
-        else /* RES */
-        {
-        }
-        break;
-    default:
-        exit(1);
-    }
-}
-
-static void LD_B_C(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8)
-    {
-        u->reg.B = value_of_letter;
-    }
-    else
-    {
-        u->reg.C = value_of_letter;
-    }
-}
-
-static void LD_D_E(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8)
-    {
-        u->reg.D = value_of_letter;
-    }
-    else
-    {
-        u->reg.E = value_of_letter;
-    }
-}
-
-static void LD_H_L(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8)
-    {
-        u->reg.H = value_of_letter;
-    }
-    else
-    {
-        u->reg.L = value_of_letter;
-    }
-}
-
-static void LD_HL_A(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8)
-    {
-        m_set8(u, u->reg.HL, value_of_letter);
-    }
-    else
-    {
-        u->reg.A = value_of_letter;
-    }
-}
-
-static void ADD_ADC_CASE(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8) /* ADD */
-    {
-        uint16_t res = (uint16_t)(u->reg.A + value_of_letter);
-        /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
-        /* https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
-         */
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) + (value_of_letter & 0xF));
-        u->reg.A = (uint8_t)res;
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
-    }
-    else /* ADC */
-    {
-        uint16_t res =
-            (uint16_t)(u->reg.A + value_of_letter + (u->reg.F & C_FLAG));
-        uint16_t wrap = (uint16_t)(
-            (u->reg.A & 0xF) + ((value_of_letter + (u->reg.F & C_FLAG)) & 0xF));
-        u->reg.A = (uint8_t)res;
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
-    }
-}
-
-static void SUB_SBC_CASE(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8) /* SUB */
-    {
-        uint16_t res = (uint16_t)(u->reg.A - value_of_letter);
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (value_of_letter & 0xF));
-        u->reg.A = (uint8_t)res;
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
-    }
-    else /* SBC */
-    {
-        uint16_t res =
-            (uint16_t)(u->reg.A - (value_of_letter + (u->reg.F & C_FLAG)));
-        uint16_t wrap = (uint16_t)(
-            (u->reg.A & 0xF) - ((value_of_letter + (u->reg.F & C_FLAG)) & 0xF));
-        u->reg.A = (uint8_t)res;
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
-    }
-}
-
-static void AND_XOR_CASE(CPU *u, uint8_t byte)
-{
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
-
-    if (byte < 0x8) /* AND */
-    {
-        uint16_t res = (uint16_t)(u->reg.A & value_of_letter);
-        u->reg.A = (uint8_t)res;
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F &= ~N_FLAG;
+    if (wrap > 0xF)
         u->reg.F |= H_FLAG;
-        u->reg.F &= ~C_FLAG;
-    }
-    else /* XOR */
-    {
-        uint16_t res = (uint16_t)(u->reg.A ^ value_of_letter);
-        u->reg.A = (uint8_t)res;
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        u->reg.F &= ~H_FLAG;
-        u->reg.F &= ~C_FLAG;
-    }
+    if (res > 0xFF)
+        u->reg.F |= C_FLAG;
 }
 
-static void OR_CP_CASE(CPU *u, uint8_t byte)
+static void ADC_8(CPU *u, uint8_t *dst, uint8_t src)
 {
-    uint8_t value_of_letter = ordered_reg_value(u, byte);
+    uint16_t res = (uint16_t)(*dst + src + (u->reg.F & C_FLAG));
+    uint16_t wrap =
+        (uint16_t)((*dst & 0xF) + ((src + (u->reg.F & C_FLAG)) & 0xF));
+    *dst = (uint8_t)res;
 
-    if (byte < 0x8) /* OR */
-    {
-        uint16_t res = (uint16_t)(u->reg.A | value_of_letter);
-        u->reg.A = (uint8_t)res;
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F &= ~N_FLAG;
+    if (wrap > 0xF)
+        u->reg.F |= H_FLAG;
+    if (res > 0xFF)
+        u->reg.F |= C_FLAG;
+}
 
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        u->reg.F &= ~H_FLAG;
-        u->reg.F &= ~C_FLAG;
-    }
-    else /* CP */
-    {
-        uint16_t res = (uint16_t)(u->reg.A - value_of_letter);
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (value_of_letter & 0xF));
+static void SUB_8(CPU *u, uint8_t *dst, uint8_t src)
+{
+    uint16_t res = (uint16_t)(*dst - src);
+    uint16_t wrap = (uint16_t)((*dst & 0xF) - (src & 0xF));
+    *dst = (uint8_t)res;
 
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
-    }
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F |= N_FLAG;
+    if (wrap > 0xF)
+        u->reg.F |= H_FLAG;
+    if (res > 0xFF)
+        u->reg.F |= C_FLAG;
+}
+
+static void SBC_8(CPU *u, uint8_t *dst, uint8_t src)
+{
+    uint16_t res = (uint16_t)(*dst - (src + (u->reg.F & C_FLAG)));
+    uint16_t wrap =
+        (uint16_t)((*dst & 0xF) - ((src + (u->reg.F & C_FLAG)) & 0xF));
+    *dst = (uint8_t)res;
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F |= N_FLAG;
+    if (wrap > 0xF)
+        u->reg.F |= H_FLAG;
+    if (res > 0xFF)
+        u->reg.F |= C_FLAG;
+}
+
+static void AND_8(CPU *u, uint8_t *dst, uint8_t src)
+{
+    uint16_t res = (uint16_t)(*dst & src);
+    *dst = (uint8_t)res;
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F &= ~N_FLAG;
+    u->reg.F |= H_FLAG;
+    u->reg.F &= ~C_FLAG;
+}
+
+static void XOR_8(CPU *u, uint8_t *dst, uint8_t src)
+{
+    uint16_t res = (uint16_t)(*dst ^ src);
+    *dst = (uint8_t)res;
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F &= ~N_FLAG;
+    u->reg.F &= ~H_FLAG;
+    u->reg.F &= ~C_FLAG;
+}
+
+static void OR_8(CPU *u, uint8_t *dst, uint8_t src)
+{
+    uint16_t res = (uint16_t)(*dst | src);
+    *dst = (uint8_t)res;
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F &= ~N_FLAG;
+    u->reg.F &= ~H_FLAG;
+    u->reg.F &= ~C_FLAG;
+}
+
+static void CP_8(CPU *u, uint8_t *dst, uint8_t src)
+{
+    uint16_t res = (uint16_t)(*dst - src);
+    uint16_t wrap = (uint16_t)((*dst & 0xF) - (src & 0xF));
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F |= N_FLAG;
+    if (wrap > 0xF)
+        u->reg.F |= H_FLAG;
+    if (res > 0xFF)
+        u->reg.F |= C_FLAG;
+}
+
+static void INC_8(CPU *u, uint8_t *dst)
+{
+    uint8_t res = ++(*dst);
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F &= ~N_FLAG;
+    if ((res & 0xF) == 0)
+        u->reg.F |= H_FLAG;
+}
+
+static void DEC_8(CPU *u, uint8_t *dst)
+{
+    uint8_t res = --(*dst);
+
+    if (res == 0)
+        u->reg.F |= Z_FLAG;
+    u->reg.F |= N_FLAG;
+    if ((res & 0xF) == 0)
+        u->reg.F |= H_FLAG;
 }
 
 int execute_opcode(CPU *u, uint8_t op)
@@ -372,12 +157,12 @@ int execute_opcode(CPU *u, uint8_t op)
     {
         printf("$%04x\t$%02x\t$%02x "
                "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\n",
-               u->mem.ptr, op, m_get8(u, u->mem.ptr),
-               m_get8(u, u->mem.ptr + 1), u->reg.AF, u->reg.BC, u->reg.DE,
-               u->reg.HL, u->st->ptr, u->reg.F);
+               u->mem.ptr, op, m_get8(u, u->mem.ptr), m_get8(u, u->mem.ptr + 1),
+               u->reg.AF, u->reg.BC, u->reg.DE, u->reg.HL, u->st->ptr,
+               u->reg.F);
     }
 
-    switch (op) /* The order should be the s
+    switch (op) /* The order should be the
                    same as in the GameBoy manual */
     {
         /* LD nn,n */
@@ -400,29 +185,204 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.L = m_read8(u);
         break;
 
-        /* XXX */
-    case 0x36: /* LD (HL),d8 */
-        m_set8(u, u->reg.HL, m_read8(u));
+        /* LD r1,r2 */
+    case 0x7F:
+        break;
+    case 0x78:
+        u->reg.A = u->reg.B;
+        break;
+    case 0x79:
+        u->reg.A = u->reg.C;
+        break;
+    case 0x7A:
+        u->reg.A = u->reg.D;
+        break;
+    case 0x7B:
+        u->reg.A = u->reg.E;
+        break;
+    case 0x7C:
+        u->reg.A = u->reg.H;
+        break;
+    case 0x7D:
+        u->reg.A = u->reg.L;
+        break;
+    case 0x7E:
+        u->reg.A = m_get8(u, u->reg.HL);
         break;
 
-        /* LD r1,r2 */
-    CASE_LD_A:
-        LD_HL_A(u, op & 0x0F);
+    case 0x47:
+        u->reg.B = u->reg.A;
         break;
-    CASE_LD_B:
-    CASE_LD_C:
-        LD_B_C(u, op & 0x0F);
+    case 0x40:
         break;
-    CASE_LD_D:
-    CASE_LD_E:
-        LD_D_E(u, op & 0x0F);
+    case 0x41:
+        u->reg.B = u->reg.C;
         break;
-    CASE_LD_H:
-    CASE_LD_L:
-        LD_H_L(u, op & 0x0F);
+    case 0x42:
+        u->reg.B = u->reg.D;
         break;
-    CASE_LD_HL:
-        LD_HL_A(u, op & 0x0F);
+    case 0x43:
+        u->reg.B = u->reg.E;
+        break;
+    case 0x44:
+        u->reg.B = u->reg.H;
+        break;
+    case 0x45:
+        u->reg.B = u->reg.L;
+        break;
+    case 0x46:
+        u->reg.B = m_get8(u, u->reg.HL);
+        break;
+
+    case 0x4F:
+        u->reg.C = u->reg.A;
+        break;
+    case 0x48:
+        u->reg.C = u->reg.B;
+        break;
+    case 0x49:
+        u->reg.C = u->reg.C;
+        break;
+    case 0x4A:
+        u->reg.C = u->reg.D;
+        break;
+    case 0x4B:
+        u->reg.C = u->reg.E;
+        break;
+    case 0x4C:
+        u->reg.C = u->reg.H;
+        break;
+    case 0x4D:
+        u->reg.C = u->reg.L;
+        break;
+    case 0x4E:
+        u->reg.C = m_get8(u, u->reg.HL);
+        break;
+
+    case 0x57:
+        u->reg.D = u->reg.A;
+        break;
+    case 0x50:
+        u->reg.D = u->reg.B;
+        break;
+    case 0x51:
+        u->reg.D = u->reg.C;
+        break;
+    case 0x52:
+        u->reg.D = u->reg.D;
+        break;
+    case 0x53:
+        u->reg.D = u->reg.E;
+        break;
+    case 0x54:
+        u->reg.D = u->reg.H;
+        break;
+    case 0x55:
+        u->reg.D = u->reg.L;
+        break;
+    case 0x56:
+        u->reg.D = m_get8(u, u->reg.HL);
+        break;
+
+    case 0x5F:
+        u->reg.E = u->reg.A;
+        break;
+    case 0x58:
+        u->reg.E = u->reg.B;
+        break;
+    case 0x59:
+        u->reg.E = u->reg.C;
+        break;
+    case 0x5A:
+        u->reg.E = u->reg.D;
+        break;
+    case 0x5B:
+        u->reg.E = u->reg.E;
+        break;
+    case 0x5C:
+        u->reg.E = u->reg.H;
+        break;
+    case 0x5D:
+        u->reg.E = u->reg.L;
+        break;
+    case 0x5E:
+        u->reg.E = m_get8(u, u->reg.HL);
+        break;
+
+    case 0x67:
+        u->reg.H = u->reg.A;
+        break;
+    case 0x60:
+        u->reg.H = u->reg.B;
+        break;
+    case 0x61:
+        u->reg.H = u->reg.C;
+        break;
+    case 0x62:
+        u->reg.H = u->reg.D;
+        break;
+    case 0x63:
+        u->reg.H = u->reg.E;
+        break;
+    case 0x64:
+        u->reg.H = u->reg.H;
+        break;
+    case 0x65:
+        u->reg.H = u->reg.L;
+        break;
+    case 0x66:
+        u->reg.H = m_get8(u, u->reg.HL);
+        break;
+
+    case 0x6F:
+        u->reg.L = u->reg.A;
+        break;
+    case 0x68:
+        u->reg.L = u->reg.B;
+        break;
+    case 0x69:
+        u->reg.L = u->reg.C;
+        break;
+    case 0x6A:
+        u->reg.L = u->reg.D;
+        break;
+    case 0x6B:
+        u->reg.L = u->reg.E;
+        break;
+    case 0x6C:
+        u->reg.L = u->reg.H;
+        break;
+    case 0x6D:
+        u->reg.L = u->reg.L;
+        break;
+    case 0x6E:
+        u->reg.L = m_get8(u, u->reg.HL);
+        break;
+
+    case 0x77:
+        m_set8(u, u->reg.HL, u->reg.A);
+        break;
+    case 0x70:
+        m_set8(u, u->reg.HL, u->reg.B);
+        break;
+    case 0x71:
+        m_set8(u, u->reg.HL, u->reg.C);
+        break;
+    case 0x72:
+        m_set8(u, u->reg.HL, u->reg.D);
+        break;
+    case 0x73:
+        m_set8(u, u->reg.HL, u->reg.E);
+        break;
+    case 0x74:
+        m_set8(u, u->reg.HL, u->reg.H);
+        break;
+    case 0x75:
+        m_set8(u, u->reg.HL, u->reg.L);
+        break;
+
+    case 0x36: /* LD (HL),d8 */
+        m_set8(u, u->reg.HL, m_read8(u));
         break;
 
         /* LD A,n */
@@ -559,266 +519,287 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
         /* ADD A,n */
-    CASE_ADD:
-        ADD_ADC_CASE(u, op & 0x0F);
+    case 0x87:
+        ADD_8(u, &u->reg.A, u->reg.A);
         break;
-    case 0xC6:                  /* ADD,d8 */
-        u->reg.A += m_read8(u); /* XXX flags */
+    case 0x80:
+        ADD_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0x81:
+        ADD_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0x82:
+        ADD_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0x83:
+        ADD_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0x84:
+        ADD_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0x85:
+        ADD_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0x86:
+        ADD_8(u, &u->reg.A, m_get8(u, u->reg.HL));
+        break;
+    case 0xC6:
+        ADD_8(u, &u->reg.A, m_read8(u));
         break;
 
         /* ADC A,n */
-    CASE_ADC:
-        ADD_ADC_CASE(u, op & 0x0F);
+    case 0x8F:
+        ADC_8(u, &u->reg.A, u->reg.A);
+        break;
+    case 0x88:
+        ADC_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0x89:
+        ADC_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0x8A:
+        ADC_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0x8B:
+        ADC_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0x8C:
+        ADC_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0x8D:
+        ADC_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0x8E:
+        ADC_8(u, &u->reg.A, m_get8(u, u->reg.HL));
         break;
     case 0xCE: /* ADC A,d8 */
-    {
-        uint8_t next8 = m_read8(u);
-        uint16_t res = (uint16_t)(u->reg.A + next8 + (u->reg.F & C_FLAG));
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) +
-                                   ((next8 + (u->reg.F & C_FLAG)) & 0xF));
-        u->reg.A = (uint8_t)res;
-
-        if (u->reg.A == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
+        ADC_8(u, &u->reg.A, m_read8(u));
         break;
-    }
 
     /* SUB n */
-    CASE_SUB:
-        SUB_SBC_CASE(u, op & 0x0F);
+    case 0x97:
+        SUB_8(u, &u->reg.A, u->reg.A);
         break;
-    case 0xD6:                  /* SUB A,d8 */
-        u->reg.A -= m_read8(u); /* XXX flags */
+    case 0x90:
+        SUB_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0x91:
+        SUB_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0x92:
+        SUB_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0x93:
+        SUB_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0x94:
+        SUB_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0x95:
+        SUB_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0x96:
+        SUB_8(u, &u->reg.A, m_get8(u, u->reg.HL));
+        break;
+    case 0xD6:
+        SUB_8(u, &u->reg.A, m_read8(u));
         break;
 
         /* SBC */
-    CASE_SBC:
-        SUB_SBC_CASE(u, op & 0x0F);
+    case 0x9F:
+        SBC_8(u, &u->reg.A, u->reg.A);
         break;
-    case 0xDE: /* SBC A,d8 */
-    {
-        uint8_t next8 = m_read8(u);
-        uint16_t res = (uint16_t)(u->reg.A - (next8 + (u->reg.F & C_FLAG)));
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) -
-                                   ((next8 + (u->reg.F & C_FLAG)) & 0xF));
-        u->reg.A = (uint8_t)res;
-
-        if (u->reg.A == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
+    case 0x98:
+        SBC_8(u, &u->reg.A, u->reg.B);
         break;
-    }
+    case 0x99:
+        SBC_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0x9A:
+        SBC_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0x9B:
+        SBC_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0x9C:
+        SBC_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0x9D:
+        SBC_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0x9E:
+        SBC_8(u, &u->reg.A, m_get8(u, u->reg.HL));
+        break;
+    case 0xDE:
+        SBC_8(u, &u->reg.A, m_read8(u));
+        break;
 
     /* AND n */
-    CASE_AND:
-        AND_XOR_CASE(u, op & 0x0F);
+    case 0xA7:
+        AND_8(u, &u->reg.A, u->reg.A);
         break;
-    case 0xE6:                            /* AND A,d8 */
-        u->reg.A = u->reg.A & m_read8(u); /* XXX FLAGS */
+    case 0xA0:
+        AND_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0xA1:
+        AND_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0xA2:
+        AND_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0xA3:
+        AND_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0xA4:
+        AND_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0xA5:
+        AND_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0xA6:
+        AND_8(u, &u->reg.A, m_get8(u, u->reg.HL));
+        break;
+    case 0xE6: /* AND A,d8 */
+        AND_8(u, &u->reg.A, m_read8(u));
         break;
 
         /* OR n */
-    CASE_OR:
-        OR_CP_CASE(u, op & 0x0F);
+    case 0xB7:
+        OR_8(u, &u->reg.A, u->reg.A);
         break;
-    case 0xF6:                            /* OR,d8 */
-        u->reg.A = u->reg.A | m_read8(u); /* XXX FLAGS */
+    case 0xB0:
+        OR_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0xB1:
+        OR_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0xB2:
+        OR_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0xB3:
+        OR_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0xB4:
+        OR_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0xB5:
+        OR_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0xB6:
+        OR_8(u, &u->reg.A, m_get8(u, u->reg.HL));
+        break;
+    case 0xF6: /* OR,d8 */
+        OR_8(u, &u->reg.A, m_read8(u));
         break;
 
         /* XOR n */
-    CASE_XOR:
-        AND_XOR_CASE(u, op & 0x0F);
+    case 0xAF:
+        XOR_8(u, &u->reg.A, u->reg.A);
         break;
-    case 0xEE: /* XOR A,d8 */
-        u->reg.A ^= m_read8(u);
-
-        /* set_flags(u, Z, N, H, C); */
-        if (u->reg.A == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        u->reg.F |= H_FLAG;
-        u->reg.F |= C_FLAG;
+    case 0xA8:
+        XOR_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0xA9:
+        XOR_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0xAA:
+        XOR_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0xAB:
+        XOR_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0xAC:
+        XOR_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0xAD:
+        XOR_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0xAE:
+        XOR_8(u, &u->reg.A, m_get8(u, u->reg.HL));
+        break;
+    case 0xEE:
+        XOR_8(u, &u->reg.A, m_read8(u));
         break;
 
         /* CP n */
-    CASE_CP:
-        OR_CP_CASE(u, op & 0x0F);
+    case 0xBF:
+        CP_8(u, &u->reg.A, u->reg.A);
+        break;
+    case 0xB8:
+        CP_8(u, &u->reg.A, u->reg.B);
+        break;
+    case 0xB9:
+        CP_8(u, &u->reg.A, u->reg.C);
+        break;
+    case 0xBA:
+        CP_8(u, &u->reg.A, u->reg.D);
+        break;
+    case 0xBB:
+        CP_8(u, &u->reg.A, u->reg.E);
+        break;
+    case 0xBC:
+        CP_8(u, &u->reg.A, u->reg.H);
+        break;
+    case 0xBD:
+        CP_8(u, &u->reg.A, u->reg.L);
+        break;
+    case 0xBE:
+        CP_8(u, &u->reg.A, m_get8(u, u->reg.HL));
         break;
     case 0xFE: /* CP d8 */
-    {
-        uint8_t next8 = m_read8(u);
-        uint16_t res = (uint16_t)(u->reg.A - next8);
-        uint16_t wrap = (uint16_t)((u->reg.A & 0xF) - (next8 & 0xF));
-
-        if (res == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if (wrap > 0xF)
-            u->reg.F |= H_FLAG;
-        if (res > 0xFF)
-            u->reg.F |= C_FLAG;
+        CP_8(u, &u->reg.A, m_read8(u));
         break;
-    }
 
     /* INC n */
     case 0x3C: /* INC A */
-        u->reg.A++;
-
-        if (u->reg.A == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.A & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        INC_8(u, &u->reg.A);
         break;
     case 0x04: /* INC B */
-        u->reg.B++;
-
-        if (u->reg.B == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.B & 0xF) == 0)
-            u->reg.F |= H_FLAG; /* XXX */
+        INC_8(u, &u->reg.B);
         break;
     case 0x0C: /* INC C */
-        u->reg.C++;
-
-        if (u->reg.C == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.C & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        INC_8(u, &u->reg.C);
         break;
     case 0x14: /* INC D */
-        u->reg.D++;
-
-        if (u->reg.D == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.D & 0xF) == 0)
-            u->reg.F |= H_FLAG; /* XXX */
+        INC_8(u, &u->reg.D);
         break;
     case 0x1C: /* INC E */
-        u->reg.E++;
-
-        if (u->reg.E == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.E & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        INC_8(u, &u->reg.E);
         break;
     case 0x24: /* INC H */
-        u->reg.H++;
-
-        if (u->reg.H == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.H & 0xF) == 0)
-            u->reg.F |= H_FLAG; /* XXX */
+        INC_8(u, &u->reg.H);
         break;
     case 0x2C: /* INC L */
-        u->reg.L++;
-
-        if (u->reg.L == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->reg.L & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        INC_8(u, &u->reg.L);
         break;
     case 0x34: /* INC (HL) */
-        u->mem.content[u->reg.HL]++;
-
-        /* set_flags(u, Z, N, H, C); */
-        if (u->mem.content[u->reg.HL] == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        if ((u->mem.content[u->reg.HL] & 0xF) == 0)
-            u->reg.F |= H_FLAG; /* XXX */
+        INC_8(u, &u->mem.content[u->reg.HL]);
         break;
 
         /* DEC n */
     case 0x3D: /* DEC A */
-        u->reg.A--;
-
-        if (u->reg.A == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.A & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        DEC_8(u, &u->reg.A);
         break;
     case 0x05: /* DEC B */
-        u->reg.B--;
-
-        if (u->reg.B == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.B & 0xF) == 0xF)
-            u->reg.F |= H_FLAG; /* XXX */
+        DEC_8(u, &u->reg.B);
         break;
     case 0x0D: /* DEC C */
-        u->reg.C--;
-
-        if (u->reg.C == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.C & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        DEC_8(u, &u->reg.C);
         break;
     case 0x15: /* DEC D */
-        u->reg.D = u->reg.D - 1;
-
-        /* set_flags(u, Z, N, H, C); */
-        if (u->reg.D == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.D & 0xF) == 0xF)
-            u->reg.F |= H_FLAG; /* XXX */
+        DEC_8(u, &u->reg.F);
         break;
     case 0x1D: /* DEC E */
-        u->reg.E--;
-
-        if (u->reg.E == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.E & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        DEC_8(u, &u->reg.E);
         break;
     case 0x25: /* DEC H */
-        u->reg.H = u->reg.H - 1;
-
-        /* set_flags(u, Z, N, H, C); */
-        if (u->reg.H == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.H & 0xF) == 0xF)
-            u->reg.F |= H_FLAG; /* XXX */
+        DEC_8(u, &u->reg.H);
         break;
     case 0x2D: /* DEC L */
-        u->reg.L--;
-
-        if (u->reg.L == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->reg.L & 0xF) == 0)
-            u->reg.F |= H_FLAG;
+        DEC_8(u, &u->reg.L);
         break;
     case 0x35: /* DEC (HL) */
-        u->mem.content[u->reg.HL]--;
-
-        /* set_flags(u, Z, N, H, C); */
-        if (u->mem.content[u->reg.HL] == 0)
-            u->reg.F |= Z_FLAG;
-        u->reg.F |= N_FLAG;
-        if ((u->mem.content[u->reg.HL] & 0xF) == 0xF)
-            u->reg.F |= H_FLAG; /* XXX */
+        DEC_8(u, &u->mem.content[u->reg.HL]);
         break;
 
         /* ADD HL,n */
@@ -994,7 +975,6 @@ int execute_opcode(CPU *u, uint8_t op)
         CASE_CB_RES:
             break;
         }
-        PREFIX_CB_CASE(u, m_read8(u)); /* XXX */
         break;
     }
 
