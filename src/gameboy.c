@@ -50,13 +50,13 @@ int main(int argc, char **argv)
             help_instruction();
             break;
         case 'd':
-            load_rom(&u, optarg, info_flag);
             boot_cpu(&u, debug_flag);
+            load_rom(&u, optarg, info_flag);
             disassemble_rom(&u);
             break;
         case 'e':
-            load_rom(&u, optarg, info_flag);
             boot_cpu(&u, debug_flag);
+            load_rom(&u, optarg, info_flag);
             emulate_rom(&u);
             break;
         case '?':

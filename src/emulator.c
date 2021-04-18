@@ -372,8 +372,8 @@ int execute_opcode(CPU *u, uint8_t op)
     {
         printf("$%04x\t$%02x\t$%02x "
                "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\n",
-               u->mem.ptr, m_peek8(u), m_get8(u, u->mem.ptr + 1),
-               m_get8(u, u->mem.ptr + 2), u->reg.AF, u->reg.BC, u->reg.DE,
+               u->mem.ptr, op, m_get8(u, u->mem.ptr),
+               m_get8(u, u->mem.ptr + 1), u->reg.AF, u->reg.BC, u->reg.DE,
                u->reg.HL, u->st->ptr, u->reg.F);
     }
 
