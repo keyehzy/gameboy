@@ -364,9 +364,7 @@ int emulate_rom(CPU *u)
         exit(1);
     }
 
-    printf("ADDRESS\tOPCODE\tBYTES\t\tAF\tBC\tDE\tHL\tSP\tPC\tZNHC\n");
-
-    printf("ADDRESS\tOPCODE\tBYTES\t\tFLAGS(ZNHC)\n");
+    printf("ADDRESS\tOPCODE\tBYTES\t\tAF\tBC\tDE\tHL\tSP\tZNHC\n");
 
     while (1)
     {
@@ -377,10 +375,10 @@ int emulate_rom(CPU *u)
         }
 
         printf("$%04x\t$%02x\t$%02x "
-               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%02x\n",
+               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\n",
                u->mem.ptr, m_peek8(u), m_get8(u, u->mem.ptr + 1),
                m_get8(u, u->mem.ptr + 2), u->reg.AF, u->reg.BC, u->reg.DE,
-               u->reg.HL, u->reg.SP, u->reg.PC, u->reg.F);
+               u->reg.HL, u->st->ptr, u->reg.F);
 
         uint8_t op = m_read8(u);
 

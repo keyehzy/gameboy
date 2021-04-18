@@ -11,7 +11,8 @@ void help_instruction()
     char *e_usage = "\t-e PATH: \tEmulate ROM in PATH\n";
     char *help = "\t-h: \t\tHelp message\n";
     char *info = "\t--info: \tDump ROM information\n";
-    printf("Gameboy Emulator\nUsage:\n %s %s %s %s", d_usage, e_usage, info, help);
+    printf("Gameboy Emulator\nUsage:\n %s %s %s %s", d_usage, e_usage, info,
+           help);
 }
 
 static int info_flag;

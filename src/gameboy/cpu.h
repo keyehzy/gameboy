@@ -98,7 +98,6 @@ typedef struct
         };
 
         uint16_t SP; /* same as our st ptr */
-        uint16_t PC; /* same as our mem ptr */
     } reg;
 
 } CPU;
