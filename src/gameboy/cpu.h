@@ -68,14 +68,14 @@ typedef struct
                 {
                     struct
                     {
-                        unsigned _B0 : 1;
-                        unsigned _B1 : 1;
-                        unsigned _B2 : 1;
-                        unsigned _B3 : 1;
-                        unsigned FC : 1;
-                        unsigned FH : 1;
-                        unsigned FN : 1;
-                        unsigned FZ : 1;
+                        uint8_t _B0 : 1;
+                        uint8_t _B1 : 1;
+                        uint8_t _B2 : 1;
+                        uint8_t _B3 : 1;
+                        uint8_t FC : 1;
+                        uint8_t FH : 1;
+                        uint8_t FN : 1;
+                        uint8_t FZ : 1;
                     };
 
                     uint8_t F;
