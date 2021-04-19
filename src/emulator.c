@@ -18,13 +18,11 @@ static void ADD_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F &= ~N_FLAG;
-    if (wrap > 0xF)
-        u->reg.F |= H_FLAG;
-    if (res > 0xFF)
-        u->reg.F |= C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+    u->reg.FH = wrap > 0xF;
+    u->reg.FC = res > 0xFF;
 }
 
 static void ADD_16(CPU *u, uint16_t *dst, uint16_t src)
@@ -34,7 +32,7 @@ static void ADD_16(CPU *u, uint16_t *dst, uint16_t src)
     *dst = (uint16_t)res;
     cycle(8);
 
-    u->reg.F &= ~N_FLAG;
+    u->reg.FN = 0;
     if (wrap > 0x0FF)
         u->reg.F |= H_FLAG;
     if (res > 0xFFFF)
@@ -49,13 +47,11 @@ static void ADC_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F &= ~N_FLAG;
-    if (wrap > 0xF)
-        u->reg.F |= H_FLAG;
-    if (res > 0xFF)
-        u->reg.F |= C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+    u->reg.FH = wrap > 0xF;
+    u->reg.FC = res > 0xFF;
 }
 
 static void SUB_8(CPU *u, uint8_t *dst, uint8_t src)
@@ -65,13 +61,11 @@ static void SUB_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F |= N_FLAG;
-    if (wrap > 0xF)
-        u->reg.F |= H_FLAG;
-    if (res > 0xFF)
-        u->reg.F |= C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 1;
+    u->reg.FH = wrap > 0xF;
+    u->reg.FC = res > 0xFF;
 }
 
 static void SBC_8(CPU *u, uint8_t *dst, uint8_t src)
@@ -82,13 +76,11 @@ static void SBC_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F |= N_FLAG;
-    if (wrap > 0xF)
-        u->reg.F |= H_FLAG;
-    if (res > 0xFF)
-        u->reg.F |= C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+    u->reg.FH = wrap > 0xF;
+    u->reg.FC = res > 0xFF;
 }
 
 static void AND_8(CPU *u, uint8_t *dst, uint8_t src)
@@ -97,11 +89,11 @@ static void AND_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F &= ~N_FLAG;
-    u->reg.F |= H_FLAG;
-    u->reg.F &= ~C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+    u->reg.FH = 1;
+    u->reg.FC = 0;
 }
 
 static void XOR_8(CPU *u, uint8_t *dst, uint8_t src)
@@ -110,11 +102,11 @@ static void XOR_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F &= ~N_FLAG;
-    u->reg.F &= ~H_FLAG;
-    u->reg.F &= ~C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = 0;
 }
 
 static void OR_8(CPU *u, uint8_t *dst, uint8_t src)
@@ -123,11 +115,11 @@ static void OR_8(CPU *u, uint8_t *dst, uint8_t src)
     *dst = (uint8_t)res;
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F &= ~N_FLAG;
-    u->reg.F &= ~H_FLAG;
-    u->reg.F &= ~C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = 0;
 }
 
 static void CP_8(CPU *u, uint8_t *dst, uint8_t src)
@@ -136,13 +128,11 @@ static void CP_8(CPU *u, uint8_t *dst, uint8_t src)
     uint16_t wrap = (uint16_t)((*dst & 0xF) - (src & 0xF));
     cycle(4);
 
-    if (res == 0)
-        u->reg.F |= Z_FLAG;
-    u->reg.F |= N_FLAG;
-    if (wrap > 0xF)
-        u->reg.F |= H_FLAG;
-    if (res > 0xFF)
-        u->reg.F |= C_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 1;
+    u->reg.FH = wrap > 0xF;
+    u->reg.FC = res > 0xFF;
 }
 
 static void INC_8(CPU *u, uint8_t *dst)
@@ -150,11 +140,18 @@ static void INC_8(CPU *u, uint8_t *dst)
     uint8_t res = ++(*dst);
     cycle(4);
 
-    if (res == 0) /* XXX FIX ALL THESES (SEE DEC) */
-        u->reg.F |= Z_FLAG;
-    u->reg.F &= ~N_FLAG;
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 0;
+
     if ((res & 0xF) == 0)
+    {
         u->reg.F |= H_FLAG;
+    }
+    else
+    {
+        u->reg.F &= ~H_FLAG;
+    }
 }
 
 static void DEC_8(CPU *u, uint8_t *dst)
@@ -162,19 +159,18 @@ static void DEC_8(CPU *u, uint8_t *dst)
     uint8_t res = --(*dst);
     cycle(4);
 
-    if (res == 0)
+    u->reg.FZ = res == 0;
+
+    u->reg.FN = 1;
+
+    if ((res & 0xF) == 0)
     {
-        u->reg.F |= Z_FLAG;
+        u->reg.F |= H_FLAG;
     }
     else
     {
-        u->reg.F &= ~Z_FLAG;
+        u->reg.F &= ~H_FLAG;
     }
-
-    u->reg.F |= N_FLAG;
-
-    if ((res & 0xF) == 0) /* XXX HALF CARRY IS WRONG */
-        u->reg.F |= H_FLAG;
 }
 
 int execute_opcode(CPU *u, uint8_t op)
@@ -191,10 +187,11 @@ int execute_opcode(CPU *u, uint8_t op)
     if (u->debug)
     {
         printf("$%04x\t$%02x\t$%02x "
-               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%02x\n",
+               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t%d%d%d%d\n",
                u->mem.ptr - 1, op, m_get8(u, u->mem.ptr),
                m_get8(u, u->mem.ptr + 1), u->reg.AF, u->reg.BC, u->reg.DE,
-               u->reg.HL, u->st->ptr, u->reg.F);
+               u->reg.HL, u->st->ptr, u->reg.FZ, u->reg.FN, u->reg.FH,
+               u->reg.FC);
     }
 
     switch (op) /* The order should be the
@@ -602,10 +599,10 @@ int execute_opcode(CPU *u, uint8_t op)
         cycle(12);
 
         /* set_flags(u, Z, N, H, C); */
-        u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        u->reg.F |= H_FLAG; /* XXX */
-        u->reg.F |= C_FLAG; /* XXX */
+        u->reg.FZ = 1;
+        u->reg.FN = 0;
+        u->reg.FH = 1; /* XXX */
+        u->reg.FC = 1; /* XXX */
         break;
 
         /* LD (nn),SP */
@@ -973,10 +970,10 @@ int execute_opcode(CPU *u, uint8_t op)
         cycle(16); /* XXX */
 
         /* set_flags(u, Z, N, H, C); */
-        u->reg.F |= Z_FLAG;
-        u->reg.F &= ~N_FLAG;
-        u->reg.F |= H_FLAG; /* XXX */
-        u->reg.F |= C_FLAG; /* XXX */
+        u->reg.FZ = 1;
+        u->reg.FN = 0;
+        u->reg.FH = 1; /* XXX */
+        u->reg.FC = 1; /* XXX */
         break;
 
         /* INC nn */
@@ -1028,8 +1025,8 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.A = ~u->reg.A;
         cycle(4);
 
-        u->reg.F |= H_FLAG;
-        u->reg.F |= C_FLAG;
+        u->reg.FH = 1;
+        u->reg.FC = 1;
         break;
 
         /* CCF */
@@ -1037,13 +1034,13 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.F ^= C_FLAG;
         cycle(4);
 
-        u->reg.F &= ~H_FLAG;
-        u->reg.F &= ~C_FLAG;
+        u->reg.FH = 0;
+        u->reg.FC = 0;
         break;
 
         /* SCF */
     case 0x37: /* SCF */
-        u->reg.F |= C_FLAG;
+        u->reg.FC = 1;
         cycle(4);
         break;
 

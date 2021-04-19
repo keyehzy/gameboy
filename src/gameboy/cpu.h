@@ -64,7 +64,23 @@ typedef struct
         {
             struct
             {
-                uint8_t F;
+                union
+                {
+                    struct
+                    {
+                        unsigned _B0 : 1;
+                        unsigned _B1 : 1;
+                        unsigned _B2 : 1;
+                        unsigned _B3 : 1;
+                        unsigned FC : 1;
+                        unsigned FH : 1;
+                        unsigned FN : 1;
+                        unsigned FZ : 1;
+                    };
+
+                    uint8_t F;
+                };
+
                 uint8_t A;
             };
 
