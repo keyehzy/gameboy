@@ -221,7 +221,7 @@ GameInfo rom_info(CPU *u)
 
     for (int i = 0; i < 16; i++)
     {
-        u->info.title[i] = m_get8(u, 0x0134 + i);
+        info.title[i] = m_get8(u, 0x0134 + i);
     }
 
     info.gb_color = m_get8(u, 0x143) == 0x80;
