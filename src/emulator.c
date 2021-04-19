@@ -5,6 +5,8 @@
 #include <gameboy/cpu.h>
 #include <gameboy/emulator.h>
 
+#define cast_signed8(x) (int)((int8_t)(x))
+
 static void ADD_8(CPU *u, uint8_t *dst, uint8_t src)
 {
     uint16_t res = (uint16_t)(*dst + src);
@@ -124,7 +126,7 @@ static void INC_8(CPU *u, uint8_t *dst)
 {
     uint8_t res = ++(*dst);
 
-    if (res == 0)
+    if (res == 0) /* XXX FIX ALL THESES (SEE DEC) */
         u->reg.F |= Z_FLAG;
     u->reg.F &= ~N_FLAG;
     if ((res & 0xF) == 0)
@@ -136,9 +138,16 @@ static void DEC_8(CPU *u, uint8_t *dst)
     uint8_t res = --(*dst);
 
     if (res == 0)
+    {
         u->reg.F |= Z_FLAG;
+    } else
+    {
+        u->reg.F &= ~Z_FLAG;
+    }
+
     u->reg.F |= N_FLAG;
-    if ((res & 0xF) == 0)
+
+    if ((res & 0xF) == 0) /* XXX HALF CARRY IS WRONG */
         u->reg.F |= H_FLAG;
 }
 
@@ -156,8 +165,8 @@ int execute_opcode(CPU *u, uint8_t op)
     if (u->debug)
     {
         printf("$%04x\t$%02x\t$%02x "
-               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\n",
-               u->mem.ptr, op, m_get8(u, u->mem.ptr), m_get8(u, u->mem.ptr + 1),
+               "$%02x\t\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t$%02x\n",
+               u->mem.ptr-1, op, m_get8(u, u->mem.ptr), m_get8(u, u->mem.ptr + 1),
                u->reg.AF, u->reg.BC, u->reg.DE, u->reg.HL, u->st->ptr,
                u->reg.F);
     }
@@ -399,8 +408,6 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.A = m_read8(u);
         break;
 
-        /* XXX */
-
         /* LD n,A */
     case 0x02: /* LD (BC),A */
         m_set8(u, u->reg.BC, u->reg.A);
@@ -411,8 +418,6 @@ int execute_opcode(CPU *u, uint8_t op)
     case 0xEA: /* LD (a16),A */
         m_set8(u, m_read16(u), u->reg.A);
         break;
-
-        /* XXX */
 
         /* LD A,(C) */
     case 0xF2: /* LD A,(C) */
@@ -475,7 +480,7 @@ int execute_opcode(CPU *u, uint8_t op)
 
         /* LDHL SP,n */
     case 0xF8: /* LD HL,SP+r8 */
-        u->reg.HL = u->reg.SP + m_read8(u);
+      u->reg.HL = u->reg.SP + cast_signed8(m_read8(u));
 
         /* set_flags(u, Z, N, H, C); */
         u->reg.F |= Z_FLAG;
@@ -858,7 +863,7 @@ int execute_opcode(CPU *u, uint8_t op)
 
     /* ADD SP,n */
     case 0xE8: /* ADD SP,r8 */
-        u->reg.SP += m_read8(u);
+      u->reg.SP += cast_signed8(m_read8(u));
 
         /* set_flags(u, Z, N, H, C); */
         u->reg.F |= Z_FLAG;
@@ -1001,7 +1006,6 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xD2: /* JP NC,a16 */
-        printf("%02x %02x %d\n", u->reg.F, C_FLAG, u->reg.F & C_FLAG);
         if (!(u->reg.F & C_FLAG))
         {
             u->mem.ptr = m_read16(u);
@@ -1024,15 +1028,15 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
         /* JR n */
-    case 0x18: /* JR r8 */ /* XXX signed? */
-        u->mem.ptr += m_read8(u);
+    case 0x18: /* JR r8 */
+      u->mem.ptr += cast_signed8(m_read8(u));
         break;
 
         /* JR cc,n */
     case 0x20: /* JR NZ (Z),d8 */
         if (!(u->reg.F & Z_FLAG))
         {
-            u->mem.ptr += m_read8(u);
+          u->mem.ptr += cast_signed8(m_read8(u));
         }
         else
         {
@@ -1042,7 +1046,7 @@ int execute_opcode(CPU *u, uint8_t op)
     case 0x28: /* JR Z,d8 */
         if (u->reg.F & Z_FLAG)
         {
-            u->mem.ptr += m_read8(u);
+            u->mem.ptr += cast_signed8(m_read8(u));
         }
         else
         {
@@ -1052,7 +1056,7 @@ int execute_opcode(CPU *u, uint8_t op)
     case 0x30: /* JR NZ (C),a8 */
         if (!(u->reg.F & C_FLAG))
         {
-            u->mem.ptr += m_read8(u);
+            u->mem.ptr += cast_signed8(m_read8(u));
         }
         else
         {
@@ -1063,7 +1067,7 @@ int execute_opcode(CPU *u, uint8_t op)
     case 0x38: /* JR C,d8 */
         if (u->reg.F & C_FLAG)
         {
-            u->mem.ptr += m_read8(u);
+            u->mem.ptr += cast_signed8(m_read8(u));
         }
         else
         {
