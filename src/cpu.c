@@ -75,35 +75,35 @@ uint16_t m_read16(CPU *u)
 }
 
 /* stack specific */
-void s_push8(Stack *s, uint8_t n) /* TODO(keyehzy): check for errors */
+void s_push8(CPU *u, uint8_t n) /* TODO(keyehzy): check for errors */
 {
-    s->content[s->ptr++] = n;
+    u->st->content[u->st->ptr++] = n;
 }
 
-uint8_t s_pop8(Stack *s) /* TODO(keyezy): check for errors */
+uint8_t s_pop8(CPU *u) /* TODO(keyezy): check for errors */
 {
-    return s->content[--s->ptr];
+    return u->st->content[--u->st->ptr];
 }
 
-uint8_t s_peek8(Stack *s, uint16_t n) /* TODO(keyehzy): check for errors */
+uint8_t s_peek8(CPU *u, uint16_t n) /* TODO(keyehzy): check for errors */
 {
-    return s->content[s->ptr - n - 1];
+    return u->st->content[u->st->ptr - n - 1];
 }
 
-void s_push16(Stack *s, uint16_t n)
+void s_push16(CPU *u, uint16_t n)
 {
-    s_push8(s, n >> 8);
-    s_push8(s, n);
+    s_push8(u, n >> 8);
+    s_push8(u, n);
 }
 
-uint16_t s_pop16(Stack *s)
+uint16_t s_pop16(CPU *u)
 {
-    return s_pop8(s) + (s_pop8(s) << 8);
+    return s_pop8(u) + (s_pop8(u) << 8);
 }
 
-uint16_t s_peek16(Stack *s, uint16_t n)
+uint16_t s_peek16(CPU *u, uint16_t n)
 {
-    return s_peek8(s, 2 * n) + (s_peek8(s, 2 * n + 1) << 8);
+    return s_peek8(u, 2 * n) + (s_peek8(u, 2 * n + 1) << 8);
 }
 
 char *rom_type(uint8_t byte)
@@ -312,14 +312,14 @@ int boot_cpu(CPU *u, int debug_flag)
 
     u->debug = debug_flag;
     u->st = (Stack *)malloc(sizeof(Stack));
-    u->st->ptr = 0xFFFE;
 
     /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */
     u->reg.AF = 0x01B0;
     u->reg.BC = 0x0013;
     u->reg.DE = 0x00D8;
     u->reg.HL = 0x014D;
-    u->mem.ptr = 0x100;
+    u->st->ptr = 0xFFFE; /* SP */
+    u->mem.ptr = 0x100;  /* PC */
     u->mem.content[0xFF05] = 0x00;
     u->mem.content[0xFF06] = 0x00;
     u->mem.content[0xFF07] = 0x00;

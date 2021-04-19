@@ -7,6 +7,10 @@
 #define H_FLAG 0x20
 #define C_FLAG 0x10
 
+#define CLOCK_SPEED 4194304
+#define UPDATES_PER_SECOND 60
+#define MAX_CYCLES_PER_SECOND (int)(CLOCK_SPEED / UPDATES_PER_SECOND)
+
 typedef struct
 {
     uint8_t title[16];
@@ -50,6 +54,8 @@ typedef struct
 {
     GameInfo info;
     int debug;
+    int cycle;
+
     Memory mem;
     Stack *st;
     struct
@@ -116,8 +122,10 @@ uint16_t m_get16(CPU *u, uint16_t n);
 void m_set8(CPU *u, uint16_t n, uint8_t val);
 void m_set16(CPU *u, uint16_t n, uint16_t val);
 
-void s_push8(Stack *s, uint8_t n);
-uint8_t s_pop8(Stack *s);
-void s_push16(Stack *s, uint16_t n);
-uint16_t s_pop16(Stack *s);
+void s_push8(CPU *u, uint8_t n);
+uint8_t s_pop8(CPU *u);
+uint8_t s_peek8(CPU *u, uint16_t n);
+void s_push16(CPU *u, uint16_t n);
+uint16_t s_pop16(CPU *u);
+uint16_t s_peek16(CPU *u, uint16_t n);
 #endif
