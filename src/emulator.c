@@ -142,7 +142,7 @@ static void DEC_8(CPU *u, uint8_t *dst)
 
     u->reg.FZ = res == 0;
     u->reg.FN = 1;
-    u->reg.FH = (res & 0xF) == 0;
+    u->reg.FH = (res & 0xF) == 0xF;
 }
 
 int execute_opcode(CPU *u, uint8_t op)
