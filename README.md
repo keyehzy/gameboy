@@ -1,9 +1,10 @@
 # Gameboy emulator
 
-Usage: 
+Usage:
 ```
 gameboy -d PATH: Disassemble ROM in PATH
 gameboy -e PATH: Emulate ROM in PATH
+gameboy -D PATH: Debugger
 gameboy --info:  Dump ROM information
 gameboy -h:      Help message
 ```
@@ -12,7 +13,7 @@ gameboy -h:      Help message
 
 A snippet of the disassembler for the tetris ROM:
 ```
-ROM loaded: roms/tetris.gb 
+ROM loaded: roms/tetris.gb
 ADDRESS         OPCODE          INSTRUCTION
 $0150           $c3 $020c       JP $020c
 $0153           $cd $29e3       CALL $29e3

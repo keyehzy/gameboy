@@ -11,5 +11,7 @@ add_library(
   cpu.c
   disassembler.c
   emulator.c
+  debugger.c
 )
 target_include_directories(gameboy-lib PUBLIC .)
+target_link_libraries(gameboy-lib readline)

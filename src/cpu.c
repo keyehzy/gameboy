@@ -273,7 +273,7 @@ void dump_info(GameInfo info)
     }
 }
 
-int load_rom(CPU *u, char *path, int flag)
+int load_rom(CPU *u, char *path, int info_flag)
 {
     FILE *f = fopen(path, "rb");
 
@@ -294,14 +294,14 @@ int load_rom(CPU *u, char *path, int flag)
 
     u->info = rom_info(u);
 
-    if (flag)
+    if (info_flag)
     {
         dump_info(u->info);
     }
     return 0;
 }
 
-int boot_cpu(CPU *u, int debug_flag)
+int boot_cpu(CPU *u)
 {
     memset(u, 0, sizeof(*u));
     if (!u)
@@ -310,7 +310,6 @@ int boot_cpu(CPU *u, int debug_flag)
         exit(1);
     }
 
-    u->debug = debug_flag;
     u->st = (Stack *)malloc(sizeof(Stack));
 
     /* http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html */

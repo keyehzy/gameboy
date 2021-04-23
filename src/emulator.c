@@ -149,21 +149,8 @@ int execute_opcode(CPU *u, uint8_t op)
 {
     if (u->mem.ptr >= 0x8000)
     {
-        if (u->debug)
-        {
-            puts("END OF ROM");
-        }
+        fprintf(stderr, "End of ROM.\n");
         return 1;
-    }
-
-    if (u->debug)
-    {
-        printf("$%04x\t$%02x\t$%02x "
-               "$%02x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t%d%d%d%d\t%d\n",
-               u->mem.ptr - 1, op, m_get8(u, u->mem.ptr),
-               m_get8(u, u->mem.ptr + 1), u->reg.AF, u->reg.BC, u->reg.DE,
-               u->reg.HL, u->st->ptr, u->reg.FZ, u->reg.FN, u->reg.FH,
-               u->reg.FC, u->cycle);
     }
 
     switch (op) /* The order should be the
@@ -1342,10 +1329,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     default:
-        if (u->debug)
-        {
-            printf("dunno $%02x\n", op);
-        }
+        fprintf(stderr, "Found unknown instrucition $%02x\n", op);
         exit(1);
     }
 
@@ -1361,17 +1345,11 @@ int emulate_rom(CPU *u)
         exit(1);
     }
 
-    if (u->debug)
-    {
-        printf("ADDRESS\tOPCODE\tBYTES\tAF\tBC\tDE\tHL\tSP\tZNHC\tCYCLE\n");
-    }
-
     uint8_t next_opcode = m_read8(u);
 
     while (execute_opcode(u, next_opcode) == 0)
     {
         next_opcode = m_read8(u);
-        /* Do stuff */
     }
 
     return 0;

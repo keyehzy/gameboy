@@ -113,4 +113,5 @@
     case 0x87
 
 int emulate_rom(CPU *u);
+int execute_opcode(CPU *u, uint8_t op);
 #endif

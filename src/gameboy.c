@@ -1,4 +1,5 @@
 #include <gameboy/cpu.h>
+#include <gameboy/debugger.h>
 #include <gameboy/disassembler.h>
 #include <gameboy/emulator.h>
 
@@ -7,17 +8,16 @@
 
 void help_instruction()
 {
-    char *d_usage = "\t-d PATH: \tDisassemble ROM in PATH\n";
-    char *e_usage = "\t-e PATH: \tEmulate ROM in PATH\n";
-    char *debug = "\t--debug: \tOutput debug logs\n";
-    char *help = "\t-h: \t\tHelp message\n";
-    char *info = "\t--info: \tDump ROM information\n";
-    printf("Gameboy Emulator\nUsage:\n %s %s %s %s %s", d_usage, e_usage, info,
-           debug, help);
+    char *d_usage = "-d or --disassemble PATH: \tDisassemble ROM in PATH\n";
+    char *e_usage = "-e or --emulate PATH: \t\tEmulate ROM in PATH\n";
+    char *debug = "-D or --debug PATH: \t\tDebugger\n";
+    char *info = "--info: \t\t\tDump ROM information\n";
+    char *help = "-h: \t\t\t\tHelp message\n";
+    printf("Gameboy Emulator\nUsage:\n %s %s %s %s %s", d_usage, e_usage, debug,
+           info, help);
 }
 
 static int info_flag;
-static int debug_flag;
 
 int main(int argc, char **argv)
 {
@@ -28,14 +28,14 @@ int main(int argc, char **argv)
     {
         static struct option long_options[] = {
             {"info", no_argument, &info_flag, 1},
-            {"debug", no_argument, &debug_flag, 1},
+            {"debug", required_argument, 0, 'D'},
             {"emulate", required_argument, 0, 'e'},
             {"disassemble", required_argument, 0, 'd'},
             {0, 0, 0, 0}};
 
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:e:h", long_options, &option_index);
+        c = getopt_long(argc, argv, "d:e:D:h", long_options, &option_index);
 
         if (c == -1)
         {
@@ -50,15 +50,21 @@ int main(int argc, char **argv)
             help_instruction();
             break;
         case 'd':
-            boot_cpu(&u, debug_flag);
+            boot_cpu(&u);
             load_rom(&u, optarg, info_flag);
             disassemble_rom(&u);
             break;
         case 'e':
-            boot_cpu(&u, debug_flag);
+            boot_cpu(&u);
             load_rom(&u, optarg, info_flag);
             emulate_rom(&u);
             break;
+        case 'D':
+            boot_cpu(&u);
+            load_rom(&u, optarg, info_flag);
+            debugger(&u);
+            break;
+
         case '?':
         default:
             help_instruction();
