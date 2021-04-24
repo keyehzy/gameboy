@@ -153,6 +153,54 @@ static void SWAP_8(uint8_t *dst)
     *dst = upper + (lower << 4);
 }
 
+static void RLC(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x80;
+    (*dst) <<= 1;
+
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry;
+}
+
+static void RL(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x80;
+    (*dst) <<= 1;
+    (*dst) |= carry;
+
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry;
+}
+
+static void RRC(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x1;
+    (*dst) >>= 1;
+
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry; /* XXX */
+    cycles(4);
+}
+
+static void RR(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x1;
+    (*dst) >>= 1;
+    (*dst) |= carry;
+
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry; /* XXX */
+    cycles(4);
+}
+
 int execute_opcode(CPU *u, uint8_t op)
 {
     if (u->mem.ptr >= 0x8000)
@@ -571,47 +619,44 @@ int execute_opcode(CPU *u, uint8_t op)
     case 0x08: /* LD (a16),SP */
         m_set8(u, m_read16(u), u->reg.SP);
         cycles(20);
-        /* TODO(keyehzy): We need to roll our own */
         break;
 
-        /* PUSH nn */
-    case 0xF5: /* PUSH AF */
+    case 0xF5: /* PUSH nn */
         s_push16(u, u->reg.AF);
         cycles(16);
         break;
-    case 0xC5: /* PUSH BC */
+    case 0xC5:
         s_push16(u, u->reg.BC);
         cycles(16);
         break;
-    case 0xD5: /* PUSH DE */
+    case 0xD5:
         s_push16(u, u->reg.DE);
         cycles(16);
         break;
-    case 0xE5: /* PUSH HL */
+    case 0xE5:
         s_push16(u, u->reg.HL);
         cycles(16);
         break;
 
-        /* POP nn */
-    case 0xF1: /* POP AF */
+    case 0xF1: /* POP nn */
         u->reg.AF = s_pop16(u);
         cycles(12);
         break;
-    case 0xC1: /* POP BC */
+    case 0xC1:
         u->reg.BC = s_pop16(u);
         cycles(12);
         break;
-    case 0xD1: /* POP DE */
+    case 0xD1:
         u->reg.DE = s_pop16(u);
         cycles(12);
         break;
-    case 0xE1: /* POP HL */
+    case 0xE1:
         u->reg.HL = s_pop16(u);
         cycles(12);
         break;
 
-        /* ADD A,n */
-    case 0x87:
+
+    case 0x87:/* ADD A,n */
         ADD_8(u, &u->reg.A, u->reg.A);
         break;
     case 0x80:
@@ -641,8 +686,8 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-        /* ADC A,n */
-    case 0x8F:
+
+    case 0x8F: /* ADC A,n */
         ADC_8(u, &u->reg.A, u->reg.A);
         break;
     case 0x88:
@@ -667,13 +712,12 @@ int execute_opcode(CPU *u, uint8_t op)
         ADC_8(u, &u->reg.A, m_get8(u, u->reg.HL));
         cycles(4);
         break;
-    case 0xCE: /* ADC A,d8 */
+    case 0xCE:
         ADC_8(u, &u->reg.A, m_read8(u));
         cycles(4);
         break;
 
-    /* SUB n */
-    case 0x97:
+    case 0x97:/* SUB n */
         SUB_8(u, &u->reg.A, u->reg.A);
         break;
     case 0x90:
@@ -703,8 +747,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-        /* SBC */
-    case 0x9F:
+    case 0x9F: /* SBC */
         SBC_8(u, &u->reg.A, u->reg.A);
         break;
     case 0x98:
@@ -734,8 +777,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-    /* AND n */
-    case 0xA7:
+    case 0xA7:  /* AND n */
         AND_8(u, &u->reg.A, u->reg.A);
         break;
     case 0xA0:
@@ -760,13 +802,13 @@ int execute_opcode(CPU *u, uint8_t op)
         AND_8(u, &u->reg.A, m_get8(u, u->reg.HL));
         cycles(4);
         break;
-    case 0xE6: /* AND A,d8 */
+    case 0xE6:
         AND_8(u, &u->reg.A, m_read8(u));
         cycles(4);
         break;
 
-        /* OR n */
-    case 0xB7:
+
+    case 0xB7:  /* OR n */
         OR_8(u, &u->reg.A, u->reg.A);
         break;
     case 0xB0:
@@ -791,13 +833,12 @@ int execute_opcode(CPU *u, uint8_t op)
         OR_8(u, &u->reg.A, m_get8(u, u->reg.HL));
         cycles(4);
         break;
-    case 0xF6: /* OR,d8 */
+    case 0xF6:
         OR_8(u, &u->reg.A, m_read8(u));
         cycles(4);
         break;
 
-        /* XOR n */
-    case 0xAF:
+    case 0xAF: /* XOR n */
         XOR_8(u, &u->reg.A, u->reg.A);
         break;
     case 0xA8:
@@ -827,8 +868,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-        /* CP n */
-    case 0xBF:
+    case 0xBF: /* CP n */
         CP_8(u, &u->reg.A, u->reg.A);
         break;
     case 0xB8:
@@ -853,83 +893,79 @@ int execute_opcode(CPU *u, uint8_t op)
         CP_8(u, &u->reg.A, m_get8(u, u->reg.HL));
         cycles(4);
         break;
-    case 0xFE: /* CP d8 */
+    case 0xFE:
         CP_8(u, &u->reg.A, m_read8(u));
         cycles(4);
         break;
 
-    /* INC n */
-    case 0x3C: /* INC A */
+    case 0x3C: /* INC n */
         INC_8(u, &u->reg.A);
         break;
-    case 0x04: /* INC B */
+    case 0x04:
         INC_8(u, &u->reg.B);
         break;
-    case 0x0C: /* INC C */
+    case 0x0C:
         INC_8(u, &u->reg.C);
         break;
-    case 0x14: /* INC D */
+    case 0x14:
         INC_8(u, &u->reg.D);
         break;
-    case 0x1C: /* INC E */
+    case 0x1C:
         INC_8(u, &u->reg.E);
         break;
-    case 0x24: /* INC H */
+    case 0x24:
         INC_8(u, &u->reg.H);
         break;
-    case 0x2C: /* INC L */
+    case 0x2C:
         INC_8(u, &u->reg.L);
         break;
-    case 0x34: /* INC (HL) */
+    case 0x34:
         INC_8(u, &u->mem.content[u->reg.HL]);
-        cycles(8); /* XXX */
+        cycles(12);
         break;
 
-        /* DEC n */
-    case 0x3D: /* DEC A */
+    case 0x3D: /* DEC n */
         DEC_8(u, &u->reg.A);
         break;
-    case 0x05: /* DEC B */
+    case 0x05:
         DEC_8(u, &u->reg.B);
         break;
-    case 0x0D: /* DEC C */
+    case 0x0D:
         DEC_8(u, &u->reg.C);
         break;
-    case 0x15: /* DEC D */
+    case 0x15:
         DEC_8(u, &u->reg.F);
         break;
-    case 0x1D: /* DEC E */
+    case 0x1D:
         DEC_8(u, &u->reg.E);
         break;
-    case 0x25: /* DEC H */
+    case 0x25:
         DEC_8(u, &u->reg.H);
         break;
-    case 0x2D: /* DEC L */
+    case 0x2D:
         DEC_8(u, &u->reg.L);
         break;
-    case 0x35: /* DEC (HL) */
+    case 0x35:
         DEC_8(u, &u->mem.content[u->reg.HL]);
-        cycles(8); /* XXX */
+        cycles(12);
         break;
 
-        /* ADD HL,n */
-    case 0x09: /* ADD HL,BC */
+    case 0x09: /* ADD HL,n */
         ADD_16(u, &u->reg.HL, u->reg.BC);
         break;
-    case 0x19: /* ADD HL,DE */
+    case 0x19:
         ADD_16(u, &u->reg.HL, u->reg.DE);
         break;
-    case 0x29: /* ADD HL, HL */
+    case 0x29:
         ADD_16(u, &u->reg.HL, u->reg.HL);
         break;
-    case 0x39: /* ADD HL,SP */
+    case 0x39:
         ADD_16(u, &u->reg.HL, u->reg.SP);
         break;
 
-    /* ADD SP,n */
-    case 0xE8: /* ADD SP,r8 */
+    case 0xE8: /* ADD SP,n */
         u->reg.SP += cast_signed8(m_read8(u));
-        cycles(16); /* XXX */
+        cycles(16);
 
         /* set_flags(u, Z, N, H, C); */
         u->reg.FZ = 1;
@@ -938,51 +974,44 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.FC = 1; /* XXX */
         break;
 
-        /* INC nn */
-    case 0x03: /* INC BC */
+    case 0x03: /* INC nn */
         u->reg.BC++;
         cycles(8);
         break;
-    case 0x13: /* INC DE */
+    case 0x13:
         u->reg.DE++;
         cycles(8);
         break;
-    case 0x23: /* INC HL */
+    case 0x23:
         u->reg.HL++;
         cycles(8);
         break;
-    case 0x33: /* INC SP */
+    case 0x33:
         u->reg.SP++;
         cycles(8);
         break;
 
-        /* DEC nn */
-    case 0x0B: /* DEC BC */
+    case 0x0B: /* DEC nn */
         u->reg.BC--;
         cycles(8);
         break;
-    case 0x1B: /* DEC DE */
+    case 0x1B:
         u->reg.DE--;
         cycles(8);
         break;
-    case 0x2B: /* DEC HL */
+    case 0x2B:
         u->reg.HL--;
         cycles(8);
         break;
-    case 0x3B: /* DEC SP */
+    case 0x3B:
         u->reg.SP--;
         cycles(8);
         break;
 
-        /* SWAP n */
-        /* CB */
-
-        /* DAA */
-    case 0x27:     /* DAA */
-        cycles(4); /* XXX */
+    case 0x27:     /* DAA XXX */
+        cycles(4);
         break;
 
-        /* CPL */
     case 0x2F: /* CPL */
         u->reg.A = ~(u->reg.A);
         cycles(4);
@@ -991,8 +1020,7 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.FH = 1;
         break;
 
-        /* CCF */
-    case 0x3F:
+    case 0x3F: /* CCF */
         u->reg.F ^= C_FLAG;
         cycles(4);
 
@@ -1000,7 +1028,6 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.FH = 0;
         break;
 
-        /* SCF */
     case 0x37: /* SCF */
         u->reg.FC = 1;
         cycles(4);
@@ -1031,73 +1058,162 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0x07: /* RLCA */ /* see https://stackoverflow.com/a/2761205 */
-    {
-        uint8_t carry = u->reg.A & 0x80;
-        u->reg.A <<= 1;
-
-        u->reg.FZ = u->reg.A == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 0;
-        u->reg.FC = carry; /* XXX */
+        RLC(u, &u->reg.A);
         cycles(4);
         break;
-    }
 
     case 0x17: /* RLA */
-    {
-        uint8_t carry = u->reg.A & 0x80;
-        u->reg.A <<= 1;
-        u->reg.A |= carry;
-
-        u->reg.FZ = u->reg.A == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 0;
-        u->reg.FC = carry; /* XXX */
+        RL(u, &u->reg.A);
         cycles(4);
         break;
-    }
 
     case 0x0F: /* RRCA */
-    {
-        uint8_t carry = u->reg.A & 0x1;
-        u->reg.A >>= 1;
-
-        u->reg.FZ = u->reg.A == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 0;
-        u->reg.FC = carry; /* XXX */
+        RRC(u, &u->reg.A);
         cycles(4);
         break;
-    }
 
     case 0x1F: /* RRA */
-    {
-        uint8_t carry = u->reg.A & 0x1;
-        u->reg.A >>= 1;
-        u->reg.A |= carry;
-
-        u->reg.FZ = u->reg.A == 0;
-        u->reg.FN = 0;
-        u->reg.FH = 0;
-        u->reg.FC = carry;
-
+        RR(u, &u->reg.A);
         cycles(4);
         break;
-    }
 
     case 0xCB: /* PREFIX CB */
     {
         uint8_t next = m_read8(u);
         switch (next)
         {
-        CASE_CB_RLC:
+        case 0x07:
+            RLC(u, &u->reg.A);
+            cycles(8);
             break;
-        CASE_CB_RRC:
+        case 0x00:
+            RLC(u, &u->reg.B);
+            cycles(8);
             break;
-        CASE_CB_RL:
+        case 0x01:
+            RLC(u, &u->reg.C);
+            cycles(8);
             break;
-        CASE_CB_RR:
+        case 0x02:
+            RLC(u, &u->reg.D);
+            cycles(8);
             break;
+        case 0x03:
+            RLC(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x04:
+            RLC(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x05:
+            RLC(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x06:
+            RLC(u, &u->mem.content[u->reg.HL]);
+            cycles(16);
+            break;
+
+        case 0x0F:
+            RRC(u, &u->reg.A);
+            cycles(8);
+            break;
+        case 0x08:
+            RRC(u, &u->reg.B);
+            cycles(8);
+            break;
+        case 0x09:
+            RRC(u, &u->reg.C);
+            cycles(8);
+            break;
+        case 0x0A:
+            RRC(u, &u->reg.D);
+            cycles(8);
+            break;
+        case 0x0B:
+            RRC(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x0C:
+            RRC(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x0D:
+            RRC(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x0E:
+            RRC(u, &u->mem.content[u->reg.A]);
+            cycles(16);
+            break;
+
+        case 0x17:
+            RL(u, &u->reg.A);
+            cycles(8);
+            break;
+        case 0x10:
+            RL(u, &u->reg.B);
+            cycles(8);
+            break;
+        case 0x11:
+            RL(u, &u->reg.C);
+            cycles(8);
+            break;
+        case 0x12:
+            RL(u, &u->reg.D);
+            cycles(8);
+            break;
+        case 0x13:
+            RL(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x14:
+            RL(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x15:
+            RL(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x16:
+            RL(u, &u->mem.content[u->reg.A]);
+            cycles(16);
+            break;
+
+        case 0x1F:
+            RL(u, &u->reg.A);
+            cycles(8);
+            break;
+        case 0x18:
+            RL(u, &u->reg.B);
+            cycles(8);
+            break;
+        case 0x19:
+            RL(u, &u->reg.C);
+            cycles(8);
+            break;
+        case 0x1A:
+            RL(u, &u->reg.D);
+            cycles(8);
+            break;
+        case 0x1B:
+            RL(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x1C:
+            RL(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x1D:
+            RL(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x1E:
+            RL(u, &u->mem.content[u->reg.A]);
+            cycles(16);
+            break;
+
         CASE_CB_SLA:
             break;
         CASE_CB_SRA:
@@ -1148,173 +1264,154 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
     }
 
-    /* JP nn */
-    case 0xC3: /* JP a16 */
+    case 0xC3: /* JP nn */
         u->mem.ptr = m_peek16(u);
         cycles(12);
         break;
 
-        /* JP cc,nn */
-    case 0xC2: /* JP NZ,a16 */
+    case 0xC2: /* JP cc,nn */
+    {
+        uint16_t next16 = m_read16(u);
         if (!(u->reg.F & Z_FLAG))
         {
-            u->mem.ptr = m_read16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
-    case 0xCA: /* JP Z,a16 */
+    }
+    case 0xCA:
+    {
+        uint16_t next16 = m_read16(u);
         if (u->reg.F & Z_FLAG)
         {
-            u->mem.ptr = m_read16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
-    case 0xD2: /* JP NC,a16 */
+    }
+    case 0xD2:
+    {
+        uint16_t next16 = m_read16(u);
         if (!(u->reg.F & C_FLAG))
         {
-            u->mem.ptr = m_read16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
-    case 0xDA: /* JP C,a16 */
+    }
+    case 0xDA:
+    {
+        uint16_t next16 = m_read16(u);
         if (u->reg.F & Z_FLAG)
         {
-            u->mem.ptr = m_read16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
+    }
 
-        /* JP (HL) */
     case 0xE9: /* JP (HL) */
         u->mem.ptr = m_get8(u, u->reg.HL);
         cycles(4);
         break;
 
-        /* JR n */
-    case 0x18: /* JR r8 */
+    case 0x18: /* JR n */
         u->mem.ptr += cast_signed8(m_read8(u));
         cycles(8);
         break;
 
-        /* JR cc,n */
-    case 0x20: /* JR NZ (Z),d8 */
+    case 0x20: /* JR cc,n */
+    {
+        uint8_t next8 = cast_signed8(m_read8(u));
         if (!(u->reg.F & Z_FLAG))
         {
-            u->mem.ptr += cast_signed8(m_read8(u));
-        }
-        else
-        {
-            m_read8(u);
+            u->mem.ptr += next8;
         }
         cycles(8);
         break;
+    }
     case 0x28: /* JR Z,d8 */
+    {
+        uint8_t next8 = cast_signed8(m_read8(u));
         if (u->reg.F & Z_FLAG)
         {
-            u->mem.ptr += cast_signed8(m_read8(u));
-        }
-        else
-        {
-            m_read8(u);
+            u->mem.ptr += next8;
         }
         cycles(8);
         break;
+    }
     case 0x30: /* JR NZ (C),a8 */
+    {
+        uint8_t next8 = cast_signed8(m_read8(u));
         if (!(u->reg.F & C_FLAG))
         {
-            u->mem.ptr += cast_signed8(m_read8(u));
-        }
-        else
-        {
-            m_read8(u);
+            u->mem.ptr += next8;
         }
         cycles(8);
         break;
+    }
 
     case 0x38: /* JR C,d8 */
+    {
+        uint8_t next8 = cast_signed8(m_read8(u));
         if (u->reg.F & C_FLAG)
         {
-            u->mem.ptr += cast_signed8(m_read8(u));
-        }
-        else
-        {
-            m_read8(u);
+            u->mem.ptr += next8;
         }
         cycles(8);
         break;
+    }
 
-        /* CALL nn */
-    case 0xCD: /* CALL a16 */
+    case 0xCD: /* CALL nn */
         s_push16(u, u->mem.ptr + 1);
         u->mem.ptr = m_peek16(u);
         cycles(12);
         break;
 
-        /* CALL cc, nn */
-    case 0xC4: /* CALL NZ,a16 */
+    case 0xC4: /* CALL nn, nn */
+    {
+        uint16_t next16 = m_read16(u);
         if (!(u->reg.F & Z_FLAG))
         {
             s_push16(u, u->mem.ptr + 1);
-            u->mem.ptr = m_read16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
+    }
     case 0xCC: /* CALL Z,a16 */
+    {
+        uint16_t next16 = m_read16(u);
         if (u->reg.F & Z_FLAG)
         {
             s_push16(u, u->mem.ptr + 1);
-            u->mem.ptr = m_peek16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
+    }
     case 0xD4: /* CALL NC,a16 */
+    {
+        uint16_t next16 = m_read16(u);
         if (!(u->reg.F & C_FLAG))
         {
             s_push16(u, u->mem.ptr + 1);
-            u->mem.ptr = m_read16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
+    }
     case 0xDC: /* CALL C,a16 */
+    {
+        uint16_t next16 = m_read16(u);
         if (u->reg.F & C_FLAG)
         {
             s_push16(u, u->mem.ptr + 1);
-            u->mem.ptr = m_peek16(u);
-        }
-        else
-        {
-            m_read16(u);
+            u->mem.ptr = next16;
         }
         cycles(12);
         break;
+    }
 
         /* RST n */
     case 0xC7: /* RST $00 */
