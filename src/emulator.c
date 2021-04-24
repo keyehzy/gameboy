@@ -156,7 +156,7 @@ static void SWAP_8(uint8_t *dst)
 static void RLC(CPU *u, uint8_t *dst)
 {
     uint8_t carry = (*dst) & 0x80;
-    (*dst) <<= 1;
+    (*dst) = ((*dst) << 1) | ((*dst) >> 7);
 
     u->reg.FZ = (*dst) == 0;
     u->reg.FN = 0;
@@ -167,7 +167,7 @@ static void RLC(CPU *u, uint8_t *dst)
 static void RL(CPU *u, uint8_t *dst)
 {
     uint8_t carry = (*dst) & 0x80;
-    (*dst) <<= 1;
+    (*dst) = ((*dst) << 1) | ((*dst) >> 7);
     (*dst) |= carry;
 
     u->reg.FZ = (*dst) == 0;
@@ -179,7 +179,19 @@ static void RL(CPU *u, uint8_t *dst)
 static void RRC(CPU *u, uint8_t *dst)
 {
     uint8_t carry = (*dst) & 0x1;
-    (*dst) >>= 1;
+    (*dst) = ((*dst) >> 1) | ((*dst) << 7);
+
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry;
+}
+
+static void RR(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x1;
+    (*dst) = ((*dst) >> 1) | ((*dst) << 7);
+    (*dst) |= carry;
 
     u->reg.FZ = (*dst) == 0;
     u->reg.FN = 0;
@@ -188,17 +200,44 @@ static void RRC(CPU *u, uint8_t *dst)
     cycles(4);
 }
 
-static void RR(CPU *u, uint8_t *dst)
+static void SLA(CPU *u, uint8_t *dst)
 {
-    uint8_t carry = (*dst) & 0x1;
-    (*dst) >>= 1;
-    (*dst) |= carry;
-
+    uint8_t carry = (*dst) & 0x80;
+    (*dst) <<= 1;
+    /* XXX SB of n set to 0 */
     u->reg.FZ = (*dst) == 0;
     u->reg.FN = 0;
     u->reg.FH = 0;
-    u->reg.FC = carry; /* XXX */
-    cycles(4);
+    u->reg.FC = carry;
+}
+
+static void SRA(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x1;
+    (*dst) >>= 1;
+    /* XXX MSB doesn't change */
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry;
+}
+
+static void SRL(CPU *u, uint8_t *dst)
+{
+    uint8_t carry = (*dst) & 0x1;
+    (*dst) >>= 1;
+    /* XXX MSB set to 0 */
+    u->reg.FZ = (*dst) == 0;
+    u->reg.FN = 0;
+    u->reg.FH = 0;
+    u->reg.FC = carry;
+}
+
+static void BIT(CPU *u, uint8_t dst, uint8_t bit)
+{
+    u->reg.FZ = ((dst & bit) == 0);
+    u->reg.FN = 0;
+    u->reg.FH = 1;
 }
 
 int execute_opcode(CPU *u, uint8_t op)
@@ -1214,9 +1253,70 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        CASE_CB_SLA:
+        case 0x27:
+            SLA(u, &u->reg.A);
+            cycles(8);
             break;
-        CASE_CB_SRA:
+        case 0x20:
+            SLA(u, &u->reg.B);
+            cycles(8);
+            break;
+        case 0x21:
+            SLA(u, &u->reg.C);
+            cycles(8);
+            break;
+        case 0x22:
+            SLA(u, &u->reg.D);
+            cycles(8);
+            break;
+        case 0x23:
+            SLA(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x24:
+            SLA(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x25:
+            SLA(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x26:
+            SLA(u, &u->mem.content[u->reg.HL]);
+            cycles(16);
+            break;
+
+        case 0x2F:
+            SRA(u, &u->reg.A);
+            cycles(8);
+            break;
+        case 0x28:
+            SRA(u, &u->reg.B);
+            cycles(8);
+            break;
+        case 0x29:
+            SRA(u, &u->reg.C);
+            cycles(8);
+            break;
+        case 0x2A:
+            SRA(u, &u->reg.D);
+            cycles(8);
+            break;
+        case 0x2B:
+            SRA(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x2C:
+            SRA(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x2D:
+            SRA(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x2E:
+            SRA(u, &u->mem.content[u->reg.HL]);
+            cycles(16);
             break;
 
         case 0x37:
@@ -1252,11 +1352,305 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        CASE_CB_SRL:
+        case 0x3F:
+            SRL(u, &u->reg.A);
+            cycles(8);
             break;
-        CASE_CB_BIT:
+        case 0x38:
+            SRL(u, &u->reg.B);
+            cycles(8);
             break;
-        CASE_CB_SET:
+        case 0x39:
+            SRL(u, &u->reg.C);
+            cycles(8);
+            break;
+        case 0x3A:
+            SRL(u, &u->reg.D);
+            cycles(8);
+            break;
+        case 0x3B:
+            SRL(u, &u->reg.E);
+            cycles(8);
+            break;
+        case 0x3C:
+            SRL(u, &u->reg.H);
+            cycles(8);
+            break;
+        case 0x3D:
+            SRL(u, &u->reg.L);
+            cycles(8);
+            break;
+        case 0x3E:
+            SRL(u, &u->mem.content[u->reg.HL]);
+            cycles(16);
+            break;
+
+        case 0x47:
+            BIT(u, u->reg.A, 0x1);
+            cycles(8);
+            break;
+        case 0x40:
+            BIT(u, u->reg.B, 0x1);
+            cycles(8);
+            break;
+        case 0x41:
+            BIT(u, u->reg.C, 0x1);
+            cycles(8);
+            break;
+        case 0x42:
+            BIT(u, u->reg.D, 0x1);
+            cycles(8);
+            break;
+        case 0x43:
+            BIT(u, u->reg.E, 0x1);
+            cycles(8);
+            break;
+        case 0x44:
+            BIT(u, u->reg.H, 0x1);
+            cycles(8);
+            break;
+        case 0x45:
+            BIT(u, u->reg.L, 0x1);
+            cycles(8);
+            break;
+        case 0x46:
+            BIT(u, m_get8(u, u->reg.HL), 0x1);
+            cycles(16);
+            break;
+
+
+        case 0x4F:
+            BIT(u, u->reg.A, 0x2);
+            cycles(8);
+            break;
+        case 0x48:
+            BIT(u, u->reg.B, 0x2);
+            cycles(8);
+            break;
+        case 0x49:
+            BIT(u, u->reg.C, 0x2);
+            cycles(8);
+            break;
+        case 0x4A:
+            BIT(u, u->reg.D, 0x2);
+            cycles(8);
+            break;
+        case 0x4B:
+            BIT(u, u->reg.E, 0x2);
+            cycles(8);
+            break;
+        case 0x4C:
+            BIT(u, u->reg.H, 0x2);
+            cycles(8);
+            break;
+        case 0x4D:
+            BIT(u, u->reg.L, 0x2);
+            cycles(8);
+            break;
+        case 0x4E:
+            BIT(u, m_get8(u, u->reg.HL), 0x2);
+            cycles(8);
+            break;
+
+        case 0x57:
+            BIT(u, u->reg.A, 0x4);
+            cycles(8);
+            break;
+        case 0x50:
+            BIT(u, u->reg.B, 0x4);
+            cycles(8);
+            break;
+        case 0x51:
+            BIT(u, u->reg.C, 0x4);
+            cycles(8);
+            break;
+        case 0x52:
+            BIT(u, u->reg.D, 0x4);
+            cycles(8);
+            break;
+        case 0x53:
+            BIT(u, u->reg.E, 0x4);
+            cycles(8);
+            break;
+        case 0x54:
+            BIT(u, u->reg.H, 0x4);
+            cycles(8);
+            break;
+        case 0x55:
+            BIT(u, u->reg.L, 0x4);
+            cycles(8);
+            break;
+        case 0x56:
+            BIT(u, m_get8(u, u->reg.HL), 0x4);
+            cycles(8);
+            break;
+
+        case 0x5F:
+            BIT(u, u->reg.A, 0x8);
+            cycles(8);
+            break;
+        case 0x58:
+            BIT(u, u->reg.B, 0x8);
+            cycles(8);
+            break;
+        case 0x59:
+            BIT(u, u->reg.C, 0x8);
+            cycles(8);
+            break;
+        case 0x5A:
+            BIT(u, u->reg.D, 0x8);
+            cycles(8);
+            break;
+        case 0x5B:
+            BIT(u, u->reg.E, 0x8);
+            cycles(8);
+            break;
+        case 0x5C:
+            BIT(u, u->reg.H, 0x8);
+            cycles(8);
+            break;
+        case 0x5D:
+            BIT(u, u->reg.L, 0x8);
+            cycles(8);
+            break;
+        case 0x5E:
+            BIT(u, m_get8(u, u->reg.HL), 0x8);
+            cycles(8);
+            break;
+
+        case 0x67:
+            BIT(u, u->reg.A, 0x10);
+            cycles(8);
+            break;
+        case 0x60:
+            BIT(u, u->reg.B, 0x10);
+            cycles(8);
+            break;
+        case 0x61:
+            BIT(u, u->reg.C, 0x10);
+            cycles(8);
+            break;
+        case 0x62:
+            BIT(u, u->reg.D, 0x10);
+            cycles(8);
+            break;
+        case 0x63:
+            BIT(u, u->reg.E, 0x10);
+            cycles(8);
+            break;
+        case 0x64:
+            BIT(u, u->reg.H, 0x10);
+            cycles(8);
+            break;
+        case 0x65:
+            BIT(u, u->reg.L, 0x10);
+            cycles(8);
+            break;
+        case 0x66:
+            BIT(u, m_get8(u, u->reg.HL), 0x10);
+            cycles(8);
+            break;
+
+        case 0x6F:
+            BIT(u, u->reg.A, 0x20);
+            cycles(8);
+            break;
+        case 0x68:
+            BIT(u, u->reg.B, 0x20);
+            cycles(8);
+            break;
+        case 0x69:
+            BIT(u, u->reg.C, 0x20);
+            cycles(8);
+            break;
+        case 0x6A:
+            BIT(u, u->reg.D, 0x20);
+            cycles(8);
+            break;
+        case 0x6B:
+            BIT(u, u->reg.E, 0x20);
+            cycles(8);
+            break;
+        case 0x6C:
+            BIT(u, u->reg.H, 0x20);
+            cycles(8);
+            break;
+        case 0x6D:
+            BIT(u, u->reg.L, 0x20);
+            cycles(8);
+            break;
+        case 0x6E:
+            BIT(u, m_get8(u, u->reg.HL), 0x20);
+            cycles(8);
+            break;
+
+        case 0x77:
+            BIT(u, u->reg.A, 0x40);
+            cycles(8);
+            break;
+        case 0x70:
+            BIT(u, u->reg.B, 0x40);
+            cycles(8);
+            break;
+        case 0x71:
+            BIT(u, u->reg.C, 0x40);
+            cycles(8);
+            break;
+        case 0x72:
+            BIT(u, u->reg.D, 0x40);
+            cycles(8);
+            break;
+        case 0x73:
+            BIT(u, u->reg.D, 0x40);
+            cycles(8);
+            break;
+        case 0x74:
+            BIT(u, u->reg.H, 0x40);
+            cycles(8);
+            break;
+        case 0x75:
+            BIT(u, u->reg.L, 0x40);
+            cycles(8);
+            break;
+        case 0x76:
+            BIT(u, m_get8(u, u->reg.HL), 0x40);
+            cycles(8);
+            break;
+
+        case 0x7F:
+            BIT(u, u->reg.A, 0x80);
+            cycles(8);
+            break;
+        case 0x78:
+            BIT(u, u->reg.B, 0x80);
+            cycles(8);
+            break;
+        case 0x79:
+            BIT(u, u->reg.C, 0x80);
+            cycles(8);
+            break;
+        case 0x7A:
+            BIT(u, u->reg.D, 0x80);
+            cycles(8);
+            break;
+        case 0x7B:
+            BIT(u, u->reg.E, 0x80);
+            cycles(8);
+            break;
+        case 0x7C:
+            BIT(u, u->reg.H, 0x80);
+            cycles(8);
+            break;
+        case 0x7D:
+            BIT(u, u->reg.L, 0x80);
+            cycles(8);
+            break;
+        case 0x7E:
+            BIT(u, m_get8(u, u->reg.HL), 0x80);
+            cycles(8);
+            break;
+
+            CASE_CB_SET:
             break;
         CASE_CB_RES:
             break;
@@ -1413,77 +1807,74 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
     }
 
-        /* RST n */
-    case 0xC7: /* RST $00 */
+    case 0xC7: /* RST n */
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x00;
         cycles(32);
         break;
-    case 0xCF: /* RST $08 */
+    case 0xCF:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x08;
         cycles(32);
         break;
-    case 0xD7: /* RST $10 */
+    case 0xD7:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x10;
         cycles(32);
         break;
-    case 0xDF: /* RST $18 */
+    case 0xDF:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x18;
         cycles(32);
         break;
-    case 0xE7: /* RST $20 */
+    case 0xE7:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x20;
         cycles(32);
         break;
-    case 0xEF: /* RST $28 */
+    case 0xEF:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x28;
         cycles(32);
         break;
-    case 0xF7: /* RST $30 */
+    case 0xF7:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x30;
         cycles(32);
         break;
-    case 0xFF: /* RST $38 */
+    case 0xFF:
         s_push16(u, u->mem.ptr);
         u->mem.ptr = 0x0000 + 0x38;
         cycles(32);
         break;
 
-        /* RET */
     case 0xC9: /* RET */
         u->mem.ptr = s_pop16(u);
         cycles(8);
         break;
 
-        /* RET cc */
-    case 0xC0: /* RET NZ */
+    case 0xC0: /* RET cc */
         if (!(u->reg.F & Z_FLAG))
         {
             u->mem.ptr = s_pop16(u);
         }
         cycles(8);
         break;
-    case 0xC8: /* RET Z */
+    case 0xC8:
         if (u->reg.F & Z_FLAG)
         {
             u->mem.ptr = s_pop16(u);
         }
         cycles(8);
         break;
-    case 0xD0: /* RET NC */
+    case 0xD0:
         if (!(u->reg.F & C_FLAG))
         {
             u->mem.ptr = s_pop16(u);
         }
         cycles(8);
         break;
-    case 0xD8: /* RET C */
+    case 0xD8:
         if (u->reg.F & C_FLAG)
         {
             u->mem.ptr = s_pop16(u);
@@ -1493,8 +1884,8 @@ int execute_opcode(CPU *u, uint8_t op)
 
     case 0xD9: /* RETI */
         u->mem.ptr = s_pop16(u);
+        u->interrupts = 1;
         cycles(8);
-        /* XXX enable interrupts? */
         break;
 
     default:
