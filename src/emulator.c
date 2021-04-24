@@ -694,8 +694,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(12);
         break;
 
-
-    case 0x87:/* ADD A,n */
+    case 0x87: /* ADD A,n */
         ADD_8(u, &u->reg.A, u->reg.A);
         break;
     case 0x80:
@@ -724,7 +723,6 @@ int execute_opcode(CPU *u, uint8_t op)
         ADD_8(u, &u->reg.A, m_read8(u));
         cycles(4);
         break;
-
 
     case 0x8F: /* ADC A,n */
         ADC_8(u, &u->reg.A, u->reg.A);
@@ -756,7 +754,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-    case 0x97:/* SUB n */
+    case 0x97: /* SUB n */
         SUB_8(u, &u->reg.A, u->reg.A);
         break;
     case 0x90:
@@ -816,7 +814,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-    case 0xA7:  /* AND n */
+    case 0xA7: /* AND n */
         AND_8(u, &u->reg.A, u->reg.A);
         break;
     case 0xA0:
@@ -846,8 +844,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(4);
         break;
 
-
-    case 0xB7:  /* OR n */
+    case 0xB7: /* OR n */
         OR_8(u, &u->reg.A, u->reg.A);
         break;
     case 0xB0:
@@ -1047,7 +1044,7 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(8);
         break;
 
-    case 0x27:     /* DAA XXX */
+    case 0x27: /* DAA XXX */
         cycles(4);
         break;
 
@@ -1121,7 +1118,7 @@ int execute_opcode(CPU *u, uint8_t op)
         uint8_t next = m_read8(u);
         switch (next)
         {
-        case 0x07:
+        case 0x07: /* RLC */
             RLC(u, &u->reg.A);
             cycles(8);
             break;
@@ -1154,7 +1151,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x0F:
+        case 0x0F: /* RRC */
             RRC(u, &u->reg.A);
             cycles(8);
             break;
@@ -1187,7 +1184,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x17:
+        case 0x17: /* RL */
             RL(u, &u->reg.A);
             cycles(8);
             break;
@@ -1220,40 +1217,40 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x1F:
-            RL(u, &u->reg.A);
+        case 0x1F: /* RR */
+            RR(u, &u->reg.A);
             cycles(8);
             break;
         case 0x18:
-            RL(u, &u->reg.B);
+            RR(u, &u->reg.B);
             cycles(8);
             break;
         case 0x19:
-            RL(u, &u->reg.C);
+            RR(u, &u->reg.C);
             cycles(8);
             break;
         case 0x1A:
-            RL(u, &u->reg.D);
+            RR(u, &u->reg.D);
             cycles(8);
             break;
         case 0x1B:
-            RL(u, &u->reg.E);
+            RR(u, &u->reg.E);
             cycles(8);
             break;
         case 0x1C:
-            RL(u, &u->reg.H);
+            RR(u, &u->reg.H);
             cycles(8);
             break;
         case 0x1D:
-            RL(u, &u->reg.L);
+            RR(u, &u->reg.L);
             cycles(8);
             break;
         case 0x1E:
-            RL(u, &u->mem.content[u->reg.A]);
+            RR(u, &u->mem.content[u->reg.A]);
             cycles(16);
             break;
 
-        case 0x27:
+        case 0x27: /* SLA */
             SLA(u, &u->reg.A);
             cycles(8);
             break;
@@ -1286,7 +1283,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x2F:
+        case 0x2F: /* SRA */
             SRA(u, &u->reg.A);
             cycles(8);
             break;
@@ -1319,7 +1316,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x37:
+        case 0x37: /* SWAP */
             SWAP_8(&u->reg.A);
             cycles(8);
             break;
@@ -1352,7 +1349,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x3F:
+        case 0x3F: /* SRL */
             SRL(u, &u->reg.A);
             cycles(8);
             break;
@@ -1385,7 +1382,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(16);
             break;
 
-        case 0x47:
+        case 0x47: /* BIT */
             BIT(u, u->reg.A, 0x1);
             cycles(8);
             break;
@@ -1417,7 +1414,6 @@ int execute_opcode(CPU *u, uint8_t op)
             BIT(u, m_get8(u, u->reg.HL), 0x1);
             cycles(16);
             break;
-
 
         case 0x4F:
             BIT(u, u->reg.A, 0x2);
@@ -1650,9 +1646,532 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
 
-            CASE_CB_SET:
+        case 0x87: /* RES */
+            u->reg.A &= ~0x1;
+            cycles(8);
             break;
-        CASE_CB_RES:
+        case 0x80:
+            u->reg.B &= ~0x1;
+            cycles(8);
+            break;
+        case 0x81:
+            u->reg.C &= ~0x1;
+            cycles(8);
+            break;
+        case 0x82:
+            u->reg.D &= ~0x1;
+            cycles(8);
+            break;
+        case 0x83:
+            u->reg.E &= ~0x1;
+            cycles(8);
+            break;
+        case 0x84:
+            u->reg.H &= ~0x1;
+            cycles(8);
+            break;
+        case 0x85:
+            u->reg.L &= ~0x1;
+            cycles(8);
+            break;
+        case 0x86:
+            u->mem.content[u->reg.HL] &= ~0x1;
+            cycles(16);
+            break;
+
+        case 0x8F:
+            u->reg.A &= ~0x2;
+            cycles(8);
+            break;
+        case 0x88:
+            u->reg.B &= ~0x2;
+            cycles(8);
+            break;
+        case 0x89:
+            u->reg.C &= ~0x2;
+            cycles(8);
+            break;
+        case 0x8A:
+            u->reg.D &= ~0x2;
+            cycles(8);
+            break;
+        case 0x8B:
+            u->reg.E &= ~0x2;
+            cycles(8);
+            break;
+        case 0x8C:
+            u->reg.H &= ~0x2;
+            cycles(8);
+            break;
+        case 0x8D:
+            u->reg.L &= ~0x2;
+            cycles(8);
+            break;
+        case 0x8E:
+            u->mem.content[u->reg.HL] &= ~0x2;
+            cycles(16);
+            break;
+
+        case 0x97:
+            u->reg.A &= ~0x4;
+            cycles(8);
+            break;
+        case 0x90:
+            u->reg.B &= ~0x4;
+            cycles(8);
+            break;
+        case 0x91:
+            u->reg.C &= ~0x4;
+            cycles(8);
+            break;
+        case 0x92:
+            u->reg.D &= ~0x4;
+            cycles(8);
+            break;
+        case 0x93:
+            u->reg.E &= ~0x4;
+            cycles(8);
+            break;
+        case 0x94:
+            u->reg.H &= ~0x4;
+            cycles(8);
+            break;
+        case 0x95:
+            u->reg.L &= ~0x4;
+            cycles(8);
+            break;
+        case 0x96:
+            u->mem.content[u->reg.HL] &= ~0x4;
+            cycles(16);
+            break;
+
+        case 0x9F:
+            u->reg.A &= ~0x8;
+            cycles(8);
+            break;
+        case 0x98:
+            u->reg.B &= ~0x8;
+            cycles(8);
+            break;
+        case 0x99:
+            u->reg.C &= ~0x8;
+            cycles(8);
+            break;
+        case 0x9A:
+            u->reg.D &= ~0x8;
+            cycles(8);
+            break;
+        case 0x9B:
+            u->reg.E &= ~0x8;
+            cycles(8);
+            break;
+        case 0x9C:
+            u->reg.H &= ~0x8;
+            cycles(8);
+            break;
+        case 0x9D:
+            u->reg.L &= ~0x8;
+            cycles(8);
+            break;
+        case 0x9E:
+            u->mem.content[u->reg.HL] &= ~0x8;
+            cycles(16);
+            break;
+
+        case 0xA7:
+            u->reg.A &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA0:
+            u->reg.B &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA1:
+            u->reg.C &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA2:
+            u->reg.D &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA3:
+            u->reg.E &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA4:
+            u->reg.H &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA5:
+            u->reg.L &= ~0x10;
+            cycles(8);
+            break;
+        case 0xA6:
+            u->mem.content[u->reg.HL] &= ~0x10;
+            cycles(16);
+            break;
+
+        case 0xAF:
+            u->reg.A &= ~0x20;
+            cycles(8);
+            break;
+        case 0xA8:
+            u->reg.B &= ~0x20;
+            cycles(8);
+            break;
+        case 0xA9:
+            u->reg.C &= ~0x20;
+            cycles(8);
+            break;
+        case 0xAA:
+            u->reg.D &= ~0x20;
+            cycles(8);
+            break;
+        case 0xAB:
+            u->reg.E &= ~0x20;
+            cycles(8);
+            break;
+        case 0xAC:
+            u->reg.H &= ~0x20;
+            cycles(8);
+            break;
+        case 0xAD:
+            u->reg.L &= ~0x20;
+            cycles(8);
+            break;
+        case 0xAE:
+            u->mem.content[u->reg.HL] &= ~0x20;
+            cycles(16);
+            break;
+
+        case 0xB7:
+            u->reg.A &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB0:
+            u->reg.B &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB1:
+            u->reg.C &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB2:
+            u->reg.D &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB3:
+            u->reg.E &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB4:
+            u->reg.H &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB5:
+            u->reg.L &= ~0x40;
+            cycles(8);
+            break;
+        case 0xB6:
+            u->mem.content[u->reg.HL] &= ~0x40;
+            cycles(16);
+            break;
+
+        case 0xBF:
+            u->reg.A &= ~0x80;
+            cycles(8);
+            break;
+        case 0xB8:
+            u->reg.B &= ~0x80;
+            cycles(8);
+            break;
+        case 0xB9:
+            u->reg.C &= ~0x80;
+            cycles(8);
+            break;
+        case 0xBA:
+            u->reg.D &= ~0x80;
+            cycles(8);
+            break;
+        case 0xBB:
+            u->reg.E &= ~0x80;
+            cycles(8);
+            break;
+        case 0xBC:
+            u->reg.H &= ~0x80;
+            cycles(8);
+            break;
+        case 0xBD:
+            u->reg.L &= ~0x80;
+            cycles(8);
+            break;
+        case 0xBE:
+            u->mem.content[u->reg.HL] &= ~0x80;
+            cycles(16);
+            break;
+
+        case 0xC7: /* SET */
+            u->reg.A |= 0x1;
+            cycles(8);
+            break;
+        case 0xC0:
+            u->reg.B |= 0x1;
+            cycles(8);
+            break;
+        case 0xC1:
+            u->reg.C |= 0x1;
+            cycles(8);
+            break;
+        case 0xC2:
+            u->reg.D |= 0x1;
+            cycles(8);
+            break;
+        case 0xC3:
+            u->reg.E |= 0x1;
+            cycles(8);
+            break;
+        case 0xC4:
+            u->reg.H |= 0x1;
+            cycles(8);
+            break;
+        case 0xC5:
+            u->reg.L |= 0x1;
+            cycles(8);
+            break;
+        case 0xC6:
+            u->mem.content[u->reg.HL] |= 0x1;
+            cycles(16);
+            break;
+
+        case 0xCF:
+            u->reg.A |= 0x2;
+            cycles(8);
+            break;
+        case 0xC8:
+            u->reg.B |= 0x2;
+            cycles(8);
+            break;
+        case 0xC9:
+            u->reg.C |= 0x2;
+            cycles(8);
+            break;
+        case 0xCA:
+            u->reg.D |= 0x2;
+            cycles(8);
+            break;
+        case 0xCB:
+            u->reg.E |= 0x2;
+            cycles(8);
+            break;
+        case 0xCC:
+            u->reg.H |= 0x2;
+            cycles(8);
+            break;
+        case 0xCD:
+            u->reg.L |= 0x2;
+            cycles(8);
+            break;
+        case 0xCE:
+            u->mem.content[u->reg.HL] |= 0x2;
+            cycles(16);
+            break;
+
+        case 0xD7:
+            u->reg.A |= 0x4;
+            cycles(8);
+            break;
+        case 0xD0:
+            u->reg.B |= 0x4;
+            cycles(8);
+            break;
+        case 0xD1:
+            u->reg.C |= 0x4;
+            cycles(8);
+            break;
+        case 0xD2:
+            u->reg.D |= 0x4;
+            cycles(8);
+            break;
+        case 0xD3:
+            u->reg.E |= 0x4;
+            cycles(8);
+            break;
+        case 0xD4:
+            u->reg.H |= 0x4;
+            cycles(8);
+            break;
+        case 0xD5:
+            u->reg.L |= 0x4;
+            cycles(8);
+            break;
+        case 0xD6:
+            u->mem.content[u->reg.HL] |= 0x4;
+            cycles(16);
+            break;
+
+        case 0xDF:
+            u->reg.A |= 0x8;
+            cycles(8);
+            break;
+        case 0xD8:
+            u->reg.B |= 0x8;
+            cycles(8);
+            break;
+        case 0xD9:
+            u->reg.C |= 0x8;
+            cycles(8);
+            break;
+        case 0xDA:
+            u->reg.D |= 0x8;
+            cycles(8);
+            break;
+        case 0xDB:
+            u->reg.E |= 0x8;
+            cycles(8);
+            break;
+        case 0xDC:
+            u->reg.H |= 0x8;
+            cycles(8);
+            break;
+        case 0xDD:
+            u->reg.L |= 0x8;
+            cycles(8);
+            break;
+        case 0xDE:
+            u->mem.content[u->reg.HL] |= 0x8;
+            cycles(16);
+            break;
+
+        case 0xE7:
+            u->reg.A |= 0x10;
+            cycles(8);
+            break;
+        case 0xE0:
+            u->reg.B |= 0x10;
+            cycles(8);
+            break;
+        case 0xE1:
+            u->reg.C |= 0x10;
+            cycles(8);
+            break;
+        case 0xE2:
+            u->reg.D |= 0x10;
+            cycles(8);
+            break;
+        case 0xE3:
+            u->reg.E |= 0x10;
+            cycles(8);
+            break;
+        case 0xE4:
+            u->reg.H |= 0x10;
+            cycles(8);
+            break;
+        case 0xE5:
+            u->reg.L |= 0x10;
+            cycles(8);
+            break;
+        case 0xE6:
+            u->mem.content[u->reg.HL] |= 0x10;
+            cycles(16);
+            break;
+
+        case 0xEF:
+            u->reg.A |= 0x20;
+            cycles(8);
+            break;
+        case 0xE8:
+            u->reg.B |= 0x20;
+            cycles(8);
+            break;
+        case 0xE9:
+            u->reg.C |= 0x20;
+            cycles(8);
+            break;
+        case 0xEA:
+            u->reg.D |= 0x20;
+            cycles(8);
+            break;
+        case 0xEB:
+            u->reg.E |= 0x20;
+            cycles(8);
+            break;
+        case 0xEC:
+            u->reg.H |= 0x20;
+            cycles(8);
+            break;
+        case 0xED:
+            u->reg.L |= 0x20;
+            cycles(8);
+            break;
+        case 0xEE:
+            u->mem.content[u->reg.HL] |= 0x20;
+            cycles(16);
+            break;
+
+        case 0xF7:
+            u->reg.A |= 0x40;
+            cycles(8);
+            break;
+        case 0xF0:
+            u->reg.B |= 0x40;
+            cycles(8);
+            break;
+        case 0xF1:
+            u->reg.C |= 0x40;
+            cycles(8);
+            break;
+        case 0xF2:
+            u->reg.D |= 0x40;
+            cycles(8);
+            break;
+        case 0xF3:
+            u->reg.E |= 0x40;
+            cycles(8);
+            break;
+        case 0xF4:
+            u->reg.H |= 0x40;
+            cycles(8);
+            break;
+        case 0xF5:
+            u->reg.L |= 0x40;
+            cycles(8);
+            break;
+        case 0xF6:
+            u->mem.content[u->reg.HL] |= 0x40;
+            cycles(16);
+            break;
+
+        case 0xFF:
+            u->reg.A |= 0x80;
+            cycles(8);
+            break;
+        case 0xF8:
+            u->reg.B |= 0x80;
+            cycles(8);
+            break;
+        case 0xF9:
+            u->reg.C |= 0x80;
+            cycles(8);
+            break;
+        case 0xFA:
+            u->reg.D |= 0x80;
+            cycles(8);
+            break;
+        case 0xFB:
+            u->reg.E |= 0x80;
+            cycles(8);
+            break;
+        case 0xFC:
+            u->reg.H |= 0x80;
+            cycles(8);
+            break;
+        case 0xFD:
+            u->reg.L |= 0x80;
+            cycles(8);
+            break;
+        case 0xFE:
+            u->mem.content[u->reg.HL] |= 0x80;
+            cycles(16);
             break;
         }
         break;
