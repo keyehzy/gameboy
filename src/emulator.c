@@ -1020,25 +1020,59 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0x07: /* RLCA */
+    {
+        uint8_t carry = u->reg.A & 0x80;
+        u->reg.A <<= 1;
+
+        u->reg.FZ = u->reg.A == 0;
+        u->reg.FN = 0;
+        u->reg.FH = 0;
+        u->reg.FC = carry;    /* XXX */
         cycles(4);
         break;
+    }
 
     case 0x17: /* RLA (A) */
-        /* see rotating section of
-         * http://www.linux-kongress.org/2009/slides/compiler_survey_felix_von_leitner.pdf
-         */
-        u->reg.A = (u->reg.A << 1) | (u->reg.A >> 7);
+    {
+        uint8_t carry = u->reg.A & 0x80;
+        u->reg.A <<= 1;
+        u->reg.A |= carry;
+
+        u->reg.FZ = u->reg.A == 0;
+        u->reg.FN = 0;
+        u->reg.FH = 0;
+        u->reg.FC = carry;    /* XXX */
         cycles(4);
         break;
+    }
 
     case 0x0F: /* RRCA */
-        cycles(4);
-        break;
+    {
+        uint8_t carry = u->reg.A & 0x1;
+        u->reg.A >>= 1;
 
-    case 0x1F: /* RRA */
-        u->reg.A = (u->reg.A >> 1) | (u->reg.A << 7);
+        u->reg.FZ = u->reg.A == 0;
+        u->reg.FN = 0;
+        u->reg.FH = 0;
+        u->reg.FC = carry;    /* XXX */
         cycles(4);
         break;
+    }
+
+    case 0x1F: /* RRA */ /* see https://stackoverflow.com/a/2761205 */
+    {
+        uint8_t carry = u->reg.A & 0x1;
+        u->reg.A >>= 1;
+        u->reg.A |= carry;
+
+        u->reg.FZ = u->reg.A == 0;
+        u->reg.FN = 0;
+        u->reg.FH = 0;
+        u->reg.FC = carry;
+
+        cycles(4);
+        break;
+    }
 
     case 0xCB: /* PREFIX CB */
     {
