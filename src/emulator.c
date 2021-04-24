@@ -6,7 +6,7 @@
 #include <gameboy/emulator.h>
 
 #define cast_signed8(x) (int)((int8_t)(x))
-#define cycle(x) u->cycle += (x)
+#define cycles(x) u->cycles += (x)
 
 static void ADD_8(CPU *u, uint8_t *dst, uint8_t src)
 {
