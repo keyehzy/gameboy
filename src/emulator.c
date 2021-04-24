@@ -976,11 +976,11 @@ int execute_opcode(CPU *u, uint8_t op)
 
         /* CPL */
     case 0x2F: /* CPL */
-        u->reg.A = ~u->reg.A;
+        u->reg.A = ~(u->reg.A);
         cycles(4);
 
+        u->reg.FN = 1;
         u->reg.FH = 1;
-        u->reg.FC = 1;
         break;
 
         /* CCF */
@@ -988,8 +988,8 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.F ^= C_FLAG;
         cycles(4);
 
+        u->reg.FN = 0;
         u->reg.FH = 0;
-        u->reg.FC = 0;
         break;
 
         /* SCF */
@@ -1003,23 +1003,26 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0x76: /* HALT */
+        /* Power down CPU */
         cycles(4);
         break;
 
     case 0x10: /* STOP */
+        /* Halt CPU & LCD */
         cycles(4);
         break;
 
     case 0xF3: /* DI */
+        u->interrupts = 0;
         cycles(4);
         break;
 
     case 0xFB: /* EI */
-
+        u->interrupts = 1;
         cycles(4);
         break;
 
-    case 0x07: /* RLCA */
+    case 0x07: /* RLCA */ /* see https://stackoverflow.com/a/2761205 */
     {
         uint8_t carry = u->reg.A & 0x80;
         u->reg.A <<= 1;
@@ -1027,12 +1030,12 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.FZ = u->reg.A == 0;
         u->reg.FN = 0;
         u->reg.FH = 0;
-        u->reg.FC = carry;    /* XXX */
+        u->reg.FC = carry; /* XXX */
         cycles(4);
         break;
     }
 
-    case 0x17: /* RLA (A) */
+    case 0x17: /* RLA */
     {
         uint8_t carry = u->reg.A & 0x80;
         u->reg.A <<= 1;
@@ -1041,7 +1044,7 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.FZ = u->reg.A == 0;
         u->reg.FN = 0;
         u->reg.FH = 0;
-        u->reg.FC = carry;    /* XXX */
+        u->reg.FC = carry; /* XXX */
         cycles(4);
         break;
     }
@@ -1054,12 +1057,12 @@ int execute_opcode(CPU *u, uint8_t op)
         u->reg.FZ = u->reg.A == 0;
         u->reg.FN = 0;
         u->reg.FH = 0;
-        u->reg.FC = carry;    /* XXX */
+        u->reg.FC = carry; /* XXX */
         cycles(4);
         break;
     }
 
-    case 0x1F: /* RRA */ /* see https://stackoverflow.com/a/2761205 */
+    case 0x1F: /* RRA */
     {
         uint8_t carry = u->reg.A & 0x1;
         u->reg.A >>= 1;
@@ -1364,6 +1367,104 @@ int execute_opcode(CPU *u, uint8_t op)
 
     return 0;
 }
+/********************************************************************/
+/* $FF0F IF Interrupt Flag                                          */
+/*                                                                  */
+/*         Bit 4: Transition from High to Low of Pin number P10-P13 */
+/*         Bit 3: Serial I/O transfer complete                      */
+/*         Bit 2: Timer Overflow                                    */
+/*         Bit 1: LCDC (see STAT)                                   */
+/*         Bit 0: V-Blank                                           */
+/*                                                                  */
+/* Interrupt        Priority     Start Address                      */
+/* V-Blank             1         $0040                              */
+/* LCDC Status         2         $0048                              */
+/* Timer Overflow      3         $0050                              */
+/* Serial Transfer     4         $0058                              */
+/* Hi-Lo of P10-P13    5         $0060                              */
+/********************************************************************/
+#define IF 0xFF0F
+/*********************************************************************/
+/* $FFFF IE - Interrupt Enable                                       */
+/*                                                                   */
+/*         Bit 4: Transition from High to Low of Pin number P10-P13. */
+/*         Bit 3: Serial I/O transfer complete                       */
+/*         Bit 2: Timer Overflow                                     */
+/*         Bit 1: LCDC (see STAT)                                    */
+/*         Bit 0: V-Blank 0: disable 1: enable                       */
+/*********************************************************************/
+#define IE 0xFFFF
+
+static void request_interupt(CPU *u, int kind)
+{
+    uint8_t set_interrupt = m_get8(u, IF) | (1 << kind);
+    m_set8(u, IF, set_interrupt);
+}
+
+static void handle_interupt(CPU *u, int kind)
+{
+    u->interrupts = 0;
+    uint8_t reset_interrupt = m_get8(u, IF) & ~(1 << kind);
+    m_set8(u, IF, reset_interrupt);
+
+    s_push16(u, u->mem.ptr);
+
+    switch (kind)
+    {
+    case 0:
+        u->mem.ptr = 0x40;
+        break;
+        u->mem.ptr = 0x48;
+        break;
+        u->mem.ptr = 0x50;
+        break;
+        u->mem.ptr = 0x60;
+        break;
+    }
+}
+
+static void execute_interupts(CPU *u)
+{
+    if (u->interrupts)
+    {
+        uint8_t interrupt_flag = m_get8(u, IF);
+        uint8_t interrupt_enabled = m_get8(u, IE);
+
+        if (interrupt_flag)
+        {
+            for (uint8_t i = 0; i < 5; i++)
+            {
+                if ((interrupt_flag & interrupt_enabled) & (1 << i))
+                {
+                    handle_interupt(u, i);
+                }
+            }
+        }
+    }
+}
+
+/***************************************************************/
+/* $FF04 Name - DIV                                            */
+/*                                                             */
+/* This register is incremented 16384(~16779 on SGB)times a    */
+/* second. Writing any value sets it to $00.  Here we are also */
+/* maintaining a counter `div_counter` for this task. At each  */
+/* iteration we increase this counter by the number of cycles  */
+/* ran. When this counter overflows we increment the div       */
+/* register. This way, we have approximately 60 fps.           */
+/***************************************************************/
+#define DIV 0xFF04
+int div_counter = 0;
+
+static void update_div_register(CPU *u, int cycles)
+{
+    div_counter += cycles;
+    if (div_counter >= 0xff /*CLOCK_SPEED/16382*/) /* overflows */
+    {
+        div_counter = 0;
+        u->mem.content[DIV]++;
+    }
+}
 
 /*********************************************************************/
 /* $FF07 - TAC                                                       */
@@ -1381,36 +1482,79 @@ int execute_opcode(CPU *u, uint8_t op)
 /*         0: Stop Timer                                             */
 /*         1: Start Timer                                            */
 /*********************************************************************/
+#define TAC 0xFF07
 static uint8_t check_frequency(CPU *u)
 {
-    uint8_t byte = m_get8(u, 0xFF07 /*TAC*/);
-    return byte & 0x3;
+    return m_get8(u, TAC) & 0x3;
+}
+
+static uint16_t get_freq(CPU *u)
+{
+    uint8_t byte = check_frequency(u);
+    switch (byte)
+    {
+    case 0x00: /* (CLOCK_SPEED / FREQ) */
+        return 0x400;
+    case 0x01:
+        return 0x10;
+    case 0x10:
+        return 0x40;
+    case 0x11:
+        return 0x100;
+    default:
+        fprintf(stderr, "Unknown frequency, aborting.\n");
+        exit(1);
+    }
 }
 
 static uint8_t check_timer(CPU *u)
 {
-    return m_get8(u, 0xFF07 /*TAC*/) & 0x4;
+    return m_get8(u, TAC) & 0x4;
 }
 
-/***************************************************************/
-/* $FF04 Name - DIV                                            */
-/*                                                             */
-/* This register is incremented 16384(~16779 on SGB)times a    */
-/* second. Writing any value sets it to $00.  Here we are also */
-/* maintaining a counter `div_counter` for this task. At each  */
-/* iteration we increase this counter by the number of cycles  */
-/* ran. When this counter overflows we increment the div       */
-/* register. This way, we have approximately 60 fps.           */
-/***************************************************************/
-uint8_t div_counter = 0;
+/*******************************************************************/
+/* $FF05 TIMA - Timer counter                                      */
+/*                                                                 */
+/* This timer is incremented by a clock frequency specified by the */
+/* TAC register ($FF07). The timer generates an interrupt when it  */
+/* overflows.                                                      */
+/*******************************************************************/
+#define TIMA 0xFF05
 
-static void update_div_register(CPU *u)
+/******************************************************/
+/* $FF06 TMA - Timer Modulo                           */
+/*                                                    */
+/* When the TIMA overflows, this data will be loaded. */
+/******************************************************/
+#define TMA 0xFF06
+int timer_counter = (int)(CLOCK_SPEED / DEFAULT_FREQ);
+
+static void update_timer_counter(CPU *u, int cycles)
 {
-    div_counter++;
-    if (div_counter >= 0xff)
+    timer_counter -= cycles;
+
+    if (timer_counter <= 0)
     {
-        div_counter = 0;
-        u->mem.content[0xFF04]++;
+        timer_counter = get_freq(u);
+
+        if (m_get8(u, TIMA) == 0xff) /* overflows */
+        {
+            m_set8(u, TIMA, m_get8(u, TMA));
+            request_interupt(u, 2);
+        }
+        else
+        {
+            m_set8(u, TIMA, m_get8(u, TIMA) + 1);
+        }
+    }
+}
+
+static void update_timers(CPU *u, int cycles)
+{
+    update_div_register(u, cycles);
+    if (check_timer(u))
+    {
+        update_timer_counter(u, cycles);
     }
 }
 
@@ -1422,8 +1566,10 @@ static void update(CPU *u)
     while (delta_cycles < MAX_CYCLES_PER_SECOND)
     {
         execute_opcode(u, m_read8(u));
-        /* update_timers(u->cycles); */
         delta_cycles = u->cycles - initial_cycles;
+
+        update_timers(u, delta_cycles);
+        execute_interupts(u);
     }
 }
 

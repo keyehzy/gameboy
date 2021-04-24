@@ -43,6 +43,7 @@ typedef struct
 {
     GameInfo info;
     int cycles;
+    uint8_t interrupts;
 
     Memory mem;
     struct

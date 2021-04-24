@@ -5,6 +5,7 @@
 
 #define CLOCK_SPEED 4194304
 #define UPDATES_PER_SECOND 60
+#define DEFAULT_FREQ 4096
 #define MAX_CYCLES_PER_SECOND (int)(CLOCK_SPEED / UPDATES_PER_SECOND)
 
 #define CASE_CB_RLC                                                            \

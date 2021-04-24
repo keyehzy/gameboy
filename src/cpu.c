@@ -4,22 +4,9 @@
 #include <string.h>
 
 /* memory specific */
-void MEMORY_CONTROL(uint16_t n)
+void MEMORY_CONTROL(CPU *u, uint16_t n, uint8_t val)
 {
-    if (n < 0x800)
-    {
-        puts("Writing to readonly memory.");
-        exit(1);
-    }
-    if ((n >= 0xFEA0) && (n < 0xFEFF))
-    {
-        puts("Writing to non-usable part of memory.");
-        exit(1);
-    }
-}
-
-void ECHO_RAM(CPU *u, uint16_t n, uint8_t val)
-{
+    /* ECHO RAM */
     if ((n >= 0xc000) && (n < 0xde00))
     {
         u->mem.content[n + 0x2000] = val;
@@ -27,6 +14,20 @@ void ECHO_RAM(CPU *u, uint16_t n, uint8_t val)
     else if ((n >= 0xe000) && (n < 0xfe00))
     {
         u->mem.content[n - 0x2000] = val;
+    }
+
+    /* READONLY SECTION */
+    if (n < 0x800)
+    {
+        puts("Writing to readonly memory.");
+        exit(1);
+    }
+
+    /* NON-USABLE */
+    if ((n >= 0xFEA0) && (n < 0xFEFF))
+    {
+        puts("Writing to non-usable part of memory.");
+        exit(1);
     }
 }
 
@@ -41,8 +42,7 @@ uint8_t m_get8(CPU *u, uint16_t n)
 
 void m_set8(CPU *u, uint16_t n, uint8_t val)
 {
-    MEMORY_CONTROL(n);
-    ECHO_RAM(u, n, val);
+    MEMORY_CONTROL(u, n, val);
     u->mem.content[n] = val;
 }
 
