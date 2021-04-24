@@ -145,6 +145,14 @@ static void DEC_8(CPU *u, uint8_t *dst)
     u->reg.FH = (res & 0xF) == 0xF;
 }
 
+static void SWAP_8(uint8_t *dst)
+{
+    uint8_t lower = (*dst) & 0x1;
+    uint8_t upper = (*dst) & 0x10;
+
+    *dst = upper + (lower << 4);
+}
+
 int execute_opcode(CPU *u, uint8_t op)
 {
     if (u->mem.ptr >= 0x8000)
@@ -1094,8 +1102,40 @@ int execute_opcode(CPU *u, uint8_t op)
             break;
         CASE_CB_SRA:
             break;
-        CASE_CB_SWAP:
+
+        case 0x37:
+            SWAP_8(&u->reg.A);
+            cycles(8);
             break;
+        case 0x30:
+            SWAP_8(&u->reg.B);
+            cycles(8);
+            break;
+        case 0x31:
+            SWAP_8(&u->reg.C);
+            cycles(8);
+            break;
+        case 0x32:
+            SWAP_8(&u->reg.D);
+            cycles(8);
+            break;
+        case 0x33:
+            SWAP_8(&u->reg.E);
+            cycles(8);
+            break;
+        case 0x34:
+            SWAP_8(&u->reg.H);
+            cycles(8);
+            break;
+        case 0x35:
+            SWAP_8(&u->reg.L);
+            cycles(8);
+            break;
+        case 0x36:
+            SWAP_8(&u->mem.content[u->reg.HL]);
+            cycles(16);
+            break;
+
         CASE_CB_SRL:
             break;
         CASE_CB_BIT:
