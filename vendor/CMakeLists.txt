@@ -8,3 +8,5 @@ set(gtest_build_tests FALSE CACHE INTERNAL "")
 set(gtest_force_shared_crt TRUE CACHE INTERNAL "")
 
 add_subdirectory(googletest)
+
+add_subdirectory(SDL)

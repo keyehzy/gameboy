@@ -15,22 +15,24 @@ Debugger Dbg = {.breakpoint = 0xFFFF};
 static int step_func(CPU *u, char *);
 static int continue_func(CPU *u, char *);
 static int breakpoint_func(CPU *u, char *addr);
+static int addr_func(CPU *u, char *addr);
 static int help_func(CPU *u, char *);
 
 CMD commands[] = {{"s", step_func, "Step to next instruction.\n"},
                   {"c", continue_func, "Continue to next breakpoint.\n"},
                   {"b", breakpoint_func, "Mark address with breakpoint.\n"},
+                  {"addr", addr_func, "Return value in memory of address.\n"},
                   {"help", help_func, "This text.\n"},
                   {"?", help_func, "Same as `help`.\n"}};
 
 static int print_status(CPU *u, uint8_t op)
 {
     printf("ADDRESS\tOPCODE\tBYTES\tAF\tBC\tDE\tHL\tSP\tZNHC\tCYCLE\n");
-    printf("$%04x\t$%02x\t$%02x "
-           "$%02x\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t%d%d%d%d\t%d\n",
-           u->mem.ptr, op, m_get8(u, u->mem.ptr), m_get8(u, u->mem.ptr + 1),
-           u->reg.AF, u->reg.BC, u->reg.DE, u->reg.HL, u->st->ptr, u->reg.FZ,
-           u->reg.FN, u->reg.FH, u->reg.FC, u->cycle);
+    printf("$%04x\t$%02x\t$%04x "
+           "\t$%04x\t$%04x\t$%04x\t$%04x\t$%04x\t%d%d%d%d\t%d\n",
+           u->mem.ptr, op, m_get16(u, u->mem.ptr + 1), u->reg.AF, u->reg.BC,
+           u->reg.DE, u->reg.HL, u->reg.SP, u->reg.FZ, u->reg.FN, u->reg.FH,
+           u->reg.FC, u->cycles);
 
     return 0;
 }
@@ -46,14 +48,12 @@ static int step_func(CPU *u, char *addr)
 static int continue_func(CPU *u, char *addr)
 {
     uint8_t next_opcode;
-    while (u->mem.ptr != Dbg.breakpoint)
+    do
     {
         next_opcode = m_read8(u);
         execute_opcode(u, next_opcode);
-    }
-
-    print_status(u, next_opcode);
-
+    } while (u->mem.ptr != Dbg.breakpoint);
+    print_status(u, m_peek8(u));
     return 0;
 }
 
@@ -62,6 +62,13 @@ static int breakpoint_func(CPU *u, char *addr)
     uint16_t hex_addr = (uint16_t)strtol(addr, NULL, 16);
     Dbg.breakpoint = hex_addr;
     printf("Address $%04x marked with a breakpoint.\n", hex_addr);
+    return 0;
+}
+
+static int addr_func(CPU *u, char *addr)
+{
+    uint16_t hex_addr = (uint16_t)strtol(addr, NULL, 16);
+    printf("$%04x: $%02x\n", hex_addr, m_get8(u, hex_addr));
     return 0;
 }
 

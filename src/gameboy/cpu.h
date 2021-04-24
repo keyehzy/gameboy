@@ -6,11 +6,6 @@
 #define N_FLAG 0x40
 #define H_FLAG 0x20
 #define C_FLAG 0x10
-
-#define CLOCK_SPEED 4194304
-#define UPDATES_PER_SECOND 60
-#define MAX_CYCLES_PER_SECOND (int)(CLOCK_SPEED / UPDATES_PER_SECOND)
-
 typedef struct
 {
     uint8_t title[16];
@@ -23,12 +18,6 @@ typedef struct
     uint8_t license[3];
 
 } GameInfo;
-
-typedef struct
-{
-    uint16_t ptr;
-    uint8_t content[0x10000];
-} Stack;
 
 typedef struct
 {
@@ -53,10 +42,9 @@ typedef struct
 typedef struct
 {
     GameInfo info;
-    int cycle;
+    int cycles;
 
     Memory mem;
-    Stack *st;
     struct
     {
         union
@@ -139,8 +127,6 @@ void m_set16(CPU *u, uint16_t n, uint16_t val);
 
 void s_push8(CPU *u, uint8_t n);
 uint8_t s_pop8(CPU *u);
-uint8_t s_peek8(CPU *u, uint16_t n);
 void s_push16(CPU *u, uint16_t n);
 uint16_t s_pop16(CPU *u);
-uint16_t s_peek16(CPU *u, uint16_t n);
 #endif

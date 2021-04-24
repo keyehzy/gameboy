@@ -12,6 +12,7 @@ add_library(
   disassembler.c
   emulator.c
   debugger.c
+  screen.c
 )
 target_include_directories(gameboy-lib PUBLIC .)
-target_link_libraries(gameboy-lib readline)
+target_link_libraries(gameboy-lib readline SDL2::SDL2)

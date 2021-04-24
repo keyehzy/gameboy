@@ -4,7 +4,7 @@ add_executable(
   gameboy-test
   test-simple.cpp
 )
-target_include_directories(gameboy-test PRIVATE include)
+target_include_directories(gameboy-test PRIVATE .)
 target_link_libraries(
   gameboy-test
   PRIVATE

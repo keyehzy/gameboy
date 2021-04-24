@@ -2,6 +2,7 @@
 #include <gameboy/debugger.h>
 #include <gameboy/disassembler.h>
 #include <gameboy/emulator.h>
+#include <gameboy/screen.h>
 
 #include <getopt.h>
 #include <stdio.h>
@@ -31,11 +32,12 @@ int main(int argc, char **argv)
             {"debug", required_argument, 0, 'D'},
             {"emulate", required_argument, 0, 'e'},
             {"disassemble", required_argument, 0, 'd'},
+            {"screen", no_argument, 0, 'S'},
             {0, 0, 0, 0}};
 
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:e:D:h", long_options, &option_index);
+        c = getopt_long(argc, argv, "d:e:D:Sh", long_options, &option_index);
 
         if (c == -1)
         {
@@ -63,6 +65,10 @@ int main(int argc, char **argv)
             boot_cpu(&u);
             load_rom(&u, optarg, info_flag);
             debugger(&u);
+            break;
+        case 'S':
+            init_screen();
+            update_screen();
             break;
 
         case '?':
