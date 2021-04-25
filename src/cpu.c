@@ -1,11 +1,37 @@
 #include <gameboy/cpu.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* DMA */
+void dma_transfer(CPU *u, uint8_t byte)
+{
+    uint16_t addr = byte << 8;
+    for (int i = 0; i < 0xA0; i++)
+    {
+        m_set16(u, 0xFE00 + i, m_get8(u, addr + i));
+    }
+}
+
 /* memory specific */
 void MEMORY_CONTROL(CPU *u, uint16_t n, uint8_t val)
 {
+    if (n == 0xFF46) /* see manual pg 55-56 */
+    {
+        dma_transfer(u, val);
+    }
+
+    if (n == 0xFF04) /* see manual pg. 38 */
+    {
+        u->mem.content[n] = 0x00;
+    }
+
+    if (n == 0xFF44) /* see manual pg. 55 */
+    {
+        u->mem.content[0xFF44] = 0x00;
+    }
+
     /* ECHO RAM */
     if ((n >= 0xc000) && (n < 0xde00))
     {
@@ -49,6 +75,11 @@ void m_set8(CPU *u, uint16_t n, uint8_t val)
 uint8_t m_read8(CPU *u)
 {
     return u->mem.content[u->mem.ptr++];
+}
+
+uint8_t *m_ptr8(CPU *u, uint16_t n)
+{
+    return &u->mem.content[n];
 }
 
 uint16_t m_peek16(CPU *u)

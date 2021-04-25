@@ -115,8 +115,8 @@ static void OR_8(CPU *u, uint8_t *dst, uint8_t src)
 
 static void CP_8(CPU *u, uint8_t *dst, uint8_t src)
 {
-    uint16_t res = (uint16_t)(*dst - src);
-    uint16_t wrap = (uint16_t)((*dst & 0xF) - (src & 0xF));
+    uint16_t res = (uint16_t)((*dst) - src);
+    uint16_t wrap = (uint16_t)(((*dst) & 0xF) - (src & 0xF));
     cycles(4);
 
     u->reg.FZ = res == 0;
@@ -931,7 +931,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
     case 0xFE:
         CP_8(u, &u->reg.A, m_read8(u));
-        cycles(4);
+        cycles(4); /* FIX CYCLES */
         break;
 
     case 0x3C: /* INC n */
@@ -956,7 +956,7 @@ int execute_opcode(CPU *u, uint8_t op)
         INC_8(u, &u->reg.L);
         break;
     case 0x34:
-        INC_8(u, &u->mem.content[u->reg.HL]);
+        INC_8(u, m_ptr8(u, u->reg.HL));
         cycles(12);
         break;
 
@@ -982,7 +982,7 @@ int execute_opcode(CPU *u, uint8_t op)
         DEC_8(u, &u->reg.L);
         break;
     case 0x35:
-        DEC_8(u, &u->mem.content[u->reg.HL]);
+        DEC_8(u, m_ptr8(u, u->reg.HL));
         cycles(12);
         break;
 
@@ -1147,7 +1147,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x06:
-            RLC(u, &u->mem.content[u->reg.HL]);
+            RLC(u, m_ptr8(u, u->reg.HL));
             cycles(16);
             break;
 
@@ -1180,7 +1180,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x0E:
-            RRC(u, &u->mem.content[u->reg.A]);
+            RRC(u, m_ptr8(u, u->reg.A));
             cycles(16);
             break;
 
@@ -1213,7 +1213,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x16:
-            RL(u, &u->mem.content[u->reg.A]);
+            RL(u, m_ptr8(u, u->reg.A));
             cycles(16);
             break;
 
@@ -1246,7 +1246,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x1E:
-            RR(u, &u->mem.content[u->reg.A]);
+            RR(u, m_ptr8(u, u->reg.A));
             cycles(16);
             break;
 
@@ -1279,7 +1279,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x26:
-            SLA(u, &u->mem.content[u->reg.HL]);
+            SLA(u, m_ptr8(u, u->reg.HL));
             cycles(16);
             break;
 
@@ -1312,7 +1312,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x2E:
-            SRA(u, &u->mem.content[u->reg.HL]);
+            SRA(u, m_ptr8(u, u->reg.HL));
             cycles(16);
             break;
 
@@ -1345,7 +1345,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x36:
-            SWAP_8(&u->mem.content[u->reg.HL]);
+            SWAP_8(m_ptr8(u, u->reg.HL));
             cycles(16);
             break;
 
@@ -1378,7 +1378,7 @@ int execute_opcode(CPU *u, uint8_t op)
             cycles(8);
             break;
         case 0x3E:
-            SRL(u, &u->mem.content[u->reg.HL]);
+            SRL(u, m_ptr8(u, u->reg.HL));
             cycles(16);
             break;
 
@@ -2235,7 +2235,7 @@ int execute_opcode(CPU *u, uint8_t op)
 
     case 0x20: /* JR cc,n */
     {
-        uint8_t next8 = cast_signed8(m_read8(u));
+        uint16_t next8 = cast_signed8(m_read8(u));
         if (!(u->reg.F & Z_FLAG))
         {
             u->mem.ptr += next8;
@@ -2245,7 +2245,7 @@ int execute_opcode(CPU *u, uint8_t op)
     }
     case 0x28: /* JR Z,d8 */
     {
-        uint8_t next8 = cast_signed8(m_read8(u));
+        uint16_t next8 = cast_signed8(m_read8(u));
         if (u->reg.F & Z_FLAG)
         {
             u->mem.ptr += next8;
@@ -2255,7 +2255,7 @@ int execute_opcode(CPU *u, uint8_t op)
     }
     case 0x30: /* JR NZ (C),a8 */
     {
-        uint8_t next8 = cast_signed8(m_read8(u));
+        uint16_t next8 = cast_signed8(m_read8(u));
         if (!(u->reg.F & C_FLAG))
         {
             u->mem.ptr += next8;
@@ -2266,7 +2266,7 @@ int execute_opcode(CPU *u, uint8_t op)
 
     case 0x38: /* JR C,d8 */
     {
-        uint8_t next8 = cast_signed8(m_read8(u));
+        uint16_t next8 = cast_signed8(m_read8(u));
         if (u->reg.F & C_FLAG)
         {
             u->mem.ptr += next8;
@@ -2470,7 +2470,7 @@ static void handle_interupt(CPU *u, int kind)
     }
 }
 
-static void execute_interupts(CPU *u)
+void execute_interupts(CPU *u)
 {
     if (u->interrupts)
     {
@@ -2486,6 +2486,194 @@ static void execute_interupts(CPU *u)
                     handle_interupt(u, i);
                 }
             }
+        }
+    }
+}
+/*********************************************************/
+/* $FF40  LCDC  (value $91 at reset) - LCD Control (R/W) */
+/*                                                       */
+/*         Bit 7 - LCD Control Operation                 */
+/*             0: Stop completely (no picture on screen) */
+/*             1: operation                              */
+/*         Bit 6 - Window Tile Map Display Select        */
+/*             0: $9800-$9BFF                            */
+/*             1: $9C00-$9FFF                            */
+/*         Bit 5 - Window Display                        */
+/*             0: off                                    */
+/*             1: on                                     */
+/*         Bit 4 - BG & Window Tile Data Select          */
+/*             0: $8800-$97FF                            */
+/*             1: $8000-$8FFF <- Same area as OBJ        */
+/*         Bit 3 - BG Tile Map Display Select            */
+/*             0: $9800-$9BFF                            */
+/*             1: $9C00-$9FFF                            */
+/*         Bit 2 - OBJ (Sprite) Size                     */
+/*             0: 8*8                                    */
+/*             1: 8*16 (width*height)                    */
+/*         Bit 1 - OBJ (Sprite) Display                  */
+/*             0: off                                    */
+/*             1: on                                     */
+/*         Bit 0 - BG & Window Display                   */
+/*             0: off                                    */
+/*             1: on                                     */
+/*********************************************************/
+#define LCDC 0xFF40
+
+static uint8_t check_lcd(CPU *u)
+{
+    return m_get8(u, LCDC) & 0x80;
+}
+
+/**************************************************************************/
+/* $FF41  STAT - LCDC Status                                              */
+/*         Bits 6-3 - Interrupt Selection                                 */
+/*             Bit 6 - LYC=LY Coincidence (Selectable)                    */
+/*             Bit 5 - Mode 10                                            */
+/*             Bit 4 - Mode 01                                            */
+/*             Bit 3 - Mode 00                                            */
+/*                 0: Non Selection                                       */
+/*                 1: Selection                                           */
+/*         Bit 2 - Coincidence Flag                                       */
+/*             0: LYC not equal to LCDC LY                                */
+/*             1: LYC = LCDC LY                                           */
+/*         Bit 1-0 - Mode Flag                                            */
+/*             00: During H-Blank                                         */
+/*             01: During V-Blank                                         */
+/*             10: During Searching OAM-RAM                               */
+/*             11: During Transfering Data to LCD Driver                  */
+/*                                                                        */
+/*         It takes a total of 456 CPU cycles to write one scanline       */
+/*         from which:                                                    */
+/*                 80 CPU cycles during `Searching OAM-RAM`               */
+/*                 172 CPU cycles during `Transfering Data to LCD Driver` */
+/*                 204 CPU cycles during `H-Blank`                        */
+/**************************************************************************/
+#define STAT 0xFF41
+
+/**********************************************************************************/
+/* $FF44 LY - LCDC Y-Coordinate */
+/*                                                                                */
+/* The LY indicates the vertical line to which the present data is transferred
+ * to */
+/* the LCD Driver. The LY can take on any value between 0 through 153. The
+ * values */
+/* between 144 and 153 indicate the V-Blank period. Writing will reset the */
+/* counter. It takes 456 CPU clock cycles to draw on scanline and move to the */
+/* next. */
+/**********************************************************************************/
+#define LY 0xFF44
+int scanline_counter = 456;
+
+/*******************************************************************/
+/* $FF45 (LYC) LYC - LY Compare                                    */
+/*                                                                 */
+/* The LYC compares itself with the LY. If the values are the same */
+/* it causes the STAT to set the coincident flag.                  */
+/*******************************************************************/
+#define LYC 0xFF45
+
+static void set_lcd_status(CPU *u)
+{
+    uint8_t *status = m_ptr8(u, STAT);
+    if (check_lcd(u) == 0)
+    {
+        scanline_counter = 456; /* Reset scanline */
+        u->mem.content[LY] = 0;
+        *status =
+            ((*status) & 0xfc) | 0x1; /* set bits 0-1 to 01, i.e V-Blank */
+        return;
+    }
+
+    uint8_t line = m_get8(u, LY);
+    uint8_t mode = m_get8(u, STAT) & 0x3;
+
+    uint8_t new_mode = 0;
+    uint8_t check_new_mode = 0;
+
+    if (line >= 144 && line <= 153) /* V-blank, see pg. 55 item 36 */
+    {
+        new_mode = 0x01;
+        *status = ((*status) & 0xfc) | 0x1; /* set bit 0-1 to 01 */
+        check_new_mode = (*status) & 0x10;  /* check bit 4 */
+    }
+    else
+    {
+        /* Here we need to check where in cycle we are: */
+        /* LY = 456-375 --- Mode 2 - `Searching OAM-RAM` */
+        /*      374-202 --- Mode 3 - `Transfering Data to LCD Driver` */
+        /*      201-0   --- Mode 1 -  `H-Blank` */
+
+        if (scanline_counter >= 375 && scanline_counter <= 456)
+        {
+            new_mode = 0x10;
+            *status = ((*status) & 0xfc) | 0x2; /* set bit 0-1 to 10 */
+            check_new_mode = (*status) & 0x20;  /* check bit 5 */
+        }
+
+        if (scanline_counter >= 202 && scanline_counter <= 374)
+        {
+            new_mode = 0x11;
+            *status |= 0x3; /* set bit 0-1 to 11 */
+        }
+
+        if (scanline_counter >= 0 && scanline_counter <= 201)
+        {
+            new_mode = 0x00;
+            *status &= ~0x3;                  /* set bit 0-1 to 00 */
+            check_new_mode = (*status) & 0x8; /* check bit 3 */
+        }
+    }
+
+    if (check_new_mode && (new_mode != mode))
+    {
+        request_interupt(u, 1);
+    }
+
+    if (line == m_get8(u, LYC)) /* see pg 55 item 36 */
+    {
+        *status |= 0x4; /* set bit 2 */
+        if (*status & 0x40)
+        {
+            request_interupt(u, 2);
+        }
+    }
+    else
+    {
+        *status &= ~0x4; /* reset bit 2 */
+    }
+}
+
+void update_graphics(CPU *u, int cycles)
+{
+    set_lcd_status(u);
+
+    if (check_lcd(u))
+    {
+        scanline_counter -= cycles;
+    }
+    else
+    {
+        return;
+    }
+
+    if (scanline_counter <= 0)
+    {
+        u->mem.content[LY]++;
+        uint8_t line = m_get8(u, LY);
+
+        scanline_counter = 456;
+
+        if (line == 144)
+        {
+            request_interupt(u, 0);
+        }
+        else if (line > 153)
+        {
+            u->mem.content[LY] = 0;
+        }
+        else if (line < 144)
+        {
+            /* draw_line(); */ /* XXX SDL */
         }
     }
 }
@@ -2596,7 +2784,7 @@ static void update_timer_counter(CPU *u, int cycles)
     }
 }
 
-static void update_timers(CPU *u, int cycles)
+void update_timers(CPU *u, int cycles)
 {
     update_div_register(u, cycles);
     if (check_timer(u))
@@ -2616,6 +2804,7 @@ static void update(CPU *u)
         delta_cycles = u->cycles - initial_cycles;
 
         update_timers(u, delta_cycles);
+        update_graphics(u, delta_cycles);
         execute_interupts(u);
     }
 }

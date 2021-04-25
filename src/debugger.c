@@ -15,13 +15,13 @@ Debugger Dbg = {.breakpoint = 0xFFFF};
 static int step_func(CPU *u, char *);
 static int continue_func(CPU *u, char *);
 static int breakpoint_func(CPU *u, char *addr);
-static int addr_func(CPU *u, char *addr);
+static int print_func(CPU *u, char *addr);
 static int help_func(CPU *u, char *);
 
 CMD commands[] = {{"s", step_func, "Step to next instruction.\n"},
-                  {"c", continue_func, "Continue to next breakpoint.\n"},
+                  {"c", continue_func, "Continue until next breakpoint.\n"},
                   {"b", breakpoint_func, "Mark address with breakpoint.\n"},
-                  {"addr", addr_func, "Return value in memory of address.\n"},
+                  {"p", print_func, "Return value in memory of address.\n"},
                   {"help", help_func, "This text.\n"},
                   {"?", help_func, "Same as `help`.\n"}};
 
@@ -40,8 +40,14 @@ static int print_status(CPU *u, uint8_t op)
 static int step_func(CPU *u, char *addr)
 {
     uint8_t next_opcode = m_read8(u);
+
+    const int initial_cycles = u->cycles;
     execute_opcode(u, next_opcode);
-    print_status(u, next_opcode);
+    update_timers(u, u->cycles - initial_cycles);
+    update_graphics(u, u->cycles - initial_cycles);
+    execute_interupts(u);
+
+    print_status(u, m_peek8(u));
     return 0;
 }
 
@@ -51,7 +57,13 @@ static int continue_func(CPU *u, char *addr)
     do
     {
         next_opcode = m_read8(u);
+
+        const int initial_cycles = u->cycles;
         execute_opcode(u, next_opcode);
+        update_timers(u, u->cycles - initial_cycles);
+        update_graphics(u, u->cycles - initial_cycles);
+        execute_interupts(u);
+
     } while (u->mem.ptr != Dbg.breakpoint);
     print_status(u, m_peek8(u));
     return 0;
@@ -65,7 +77,7 @@ static int breakpoint_func(CPU *u, char *addr)
     return 0;
 }
 
-static int addr_func(CPU *u, char *addr)
+static int print_func(CPU *u, char *addr)
 {
     uint16_t hex_addr = (uint16_t)strtol(addr, NULL, 16);
     printf("$%04x: $%02x\n", hex_addr, m_get8(u, hex_addr));

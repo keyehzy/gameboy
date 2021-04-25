@@ -125,6 +125,7 @@ uint8_t m_get8(CPU *u, uint16_t n);
 uint16_t m_get16(CPU *u, uint16_t n);
 void m_set8(CPU *u, uint16_t n, uint8_t val);
 void m_set16(CPU *u, uint16_t n, uint16_t val);
+uint8_t *m_ptr8(CPU *u, uint16_t n);
 
 void s_push8(CPU *u, uint8_t n);
 uint8_t s_pop8(CPU *u);

@@ -10,6 +10,9 @@
 
 int emulate_rom(CPU *u);
 int execute_opcode(CPU *u, uint8_t op);
+void execute_interupts(CPU *u);
+void update_timers(CPU *u, int cycles);
+void update_graphics(CPU *u, int cycles);
 
 /* Extra registers */
 
