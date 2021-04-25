@@ -12,6 +12,7 @@ add_library(
   disassembler.c
   emulator.c
   debugger.c
+  opcode.c
   screen.c
 )
 target_include_directories(gameboy-lib PUBLIC .)

@@ -50,7 +50,7 @@ void MEMORY_CONTROL(CPU *u, uint16_t n, uint8_t val)
     }
 
     /* NON-USABLE */
-    if ((n >= 0xFEA0) && (n < 0xFEFF))
+    if (((n >= 0xFEA0) && (n < 0xFEFF)))
     {
         puts("Writing to non-usable part of memory.");
         exit(1);
