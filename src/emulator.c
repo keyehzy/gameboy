@@ -183,7 +183,7 @@ static void RR(CPU *u, uint8_t *dst)
     u->reg.FZ = (*dst) == 0;
     u->reg.FN = 0;
     u->reg.FH = 0;
-    u->reg.FC = carry; /* XXX */
+    u->reg.FC = carry;
     cycles(4);
 }
 
@@ -191,7 +191,7 @@ static void SLA(CPU *u, uint8_t *dst)
 {
     uint8_t carry = (*dst) & 0x80;
     (*dst) <<= 1;
-    /* XXX SB of n set to 0 */
+    /* XXX LSB of n set to 0 */
     u->reg.FZ = (*dst) == 0;
     u->reg.FN = 0;
     u->reg.FH = 0;
@@ -594,13 +594,13 @@ int execute_opcode(CPU *u, uint8_t op)
         cycles(8);
         break;
 
-    case 0xE0: /* LDH (a8),A */ /* SIGN XXX */
+    case 0xE0: /* LDH (a8),A */
         m_set8(u, 0xFF00 + m_read8(u), u->reg.A);
         cycles(12);
         break;
 
         /* LDH A,(n) */
-    case 0xF0: /* LDH A,(a8) */ /* SIGN XXX */
+    case 0xF0: /* LDH A,(a8) */
         u->reg.A = m_get8(u, 0xFF00 + m_read8(u));
         cycles(12);
         break;
@@ -631,15 +631,33 @@ int execute_opcode(CPU *u, uint8_t op)
 
         /* LDHL SP,n */
     case 0xF8: /* LD HL,SP+r8 */
-        u->reg.HL = u->reg.SP + cast_signed8(m_read8(u));
+    {
+        uint32_t r8 = cast_signed8(m_read8(u));
+        uint32_t res;
+        uint32_t wrap;
+
+        if (r8 > 0)
+        {
+            res = (uint32_t)(u->reg.SP + r8);
+            wrap = (uint32_t)((u->reg.SP & 0xFFF) + (r8 & 0xFFF));
+        }
+        else
+        {
+            r8 = -r8;
+            res = (uint32_t)(u->reg.SP - r8);
+            wrap = (uint32_t)((u->reg.SP & 0xFFF) - (r8 & 0xFFF));
+        }
+
+        u->reg.HL = (uint16_t)res;
         cycles(12);
 
-        /* set_flags(u, Z, N, H, C); */
-        u->reg.FZ = 1;
+        u->reg.FZ = 0;
         u->reg.FN = 0;
-        u->reg.FH = 1; /* XXX */
-        u->reg.FC = 1; /* XXX */
+        u->reg.FH = wrap > 0x0FF;
+        u->reg.FC = res > 0xFFFF;
+
         break;
+    }
 
         /* LD (nn),SP */
     case 0x08: /* LD (a16),SP */
@@ -1061,15 +1079,32 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0xE8: /* ADD SP,n */
-        u->reg.SP += cast_signed8(m_read8(u));
+    {
+        uint32_t r8 = cast_signed8(m_read8(u));
+        uint32_t res;
+        uint32_t wrap;
+
+        if (r8 > 0)
+        {
+            res = (uint32_t)(u->reg.SP + r8);
+            wrap = (uint32_t)((u->reg.SP & 0xFFF) + (r8 & 0xFFF));
+        }
+        else
+        {
+            r8 = -r8;
+            res = (uint32_t)(u->reg.SP - r8);
+            wrap = (uint32_t)((u->reg.SP & 0xFFF) - (r8 & 0xFFF));
+        }
+
+        u->reg.SP = (uint16_t)res;
         cycles(16);
 
-        /* set_flags(u, Z, N, H, C); */
-        u->reg.FZ = 1;
+        u->reg.FZ = 0;
         u->reg.FN = 0;
-        u->reg.FH = 1; /* XXX */
-        u->reg.FC = 1; /* XXX */
+        u->reg.FH = wrap > 0x0FF;
+        u->reg.FC = res > 0xFFFF;
         break;
+    }
 
     case 0x03: /* INC nn */
         u->reg.BC++;
