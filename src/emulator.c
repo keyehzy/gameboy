@@ -36,9 +36,8 @@ static void ADD_16(CPU *u, uint16_t *dst, uint16_t src)
 
 static void ADC_8(CPU *u, uint8_t *dst, uint8_t src)
 {
-    uint16_t res = (uint16_t)(*dst + src + (u->reg.F & C_FLAG));
-    uint16_t wrap =
-        (uint16_t)((*dst & 0xF) + ((src + (u->reg.F & C_FLAG)) & 0xF));
+    uint16_t res = (uint16_t)(*dst + src + u->reg.FC);
+    uint16_t wrap = (uint16_t)((*dst & 0xF) + ((src + u->reg.FC) & 0xF));
     *dst = (uint8_t)res;
 
     u->reg.FZ = res == 0;
@@ -61,9 +60,8 @@ static void SUB_8(CPU *u, uint8_t *dst, uint8_t src)
 
 static void SBC_8(CPU *u, uint8_t *dst, uint8_t src)
 {
-    uint16_t res = (uint16_t)(*dst - (src + (u->reg.F & C_FLAG)));
-    uint16_t wrap =
-        (uint16_t)((*dst & 0xF) - ((src + (u->reg.F & C_FLAG)) & 0xF));
+    uint16_t res = (uint16_t)(*dst - (src + u->reg.FC));
+    uint16_t wrap = (uint16_t)((*dst & 0xF) - ((src + u->reg.FC) & 0xF));
     *dst = (uint8_t)res;
 
     u->reg.FZ = res == 0;
@@ -2246,7 +2244,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0xC2: /* JP cc,nn */
-        if (!(u->reg.F & Z_FLAG))
+        if (!u->reg.FZ)
         {
             u->mem.ptr = m_read16(u);
             cycles(16);
@@ -2259,7 +2257,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0xCA:
-        if (u->reg.F & Z_FLAG)
+        if (u->reg.FZ)
         {
             u->mem.ptr = m_read16(u);
             cycles(16);
@@ -2271,7 +2269,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xD2:
-        if (!(u->reg.F & C_FLAG))
+        if (!u->reg.FC)
         {
             u->mem.ptr = m_read16(u);
             cycles(16);
@@ -2283,7 +2281,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xDA:
-        if (u->reg.F & Z_FLAG)
+        if (u->reg.FZ)
         {
             u->mem.ptr = m_read16(u);
             cycles(12);
@@ -2306,7 +2304,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0x20: /* JR cc,n */
-        if (!(u->reg.F & Z_FLAG))
+        if (!u->reg.FZ)
         {
             u->mem.ptr += cast_signed8(m_read8(u));
             cycles(12);
@@ -2318,7 +2316,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0x28: /* JR Z,d8 */
-        if (u->reg.F & Z_FLAG)
+        if (u->reg.FZ)
         {
             u->mem.ptr += cast_signed8(m_read8(u));
             cycles(12);
@@ -2330,7 +2328,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0x30: /* JR NZ (C),a8 */
-        if (!(u->reg.F & C_FLAG))
+        if (!u->reg.FC)
         {
             u->mem.ptr += cast_signed8(m_read8(u));
             cycles(12);
@@ -2343,7 +2341,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0x38: /* JR C,d8 */
-        if (u->reg.F & C_FLAG)
+        if (u->reg.FC)
         {
             u->mem.ptr += cast_signed8(m_read8(u));
             cycles(12);
@@ -2362,7 +2360,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0xC4: /* CALL nn, nn */
-        if (!(u->reg.F & Z_FLAG))
+        if (!u->reg.FZ)
         {
             s_push16(u, u->mem.ptr + 1);
             u->mem.ptr = m_read16(u);
@@ -2375,7 +2373,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xCC: /* CALL Z,a16 */
-        if (u->reg.F & Z_FLAG)
+        if (u->reg.FZ)
         {
             s_push16(u, u->mem.ptr + 1);
             u->mem.ptr = m_read16(u);
@@ -2388,7 +2386,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xD4: /* CALL NC,a16 */
-        if (!(u->reg.F & C_FLAG))
+        if (!u->reg.FC)
         {
             s_push16(u, u->mem.ptr + 1);
             u->mem.ptr = m_read8(u);
@@ -2401,7 +2399,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xDC: /* CALL C,a16 */
-        if (u->reg.F & C_FLAG)
+        if (u->reg.FC)
         {
             s_push16(u, u->mem.ptr + 1);
             u->mem.ptr = m_read16(u);
@@ -2461,7 +2459,7 @@ int execute_opcode(CPU *u, uint8_t op)
         break;
 
     case 0xC0: /* RET cc */
-        if (!(u->reg.F & Z_FLAG))
+        if (!u->reg.FZ)
         {
             u->mem.ptr = s_pop16(u);
             cycles(20);
@@ -2472,7 +2470,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xC8:
-        if (u->reg.F & Z_FLAG)
+        if (u->reg.FZ)
         {
             u->mem.ptr = s_pop16(u);
             cycles(20);
@@ -2483,7 +2481,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xD0:
-        if (!(u->reg.F & C_FLAG))
+        if (!u->reg.FC)
         {
             u->mem.ptr = s_pop16(u);
             cycles(20);
@@ -2494,7 +2492,7 @@ int execute_opcode(CPU *u, uint8_t op)
         }
         break;
     case 0xD8:
-        if (u->reg.F & C_FLAG)
+        if (u->reg.FC)
         {
             u->mem.ptr = s_pop16(u);
             cycles(20);
